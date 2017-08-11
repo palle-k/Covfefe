@@ -73,4 +73,8 @@ class ProductionTests: XCTestCase {
 		}
 		XCTAssertTrue(eliminated.contains("A" --> t("x")))
 	}
+	
+	func testNormalization() {
+		Grammar(productions: ["A" --> n("C"), "B" --> n("D")], start: "A")
+	}
 }

@@ -135,7 +135,7 @@ extension Grammar {
 				return production
 			}
 			
-			let filteredProduction = production.generatedNonTerminals.filter {nonTerminalCanProduceNonEmpty[$0]!}
+			let filteredProduction = production.generatedNonTerminals.filter {nonTerminalCanProduceNonEmpty[$0] ?? false}
 			
 			if !filteredProduction.isEmpty {
 				return Production(pattern: production.pattern, production: filteredProduction.map{.nonTerminal($0)})
@@ -179,7 +179,7 @@ extension Grammar {
 			}
 			
 			let newVisited = visited.union([nonTerminal])
-			let reachableProductions = nonTerminalProductions[nonTerminal]!
+			let reachableProductions = nonTerminalProductions[nonTerminal] ?? []
 			return reachableProductions.reduce(newVisited) { partialVisited, production -> Set<NonTerminal> in
 				production.generatedNonTerminals.reduce(partialVisited) { partial, n -> Set<NonTerminal> in
 					mark(nonTerminal: n, visited: partial)
