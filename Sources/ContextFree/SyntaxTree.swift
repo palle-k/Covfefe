@@ -1,6 +1,6 @@
 //
 //  SyntaxTree.swift
-//  Grammar
+//  ContextFree
 //
 //  Created by Palle Klewitz on 07.08.17.
 //

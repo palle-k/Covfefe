@@ -1,6 +1,6 @@
 //
 //  Grammar.swift
-//  Grammar
+//  ContextFree
 //
 //  Created by Palle Klewitz on 07.08.17.
 //  Copyright (c) 2017 Palle Klewitz
@@ -34,19 +34,24 @@ enum SyntaxError: Error {
 public struct Grammar {
 	public let productions: [Production]
 	public let start: NonTerminal
+	private let normalizationNonTerminals: Set<NonTerminal>
 	
 	public init(productions: [Production], start: NonTerminal) {
-		guard productions.allMatch({ production -> Bool in
+		if productions.allMatch({ production -> Bool in
 			production.isInChomskyNormalForm || (production.pattern == start && production.production.isEmpty)
-		}) else {
-			fatalError("""
-			Grammar must be in Chomsky normal form.
-			Every production must be of the form A -> BC or A -> a.
-			The production S -> empty is only allowed for the start non-terminal.
-			""")
+		}) {
+			self.productions = productions
+			self.start = start
+			self.normalizationNonTerminals = []
+		} else {
+			self = Grammar.makeChomskyNormalForm(of: productions, start: start)
 		}
+	}
+	
+	init(productions: [Production], start: NonTerminal, normalizationNonTerminals: Set<NonTerminal>) {
 		self.productions = productions
 		self.start = start
+		self.normalizationNonTerminals = normalizationNonTerminals
 	}
 	
 	public func contains(word: String) -> Bool {
@@ -65,7 +70,6 @@ public struct Grammar {
 				word.hasPrefix(production.generatedTerminals, from: startIndex)
 			}
 			guard let first = matches.first, let firstMatchRange = word.rangeOfPrefix(first.generatedTerminals, from: startIndex) else {
-				print("Unknown sequence. Matches: \(matches), productions: \(finalProductions)")
 				throw SyntaxError.unknownSequence(from: String(word[startIndex...]))
 			}
 			
@@ -91,8 +95,6 @@ public struct Grammar {
 		let nonTerminalProductions = Dictionary(grouping: productions.filter{!$0.isFinal}) { production -> NonTerminalString in
 			NonTerminalString(characters: production.generatedNonTerminals)
 		}
-		
-		print(tokenization)
 		
 		if tokenization.isEmpty {
 			if productions.contains(where: { production -> Bool in
@@ -154,7 +156,7 @@ public struct Grammar {
 				throw SyntaxError.unmatchedPattern(pattern: cykTable[0][0][0])
 			}
 		}
-		return syntaxTree
+		return syntaxTree.explode(normalizationNonTerminals.contains)[0]
 	}
 }
 
@@ -168,7 +170,7 @@ extension Grammar: CustomStringConvertible {
 			let (pattern, productions) = entry
 			
 			let productionString = productions.map { production in
-				production.production.map(\.description).joined()
+				production.production.map(\.description).joined(separator: " ")
 			}.joined(separator: " | ")
 			
 			return "\(pattern.name) --> \(productionString)"

@@ -1,6 +1,6 @@
 //
 //  GrammarTests.swift
-//  GrammarTests
+//  ContextFreeTests
 //
 //  Created by Palle Klewitz on 07.08.17.
 //  Copyright (c) 2017 Palle Klewitz
@@ -265,6 +265,22 @@ class GrammarTests: XCTestCase {
 			.explode{["BinaryOperationStart", "ParenthesisExpressionBegin", "VarNameAssignment", "VarNameAssignmentRest", "VarNameType", "VarTypeBegin"].contains($0)}
 			.first!
 			.compressed()
+	}
+	
+	func testNonNormalizedGrammar() {
+		let expression = "Expr" -->
+			n("Expr") <+> n("BinOp") <+> n("Expr")
+			<|> t("(") <+> n("Expr") <+> t(")")
+			<|> n("UnOp") <+> n("Expr")
+			<|> n("Num")
+			<|> n("Var")
+		
+		let BinOp = "BinOp" --> t("+") <|> t("-") <|> t("*") <|> t("/")
+		let UnOp = "UnOp" --> t("+") <|> t("-")
+		let Num = try! "Num" --> rt("\\b\\d+(\\.\\d+)?\\b")
+		let Var = try! "Var" --> rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
+		
+		let grammar = Grammar(productions: expression + BinOp + UnOp + [Num, Var], start: "Expr")
 	}
 
     static var allTests = [

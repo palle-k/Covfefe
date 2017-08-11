@@ -1,6 +1,6 @@
 //
 //  Productions.swift
-//  Grammar
+//  ContextFree
 //
 //  Created by Palle Klewitz on 07.08.17.
 //  Copyright (c) 2017 Palle Klewitz
@@ -228,7 +228,7 @@ extension Production: Hashable {
 
 extension Production: CustomStringConvertible {
 	public var description: String {
-		return "\(pattern.name) --> \(production.map{$0.description}.joined())"
+		return "\(pattern.name) --> \(production.map{$0.description}.joined(separator: " "))"
 	}
 }
 

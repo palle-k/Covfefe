@@ -1,6 +1,6 @@
 //
 //  Normalization.swift
-//  Grammar
+//  ContextFree
 //
 //  Created by Palle Klewitz on 11.08.17.
 //
@@ -61,16 +61,16 @@ extension Grammar {
 			guard production.generatedNonTerminals.count >= 3 else {
 				return [production]
 			}
-			let newProductions = production.generatedNonTerminals.dropLast(2).enumerated().map { element -> Production in
-				let (offset, nonTerminal) = element
+			let newProductions = production.generatedNonTerminals.dropLast().pairs().enumerated().map { element -> Production in
+				let (offset, (nonTerminal, next)) = element
 				return Production(
-					pattern: NonTerminal(name: "\(production.pattern.name)_\(offset)"),
-					production: [.nonTerminal(nonTerminal), n("\(production.pattern.name)_\(offset + 1)")]
+					pattern: NonTerminal(name: "\(production.pattern.name)_\(nonTerminal.name)\(offset)"),
+					production: [.nonTerminal(nonTerminal), n("\(production.pattern.name)_\(next.name)\(offset + 1)")]
 				)
 			}
 			
 			let lastProduction = Production(
-				pattern: NonTerminal(name: "\(production.pattern.name)_\(production.generatedNonTerminals.count-2)"),
+				pattern: NonTerminal(name: "\(production.pattern.name)_\(production.generatedNonTerminals.dropLast().last!.name)\(production.generatedNonTerminals.count-2)"),
 				production: production.generatedNonTerminals.suffix(2).map{.nonTerminal($0)}
 			)
 			
@@ -151,6 +151,30 @@ extension Grammar {
 		}
 	}
 	
+	static func eliminateUnusedProductions(productions: [Production], start: NonTerminal) -> [Production] {
+		let nonTerminalProductions = Dictionary(grouping: productions, by: {$0.pattern})
+		
+		func mark(nonTerminal: NonTerminal, visited: Set<NonTerminal>) -> Set<NonTerminal> {
+			if visited.contains(nonTerminal) {
+				return visited
+			}
+			
+			let newVisited = visited.union([nonTerminal])
+			let reachableProductions = nonTerminalProductions[nonTerminal]!
+			return reachableProductions.reduce(newVisited) { partialVisited, production -> Set<NonTerminal> in
+				production.generatedNonTerminals.reduce(partialVisited) { partial, n -> Set<NonTerminal> in
+					mark(nonTerminal: n, visited: partial)
+				}
+			}
+		}
+		
+		let reachableNonTerminals = mark(nonTerminal: start, visited: [])
+		
+		return productions.filter { production -> Bool in
+			reachableNonTerminals.contains(production.pattern)
+		}
+	}
+	
 	
 	public static func makeChomskyNormalForm(of productions: [Production], start: NonTerminal) -> Grammar {
 		
@@ -166,6 +190,16 @@ extension Grammar {
 		// Remove chains
 		let nonChainedProductions = eliminateChainProductions(productions: nonEmptyProductions)
 		
-		return Grammar(productions: nonChainedProductions.uniqueElements().collect(Array.init), start: start)
+		// Remove duplicates
+		let uniqueProductions = nonChainedProductions.uniqueElements().collect(Array.init)
+		
+		// Remove unreachable productions
+		let reachableProductions = eliminateUnusedProductions(productions: uniqueProductions, start: start)
+		
+		let initialNonTerminals = productions.flatMap{[$0.pattern] + $0.generatedNonTerminals}.collect(Set.init)
+		let generatedNonTerminals = reachableProductions.flatMap{[$0.pattern] + $0.generatedNonTerminals}.collect(Set.init)
+		let newNonTerminals = generatedNonTerminals.subtracting(initialNonTerminals)
+		
+		return Grammar(productions: reachableProductions, start: start, normalizationNonTerminals: newNonTerminals)
 	}
 }
