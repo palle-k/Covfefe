@@ -27,7 +27,7 @@ import Foundation
 
 enum SyntaxError: Error {
 	case unknownSequence(from: String)
-	case unmatchedPattern(pattern: Tree<NonTerminal, String>, location: Int)
+	case unmatchedPattern(pattern: Tree<NonTerminal, Range<String.Index>>)
 	case emptyWordNotAllowed
 }
 
@@ -53,11 +53,11 @@ public struct Grammar {
 		return (try? generateSyntaxTree(for: word)) != nil
 	}
 	
-	public func generateSyntaxTree(`for` word: String) throws -> Tree<NonTerminal, String> {
+	public func generateSyntaxTree(`for` word: String) throws -> Tree<NonTerminal, Range<String.Index>> {
 		let finalProductions = productions.filter(\.isFinal)
 		
 		// Tokenizes a word based on the production rules
-		func tokenize(word: String, from startIndex: String.Index) throws -> [[Tree<NonTerminal, String>]] {
+		func tokenize(word: String, from startIndex: String.Index) throws -> [[Tree<NonTerminal, Range<String.Index>>]] {
 			if word[startIndex...].isEmpty {
 				return []
 			}
@@ -69,7 +69,7 @@ public struct Grammar {
 				throw SyntaxError.unknownSequence(from: String(word[startIndex...]))
 			}
 			
-			let firstMatchString = String(word[firstMatchRange])
+			//let firstMatchString = String(word[firstMatchRange])
 			
 			//TODO: Do not cut string, just instruct subsequent calls to only search after match range
 			// This would also improve performance
@@ -80,8 +80,8 @@ public struct Grammar {
 //			}()
 			
 			let restTokenization = try tokenize(word: word, from: firstMatchRange.upperBound)
-			let matchTrees = matches.flatMap { production -> Tree<NonTerminal, String>? in
-				Tree(key: production.pattern, children: [Tree(value: firstMatchString)])
+			let matchTrees = matches.flatMap { production -> Tree<NonTerminal, Range<String.Index>>? in
+				Tree(key: production.pattern, children: [Tree(value: firstMatchRange)])
 			}
 			//TODO: Make this method tail recursive
 			return [matchTrees] + restTokenization
@@ -98,7 +98,7 @@ public struct Grammar {
 			if productions.contains(where: { production -> Bool in
 				production.pattern == start && production.generatedTerminals.isEmpty
 			}) {
-				return Tree.node(key: start, children: [Tree.leaf("")])
+				return Tree.node(key: start, children: [Tree.leaf(word.startIndex..<word.endIndex)])
 			} else {
 				throw SyntaxError.emptyWordNotAllowed
 			}
@@ -106,23 +106,23 @@ public struct Grammar {
 		
 		// CYK-Algorithm
 		
-		var cykTable = Array<[[Tree<NonTerminal, String>]]>(repeating: [], count: tokenization.count)
+		var cykTable = Array<[[Tree<NonTerminal, Range<String.Index>>]]>(repeating: [], count: tokenization.count)
 		cykTable[0] = tokenization
 		
 		for row in 1 ..< cykTable.count {
 			let upperBound = cykTable.count - row
 			
-			cykTable[row] = (0..<upperBound).map { column -> [Tree<NonTerminal, String>] in
-				(1...row).flatMap { offset -> [Tree<NonTerminal, String>] in
+			cykTable[row] = (0..<upperBound).map { column -> [Tree<NonTerminal, Range<String.Index>>] in
+				(1...row).flatMap { offset -> [Tree<NonTerminal, Range<String.Index>>] in
 					let ref1Row = row - offset
 					let ref2Col = column + row - offset + 1
 					let ref2Row = offset - 1
 					
-					return crossProduct(cykTable[ref1Row][column], cykTable[ref2Row][ref2Col]).flatMap { nonTerminals -> [Tree<NonTerminal, String>] in
+					return crossProduct(cykTable[ref1Row][column], cykTable[ref2Row][ref2Col]).flatMap { nonTerminals -> [Tree<NonTerminal, Range<String.Index>>] in
 						let (leftNonTerminal, rightNonTerminal) = nonTerminals
 						let combinedString = NonTerminalString(characters: [leftNonTerminal.root!, rightNonTerminal.root!])
 						let possibleProductions = nonTerminalProductions[combinedString, default: []].map(\Production.pattern)
-						return possibleProductions.map { pattern -> Tree<NonTerminal, String> in
+						return possibleProductions.map { pattern -> Tree<NonTerminal, Range<String.Index>> in
 							Tree(key: pattern, children: [leftNonTerminal, rightNonTerminal])
 						}
 					}
@@ -149,9 +149,9 @@ public struct Grammar {
 			}
 			
 			if let firstMember = memberRows[0] {
-				throw SyntaxError.unmatchedPattern(pattern: cykTable[0][firstMember+1][0], location: firstMember+1)
+				throw SyntaxError.unmatchedPattern(pattern: cykTable[0][firstMember+1][0])
 			} else {
-				throw SyntaxError.unmatchedPattern(pattern: cykTable[0][0][0], location: 0)
+				throw SyntaxError.unmatchedPattern(pattern: cykTable[0][0][0])
 			}
 		}
 		return syntaxTree
