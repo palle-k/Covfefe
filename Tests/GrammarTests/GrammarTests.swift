@@ -223,6 +223,21 @@ class GrammarTests: XCTestCase {
 			<|> n("Whitespace") <+> n("CloseParenthesis")
 		
 		
+		let functionCall = "FunctionCall" --> n("FunctionName") <+> n("FunctionArguments")
+		let functionName = "FunctionName" -->
+			n("Whitespace") <+> n("FunctionName")
+			<|> n("FunctionName") <+> n("Whitespace")
+			<|> anyIdentifier
+		
+		let functionArguments = "FunctionArguments" --> n("FunctionArgumentsStart") <+> n("CloseParenthesis")
+		let functionArgumentsStart = "FunctionArgumentsStart" -->
+			n("OpenParenthesis") <+> n("FunctionArgumentList")
+			<|> n("OpenParenthesis") <+> n("ValueExpression")
+		
+		let functionArgumentList = "FunctionArgumentList" -->
+			n("FunctionArgument") <+> n("FunctionArgumentSeparator")
+		
+		
 		let varAssignmentExpressionProductions = valueExpression + [valueExpressionBegin] + openParenthesis + closeParenthesis
 		
 		let grammar = Grammar(productions: [whitespaceProduction, assignmentOperator, binaryOperationStart, colon] + binaryOperator + prefixOperator + varDeclarationProductions + varAssignmentProductions + varAssignmentExpressionProductions, start: "VarDeclaration")

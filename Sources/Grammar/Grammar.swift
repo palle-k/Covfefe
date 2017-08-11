@@ -89,7 +89,7 @@ public struct Grammar {
 		
 		let tokenization = try tokenize(word: word, from: word.startIndex)
 		let nonTerminalProductions = Dictionary(grouping: productions.filter{!$0.isFinal}) { production -> NonTerminalString in
-			NonTerminalString(characters: production.producedNonTerminals)
+			NonTerminalString(characters: production.generatedNonTerminals)
 		}
 		
 		print(tokenization)

@@ -53,7 +53,7 @@ public struct LinearGrammar {
 					return true
 				}
 				let unexplainedSubstring = production.removingGeneratedSubstring(from: word)
-				guard let nonTerminal = production.producedNonTerminals.first else {
+				guard let nonTerminal = production.generatedNonTerminals.first else {
 					return false
 				}
 				return contains(word: unexplainedSubstring, startingAt: nonTerminal)
@@ -72,7 +72,7 @@ public struct LinearGrammar {
 					return production.pattern.name
 				}
 				let unexplainedSubstring = production.removingGeneratedSubstring(from: word)
-				guard let nonTerminal = production.producedNonTerminals.first else {
+				guard let nonTerminal = production.generatedNonTerminals.first else {
 					return nil
 				}
 				guard let substringExplanation = explain(word: unexplainedSubstring, startingAt: nonTerminal) else {

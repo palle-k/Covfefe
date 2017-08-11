@@ -34,6 +34,11 @@ public struct Production {
 		self.production = production.characters
 	}
 	
+	init(pattern: NonTerminal, production: [Symbol]) {
+		self.pattern = pattern
+		self.production = production
+	}
+	
 	public var isLinear: Bool {
 		return self.production.filter { symbol -> Bool in
 			if case .nonTerminal(_) = symbol {
@@ -201,7 +206,7 @@ public struct Production {
 		}
 	}
 	
-	var producedNonTerminals: [NonTerminal] {
+	var generatedNonTerminals: [NonTerminal] {
 		return production.flatMap { symbol -> NonTerminal? in
 			guard case .nonTerminal(let nonTerminal) = symbol else {
 				return nil
