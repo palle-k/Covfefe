@@ -103,7 +103,7 @@ public struct Production {
 		return generatedTerminals.map(\.value).joined()
 	}
 	
-	var generatedTerminals: [Terminal] {
+	public var generatedTerminals: [Terminal] {
 		return production.flatMap{ symbol -> Terminal? in
 			guard case .terminal(let terminal) = symbol  else {
 				return nil

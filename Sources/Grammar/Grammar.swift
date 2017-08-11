@@ -26,7 +26,7 @@
 import Foundation
 
 enum SyntaxError: Error {
-	case unknownSequence(beginningAt: String)
+	case unknownSequence(from: String)
 	case unmatchedPattern(pattern: Tree<NonTerminal, String>, location: Int)
 	case emptyWordNotAllowed
 }
@@ -57,29 +57,29 @@ public struct Grammar {
 		let finalProductions = productions.filter(\.isFinal)
 		
 		// Tokenizes a word based on the production rules
-		func tokenize(word: String) throws -> [[Tree<NonTerminal, String>]] {
-			if word.isEmpty {
+		func tokenize(word: String, from startIndex: String.Index) throws -> [[Tree<NonTerminal, String>]] {
+			if word[startIndex...].isEmpty {
 				return []
 			}
 			let matches = finalProductions.filter { production -> Bool in
-				word.hasPrefix(production.generatedTerminals)
+				word.hasPrefix(production.generatedTerminals, from: startIndex)
 			}
-			guard let first = matches.first,
-				let firstMatchRange = word.rangeOfPrefix(first.generatedTerminals) else {
-				throw SyntaxError.unknownSequence(beginningAt: word)
+			guard let first = matches.first, let firstMatchRange = word.rangeOfPrefix(first.generatedTerminals, from: startIndex) else {
+				print("Unknown sequence. Matches: \(matches), productions: \(finalProductions)")
+				throw SyntaxError.unknownSequence(from: String(word[startIndex...]))
 			}
 			
 			let firstMatchString = String(word[firstMatchRange])
 			
 			//TODO: Do not cut string, just instruct subsequent calls to only search after match range
 			// This would also improve performance
-			let rest = { () -> String in
-				var rest = word
-				rest.removeSubrange(firstMatchRange)
-				return rest
-			}()
+//			let rest = { () -> String in
+//				var rest = word
+//				rest.removeSubrange(firstMatchRange)
+//				return rest
+//			}()
 			
-			let restTokenization = try tokenize(word: rest)
+			let restTokenization = try tokenize(word: word, from: firstMatchRange.upperBound)
 			let matchTrees = matches.flatMap { production -> Tree<NonTerminal, String>? in
 				Tree(key: production.pattern, children: [Tree(value: firstMatchString)])
 			}
@@ -87,10 +87,12 @@ public struct Grammar {
 			return [matchTrees] + restTokenization
 		}
 		
-		let tokenization = try tokenize(word: word)
+		let tokenization = try tokenize(word: word, from: word.startIndex)
 		let nonTerminalProductions = Dictionary(grouping: productions.filter{!$0.isFinal}) { production -> NonTerminalString in
 			NonTerminalString(characters: production.producedNonTerminals)
 		}
+		
+		print(tokenization)
 		
 		if tokenization.isEmpty {
 			if productions.contains(where: { production -> Bool in

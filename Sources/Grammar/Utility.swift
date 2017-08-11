@@ -57,10 +57,15 @@ extension Sequence {
 	}
 }
 
-extension String {
-	func matches(`for` pattern: String) throws -> [Range<String.Index>] {
+public extension String {
+	
+	public func matches(for pattern: String) throws -> [Range<String.Index>] {
+		return try matches(for: pattern, in: self.startIndex ..< self.endIndex)
+	}
+
+	public func matches(for pattern: String, in range: Range<String.Index>) throws -> [Range<String.Index>] {
 		let expression = try NSRegularExpression(pattern: pattern, options: [])
-		let range = NSRange(self.startIndex ..< self.endIndex, in: self)
+		let range = NSRange(range, in: self)
 		
 		let matches = expression.matches(in: self, options: [], range: range)
 		return matches.flatMap { match -> Range<String.Index>? in
@@ -68,51 +73,67 @@ extension String {
 		}
 	}
 	
-	func hasRegularPrefix(_ pattern: String) throws -> Bool {
+	public func hasRegularPrefix(_ pattern: String) throws -> Bool {
+		return try hasRegularPrefix(pattern, from: self.startIndex)
+	}
+	
+	public func hasRegularPrefix(_ pattern: String, from startIndex: String.Index) throws -> Bool {
 		return try matches(for: pattern).contains(where: { range -> Bool in
-			range.lowerBound == self.startIndex
+			range.lowerBound == startIndex
 		})
 	}
 	
-	func rangeOfRegularPrefix(_ pattern: String) throws -> Range<String.Index>? {
-		return try matches(for: pattern).first(where: { range -> Bool in
-			range.lowerBound == self.startIndex
+	public func rangeOfRegularPrefix(_ pattern: String) throws -> Range<String.Index>? {
+		return try rangeOfRegularPrefix(pattern, from: self.startIndex)
+	}
+	
+	public func rangeOfRegularPrefix(_ pattern: String, from startIndex: String.Index) throws -> Range<String.Index>? {
+		return try matches(for: pattern, in: startIndex ..< self.endIndex).first(where: { range -> Bool in
+			range.lowerBound == startIndex
 		})
 	}
 	
-	func hasRegularSuffix(_ pattern: String) throws -> Bool {
+	public func hasRegularSuffix(_ pattern: String) throws -> Bool {
 		return try matches(for: pattern).contains(where: { range -> Bool in
 			range.upperBound == self.endIndex
 		})
 	}
 	
-	func rangeOfRegularSuffix(_ pattern: String) throws -> Range<String.Index>? {
+	public func rangeOfRegularSuffix(_ pattern: String) throws -> Range<String.Index>? {
 		return try matches(for: pattern).first(where: { range -> Bool in
 			range.upperBound == self.endIndex
 		})
 	}
 	
-	func hasPrefix(_ prefix: [Terminal]) -> Bool {
+	public func hasPrefix(_ prefix: [Terminal]) -> Bool {
+		return hasPrefix(prefix, from: self.startIndex)
+	}
+	
+	public func hasPrefix(_ prefix: [Terminal], from startIndex: String.Index) -> Bool {
 		let prefixString = prefix.map(\Terminal.value).joined()
 		
 		if prefix.contains(where: {$0.isRegularExpression}) {
-			return try! self.hasRegularPrefix("^\(prefixString)")
+			return try! self.hasRegularPrefix("\(prefixString)", from: startIndex)
 		} else {
-			return self.hasPrefix(prefixString)
+			return self[startIndex...].hasPrefix(prefixString)
 		}
 	}
 	
-	func rangeOfPrefix(_ prefix: [Terminal]) -> Range<String.Index>? {
+	public func rangeOfPrefix(_ prefix: [Terminal]) -> Range<String.Index>? {
+		return rangeOfPrefix(prefix, from: self.startIndex)
+	}
+	
+	public func rangeOfPrefix(_ prefix: [Terminal], from startIndex: String.Index) -> Range<String.Index>? {
 		let prefixString = prefix.map(\Terminal.value).joined()
 		
 		if prefix.contains(where: {$0.isRegularExpression}) {
-			return try! self.rangeOfRegularPrefix(prefixString)
+			return try! self.rangeOfRegularPrefix(prefixString, from: startIndex)
 		} else {
-			return self.range(of: prefixString)
+			return self.range(of: prefixString, range: startIndex ..< self.endIndex)
 		}
 	}
 	
-	func hasSuffix(_ suffix: [Terminal]) -> Bool {
+	public func hasSuffix(_ suffix: [Terminal]) -> Bool {
 		let suffixString = suffix.map(\Terminal.value).joined()
 		
 		if suffix.contains(where: {$0.isRegularExpression}) {
@@ -122,7 +143,7 @@ extension String {
 		}
 	}
 	
-	func rangeOfSuffix(_ suffix: [Terminal]) -> Range<String.Index>? {
+	public func rangeOfSuffix(_ suffix: [Terminal]) -> Range<String.Index>? {
 		let suffixString = suffix.map(\Terminal.value).joined()
 		
 		if suffix.contains(where: {$0.isRegularExpression}) {
@@ -202,7 +223,7 @@ func crossProduct<S1: Sequence, S2: Sequence>(_ lhs: S1, _ rhs: S2) -> AnySequen
 			state.lhsElement = lhsNewElement
 			return (lhsNewElement, rhsElement)
 		}
-		}.collect(AnySequence.init)
+	}.collect(AnySequence.init)
 }
 
 func unzip<A, B, SequenceType: Sequence>(_ sequence: SequenceType) -> (AnySequence<A>, AnySequence<B>) where SequenceType.Element == (A, B) {
