@@ -113,7 +113,7 @@ public struct Grammar {
 	}
 	
 	public func generateSyntaxTree(`for` word: String) throws -> Tree<NonTerminal, Range<String.Index>> {
-		let finalProductions = productions.filter(\.isFinal)
+		let finalProductions = productions.filter(\.isFinal).filter{!$0.production.isEmpty}
 		
 		// Tokenizes a word based on the production rules
 		let tokenization = try tokenize(word: word, from: word.startIndex, finalProductions: finalProductions)
