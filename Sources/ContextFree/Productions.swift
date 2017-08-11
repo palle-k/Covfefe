@@ -29,14 +29,18 @@ public struct Production {
 	public let pattern: NonTerminal
 	public let production: [Symbol]
 	
+	let nonTerminalChain: [NonTerminal]?
+	
 	public init(pattern: NonTerminal, production: ProductionString) {
 		self.pattern = pattern
 		self.production = production.characters
+		self.nonTerminalChain = nil
 	}
 	
-	init(pattern: NonTerminal, production: [Symbol]) {
+	init(pattern: NonTerminal, production: [Symbol], chain: [NonTerminal]? = nil) {
 		self.pattern = pattern
 		self.production = production
+		self.nonTerminalChain = chain
 	}
 	
 	public var isLinear: Bool {
@@ -229,6 +233,18 @@ extension Production: Hashable {
 extension Production: CustomStringConvertible {
 	public var description: String {
 		return "\(pattern.name) --> \(production.map{$0.description}.joined(separator: " "))"
+	}
+}
+
+extension Production: CustomDebugStringConvertible {
+	public var debugDescription: String {
+		return """
+		production {
+			pattern: \(self.pattern)
+			produces: \(self.production.map(\.description))
+			chain: \(self.nonTerminalChain?.map(\.description).joined(separator: ", ") ?? "empty")
+		}
+		"""
 	}
 }
 

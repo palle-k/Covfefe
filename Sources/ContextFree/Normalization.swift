@@ -130,9 +130,9 @@ extension Grammar {
 	static func eliminateChainProductions(productions: [Production]) -> [Production] {
 		let nonTerminalProductions = Dictionary(grouping: productions, by: {$0.pattern})
 		
-		func findNonChainProduction(from start: Production, visited: Set<NonTerminal>) -> [Production] {
+		func findNonChainProduction(from start: Production, visited: Set<NonTerminal>, path: [NonTerminal]) -> [(Production, [NonTerminal])] {
 			if start.isFinal || start.generatedNonTerminals.count != 1 {
-				return [start]
+				return [(start, path)]
 			} else if visited.contains(start.pattern) {
 				return []
 			}
@@ -140,13 +140,14 @@ extension Grammar {
 			let nonTerminal = start.generatedNonTerminals[0]
 			let reachableProductions = nonTerminalProductions[nonTerminal]!
 			
-			return reachableProductions.flatMap{findNonChainProduction(from: $0, visited: visited.union([start.pattern]))}
+			return reachableProductions.flatMap{findNonChainProduction(from: $0, visited: visited.union([start.pattern]), path: path + [nonTerminal])}
 		}
 		
 		return productions.flatMap { production -> [Production] in
-			let nonChainProductions = findNonChainProduction(from: production, visited: [])
-			return nonChainProductions.map { p -> Production in
-				Production(pattern: production.pattern, production: p.production)
+			let nonChainProductions = findNonChainProduction(from: production, visited: [], path: [])
+			return nonChainProductions.map { element -> Production in
+				let (p, chain) = element
+				return Production(pattern: production.pattern, production: p.production, chain: chain)
 			}
 		}
 	}
