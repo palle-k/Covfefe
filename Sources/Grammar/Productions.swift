@@ -218,7 +218,7 @@ public struct Production {
 
 extension Production: Hashable {
 	public var hashValue: Int {
-		return pattern.hashValue ^ production.map(\Symbol.hashValue).reduce(0, ^)
+		return pattern.hashValue ^ production.map(\.hashValue).reduce(0, ^)
 	}
 	
 	public static func ==(lhs: Production, rhs: Production) -> Bool {

@@ -8,10 +8,9 @@
 import Foundation
 
 extension Grammar {
-	static func makeChomskyNormalForm(of productions: [Production], start: NonTerminal) -> Grammar {
-		
-		// Generate weak Chomsky Normal Form by eliminating all productions generating a pattern of nonTerminals mixed with terminals
-		let nonMixedProductions = productions.flatMap { production -> [Production] in
+	
+	static func eliminateMixedProductions(productions: [Production]) -> [Production] {
+		return productions.flatMap { production -> [Production] in
 			// Determine, if the production is invalid and if not, return early
 			let terminals = production.generatedTerminals
 			let nonTerminals = production.generatedNonTerminals
@@ -55,28 +54,118 @@ extension Grammar {
 			
 			return newProductions + [updatedProduction]
 		}
-		
-		// All productions for a given non terminal pattern
-		let nonTerminalProductions = Dictionary(grouping: nonMixedProductions) { production in
-			production.pattern
-		}
-		
-		// Determine which non terminals can produce an empty string
-		let nonTerminalProducesEmpty = nonTerminalProductions.mapValues { productions -> Bool in
-			productions.contains(where: {$0.production.isEmpty})
-		}
-		let producedNonTerminals = nonTerminalProductions.mapValues { productions -> Set<NonTerminal> in
-			productions.flatMap(\.generatedNonTerminals).collect(Set.init)
-		}
-		
-		let producedBy = Dictionary(
-			uniqueKeysWithValues: producedNonTerminals.keys.map { pattern -> (NonTerminal, Set<NonTerminal>) in
-				(pattern, producedNonTerminals.filter{$0.value.contains(pattern)}.keys.collect(Set.init))
+	}
+	
+	static func decomposeProductions(productions: [Production]) -> [Production] {
+		return productions.flatMap { production -> [Production] in
+			guard production.generatedNonTerminals.count >= 3 else {
+				return [production]
 			}
-		)
+			let newProductions = production.generatedNonTerminals.dropLast(2).enumerated().map { element -> Production in
+				let (offset, nonTerminal) = element
+				return Production(
+					pattern: NonTerminal(name: "\(production.pattern.name)_\(offset)"),
+					production: [.nonTerminal(nonTerminal), n("\(production.pattern.name)_\(offset + 1)")]
+				)
+			}
+			
+			let lastProduction = Production(
+				pattern: NonTerminal(name: "\(production.pattern.name)_\(production.generatedNonTerminals.count-2)"),
+				production: production.generatedNonTerminals.suffix(2).map{.nonTerminal($0)}
+			)
+			
+			let firstProduction = Production(pattern: production.pattern, production: newProductions[0].production)
+			let middleProductions = newProductions.dropFirst().collect(Array.init)
+			return [firstProduction] + middleProductions + [lastProduction]
+		}
+	}
+	
+	static func eliminateEmptyProductions(productions: [Production], start: NonTerminal) -> [Production] {
+		let nonTerminalProductions = Dictionary(grouping: productions, by: {$0.pattern})
+		//let nonTerminalProducesCanProduceNonEmpty = nonTerminalProductions.mapValues{$0.contains{!$0.production.isEmpty}}
 		
+		func canProduceNonEmpty(pattern: NonTerminal, path: Set<NonTerminal>, state: Dictionary<NonTerminal, Bool>) -> Dictionary<NonTerminal, Bool> {
+			if state[pattern]! || path.contains(pattern) {
+				return state
+			}
+			
+			let reachableNonTerminals = nonTerminalProductions[pattern]!.map { $0.generatedNonTerminals.collect(Set.init) }.reduce(Set()) { $0.union($1) }
+			if reachableNonTerminals.contains(where: {state[$0]!}) {
+				var mutableState = state
+				mutableState[pattern] = true
+				return mutableState
+			} else {
+				return reachableNonTerminals.reduce(state) { (partialState, nonTerminal) -> Dictionary<NonTerminal, Bool> in
+					guard !partialState[pattern]! else {
+						return partialState
+					}
+					return canProduceNonEmpty(pattern: nonTerminal, path: path.union([pattern]), state: partialState)
+				}
+			}
+		}
 		
+		let nonTerminalCanProduceNonEmpty = nonTerminalProductions.keys.reduce(
+			nonTerminalProductions.mapValues{$0.contains{!$0.production.isEmpty}}
+		) { partialResult, nonTerminal -> Dictionary<NonTerminal, Bool> in
+			canProduceNonEmpty(pattern: nonTerminal, path: [], state: partialResult)
+		}
 		
-		fatalError("TODO")
+		return productions.flatMap { production -> Production? in
+			if production.production.isEmpty {
+				return production.pattern == start ? production : nil
+			} else if production.isFinal {
+				return production
+			}
+			
+			let filteredProduction = production.generatedNonTerminals.filter {nonTerminalCanProduceNonEmpty[$0]!}
+			
+			if !filteredProduction.isEmpty {
+				return Production(pattern: production.pattern, production: filteredProduction.map{.nonTerminal($0)})
+			} else {
+				return nil
+			}
+		}
+	}
+	
+	static func eliminateChainProductions(productions: [Production]) -> [Production] {
+		let nonTerminalProductions = Dictionary(grouping: productions, by: {$0.pattern})
+		
+		func findNonChainProduction(from start: Production, visited: Set<NonTerminal>) -> [Production] {
+			if start.isFinal || start.generatedNonTerminals.count != 1 {
+				return [start]
+			} else if visited.contains(start.pattern) {
+				return []
+			}
+			
+			let nonTerminal = start.generatedNonTerminals[0]
+			let reachableProductions = nonTerminalProductions[nonTerminal]!
+			
+			return reachableProductions.flatMap{findNonChainProduction(from: $0, visited: visited.union([start.pattern]))}
+		}
+		
+		return productions.flatMap { production -> [Production] in
+			let nonChainProductions = findNonChainProduction(from: production, visited: [])
+			return nonChainProductions.map { p -> Production in
+				Production(pattern: production.pattern, production: p.production)
+			}
+		}
+	}
+	
+	
+	public static func makeChomskyNormalForm(of productions: [Production], start: NonTerminal) -> Grammar {
+		
+		// Generate weak Chomsky Normal Form by eliminating all productions generating a pattern of nonTerminals mixed with terminals
+		let nonMixedProductions = eliminateMixedProductions(productions: productions)
+		
+		// Decompose all productions with three or more nonTerminals
+		let decomposedProductions = decomposeProductions(productions: nonMixedProductions)
+		
+		// Remove empty productions
+		let nonEmptyProductions = eliminateEmptyProductions(productions: decomposedProductions, start: start)
+		
+		// Remove chains
+		let nonChainedProductions = eliminateChainProductions(productions: nonEmptyProductions)
+		
+		return Grammar(productions: nonChainedProductions.uniqueElements().collect(Array.init), start: start)
 	}
 }

@@ -192,6 +192,21 @@ extension Sequence {
 	}
 }
 
+extension Sequence where Element: Hashable {
+	func uniqueElements() -> AnySequence<Element> {
+		return sequence(state: (makeIterator(), [])) { (state: inout (Iterator, Set<Element>)) -> Element? in
+			guard let next = state.0.next() else {
+				return nil
+			}
+			guard !state.1.contains(next) else {
+				return nil
+			}
+			state.1.insert(next)
+			return next
+		}.collect(AnySequence.init)
+	}
+}
+
 func crossProduct<S1: Sequence, S2: Sequence>(_ lhs: S1, _ rhs: S2) -> AnySequence<(S1.Element, S2.Element)> {
 	return sequence(
 		state: (
