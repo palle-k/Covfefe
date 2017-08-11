@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import Grammar
+@testable import ContextFree
 
 class ProductionTests: XCTestCase {
 	
@@ -18,8 +18,8 @@ class ProductionTests: XCTestCase {
 			XCTFail()
 			return
 		}
-		XCTAssertTrue(decomposed.contains("A" --> n("B") <+> n("A_1")))
-		XCTAssertTrue(decomposed.contains("A_1" --> n("C") <+> n("D")))
+		XCTAssertTrue(decomposed.contains("A" --> n("B") <+> n("A_C1")))
+		XCTAssertTrue(decomposed.contains("A_C1" --> n("C") <+> n("D")))
 	}
 	
 	func testChainElimination() {

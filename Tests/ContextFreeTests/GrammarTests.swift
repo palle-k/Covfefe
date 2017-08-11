@@ -24,7 +24,7 @@
 //  SOFTWARE.
 
 import XCTest
-@testable import Grammar
+@testable import ContextFree
 
 class GrammarTests: XCTestCase {
 	
@@ -116,30 +116,6 @@ class GrammarTests: XCTestCase {
 		XCTAssertFalse(grammar.contains(word: "(a+b)(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))"))
 		XCTAssertFalse(grammar.contains(word: "(a+b)*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a)"))
 	}
-	
-//	func testCYKPerformance() {
-//		let S = "S" --> (n("X") <+> n("U")) <|> (n("S") <+> n("V")) <|> (n("Neg") <+> n("S")) <|> SymbolSet.letters <|> (n("VarStart") <+> n("Var"))
-//		let X = "X" --> t("(")
-//		let Y = "Y" --> t(")")
-//		let V = "V" --> n("Op") <+> n("S")
-//		let U = "U" --> n("S") <+> n("Y")
-//		let Op = "Op" --> t("+") <|> t("-") <|> t("*") <|> t("/")
-//		let Neg = "Neg" --> t("-")
-//		let VarStart = "VarStart" --> SymbolSet.letters <|> (n("VarStart") <+> n("Var"))
-//		let Var = "Var" --> SymbolSet.alphanumerics <|> (n("Var") <+> n("Var"))
-//
-//		let grammar = Grammar(productions: S + Op + VarStart + Var + [X, Y, U, V, Neg], start: "S")
-//
-//		measure {
-//			for _ in 0 ..< 100 {
-//				grammar.contains(word: "(-a+b)*-(b+a)/(((b-a)+(a-b)*(a-b))/-(b-a))")
-//				grammar.contains(word: "a+b)*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))")
-//				grammar.contains(word: "()*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))")
-//				grammar.contains(word: "(a+b)(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))")
-//				grammar.contains(word: "(a+b)*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a)")
-//			}
-//		}
-//	}
 	
 	func testProgrammingLanguage() throws {
 		let anyIdentifier = try rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
