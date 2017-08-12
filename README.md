@@ -18,7 +18,7 @@ The following code creates a grammar which can be used to parse arithmetic expre
 
 ```swift
 let expression = try! "Expr" -->
-		n("BinOperation")
+        n("BinOperation")
 	<|> n("Brackets")
 	<|> n("UnOperation")
 	<|> n("Num")
