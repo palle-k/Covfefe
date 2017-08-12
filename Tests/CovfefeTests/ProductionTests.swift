@@ -1,6 +1,6 @@
 //
 //  ProductionTests.swift
-//  ContextFreeTests
+//  CovfefeTests
 //
 //  Created by Palle Klewitz on 11.08.17.
 //  Copyright (c) 2017 Palle Klewitz
@@ -24,7 +24,7 @@
 //  SOFTWARE.
 
 import XCTest
-@testable import ContextFree
+@testable import Covfefe
 
 class ProductionTests: XCTestCase {
 	

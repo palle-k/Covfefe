@@ -1,6 +1,6 @@
 //
 //  Symbols.swift
-//  ContextFree
+//  Covfefe
 //
 //  Created by Palle Klewitz on 07.08.17.
 //  Copyright (c) 2017 Palle Klewitz
@@ -25,7 +25,7 @@
 
 import Foundation
 
-public struct NonTerminal {
+public struct NonTerminal: Codable {
 	public let name: String
 	
 	public init(name: String) {
@@ -57,7 +57,7 @@ extension NonTerminal: Hashable {
 	}
 }
 
-public struct Terminal {
+public struct Terminal: Codable {
 	public let value: String
 	public let isRegularExpression: Bool
 	
@@ -95,9 +95,36 @@ extension Terminal: CustomStringConvertible {
 	}
 }
 
-public enum Symbol {
+public enum Symbol: Codable {
 	case terminal(Terminal)
 	case nonTerminal(NonTerminal)
+	
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		
+		if container.allKeys.contains(CodingKeys.terminal) {
+			self = try .terminal(container.decode(Terminal.self, forKey: CodingKeys.terminal))
+		} else {
+			self = try .nonTerminal(container.decode(NonTerminal.self, forKey: CodingKeys.nonTerminal))
+		}
+	}
+	
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		
+		switch self {
+		case .terminal(let terminal):
+			try container.encode(terminal, forKey: .terminal)
+			
+		case .nonTerminal(let nonTerminal):
+			try container.encode(nonTerminal, forKey: .nonTerminal)
+		}
+	}
+	
+	private enum CodingKeys: String, CodingKey {
+		case terminal
+		case nonTerminal = "non_terminal"
+	}
 }
 
 public func t(_ value: String) -> Symbol {

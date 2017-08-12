@@ -1,6 +1,6 @@
 //
 //  Productions.swift
-//  ContextFree
+//  Covfefe
 //
 //  Created by Palle Klewitz on 07.08.17.
 //  Copyright (c) 2017 Palle Klewitz
@@ -25,11 +25,11 @@
 
 import Foundation
 
-public struct Production {
+public struct Production: Codable {
 	public let pattern: NonTerminal
 	public let production: [Symbol]
 	
-	let nonTerminalChain: [NonTerminal]?
+	public let nonTerminalChain: [NonTerminal]?
 	
 	public init(pattern: NonTerminal, production: ProductionString) {
 		self.pattern = pattern
@@ -37,7 +37,7 @@ public struct Production {
 		self.nonTerminalChain = nil
 	}
 	
-	init(pattern: NonTerminal, production: [Symbol], chain: [NonTerminal]? = nil) {
+	public init(pattern: NonTerminal, production: [Symbol], chain: [NonTerminal]? = nil) {
 		self.pattern = pattern
 		self.production = production
 		self.nonTerminalChain = chain
