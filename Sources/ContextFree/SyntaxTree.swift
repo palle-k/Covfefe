@@ -132,7 +132,7 @@ extension Tree: CustomStringConvertible {
 			switch tree {
 			case .leaf(let leaf):
 				let (id, leafElement) = leaf
-				return "node\(id) [label=\"\(leafElement)\"]"
+				return "node\(id) [label=\"\(leafElement)\" shape=box]"
 				
 			case .node(key: let key, children: let children):
 				let (id, element) = key

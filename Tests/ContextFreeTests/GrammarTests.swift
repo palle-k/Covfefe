@@ -244,19 +244,26 @@ class GrammarTests: XCTestCase {
 	}
 	
 	func testNonNormalizedGrammar() {
-		let expression = "Expr" -->
-			n("Expr") <+> n("BinOp") <+> n("Expr")
-			<|> t("(") <+> n("Expr") <+> t(")")
-			<|> n("UnOp") <+> n("Expr")
+		let expression = try! "Expr" -->
+			n("BinOperation")
+			<|> n("Brackets")
+			<|> n("UnOperation")
 			<|> n("Num")
 			<|> n("Var")
+			<|> n("Whitespace") <+> n("Expr")
+			<|> n("Expr") <+> n("Whitespace")
 		
-		let BinOp = "BinOp" --> t("+") <|> t("-") <|> t("*") <|> t("/")
+		let BracketExpr = "Brackets" --> t("(") <+> n("Expr") <+> t(")")
+		let BinOperation = "BinOperation" --> n("Expr") <+> n("Op") <+> n("Expr")
+		let BinOp = "Op" --> t("+") <|> t("-") <|> t("*") <|> t("/")
+		
+		let UnOperation = "UnOperation" --> n("UnOp") <+> n("Expr")
 		let UnOp = "UnOp" --> t("+") <|> t("-")
 		let Num = try! "Num" --> rt("\\b\\d+(\\.\\d+)?\\b")
 		let Var = try! "Var" --> rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
+		let Whitespace = try! "Whitespace" --> rt("\\s+")
 		
-		let grammar = Grammar(productions: expression + BinOp + UnOp + [Num, Var], start: "Expr")
+		let grammar = Grammar(productions: expression + BinOp + UnOp + [Num, Var, BracketExpr, BinOperation, UnOperation, Whitespace], start: "Expr")
 	}
 
     static var allTests = [
