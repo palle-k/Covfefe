@@ -30,20 +30,17 @@ class GrammarTests: XCTestCase {
 	
     func testLinearGrammar() {
 		let productions = "S" --> (t("(") <+> n("S") <+> t(")")) <|> (t("[") <+> n("S") <+> t("]")) <|> (t("{") <+> n("S") <+> t("}")) <|> [[]]
-		guard let grammar = try? LinearGrammar(productions: productions, start: "S") else {
-			XCTFail()
-			return
-		}
-		
+		let grammar = Grammar(productions: productions, start: "S")
+		let parser = LinearParser(grammar: grammar)
 		for string in ["", "()", "[]", "{}", "(())", "[[]]", "{{}}"] {
-			XCTAssertTrue(grammar.contains(word: string))
-			if !grammar.contains(word: string) {
+			XCTAssertTrue(parser.recognizes(word: string))
+			if !parser.recognizes(word: string) {
 				print("Expected \(string) to be in grammar.")
 			}
 		}
 		
 		for string in ["(()"] {
-			XCTAssertFalse(grammar.contains(word: string))
+			XCTAssertFalse(parser.recognizes(word: string))
 		}
     }
 	
@@ -72,7 +69,7 @@ class GrammarTests: XCTestCase {
 		XCTAssertFalse(parser.recognizes("){}"))
 		
 		do {
-			try print(CYKParser(grammar: grammar).syntaxTree(for: "(){()}").debugDescription)
+			let _ = try CYKParser(grammar: grammar).syntaxTree(for: "(){()}")
 		} catch {
 			XCTFail()
 		}
