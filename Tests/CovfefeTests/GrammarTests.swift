@@ -56,7 +56,7 @@ class GrammarTests: XCTestCase {
 	func testCYKEmpty() {
 		let S = "S" --> [[]]
 		let grammar = Grammar(productions: S, start: "S")
-		XCTAssertTrue(grammar.contains(word: ""))
+		XCTAssertTrue(grammar.contains(""))
 	}
 	
 	func testCYK() {
@@ -71,12 +71,12 @@ class GrammarTests: XCTestCase {
 		
 		let grammar = Grammar(productions: S + [T, U, A, B, C, D], start: "S")
 		
-		XCTAssertTrue(grammar.contains(word: "(){()}"))
-		XCTAssertFalse(grammar.contains(word: "(){"))
-		XCTAssertFalse(grammar.contains(word: "){}"))
+		XCTAssertTrue(grammar.contains("(){()}"))
+		XCTAssertFalse(grammar.contains("(){"))
+		XCTAssertFalse(grammar.contains("){}"))
 		
 		do {
-			try print(grammar.generateSyntaxTree(for: "(){()}").debugDescription)
+			try print(grammar.syntaxTree(for: "(){()}").debugDescription)
 		} catch {
 			XCTFail()
 		}
@@ -92,8 +92,8 @@ class GrammarTests: XCTestCase {
 		
 		let grammar = Grammar(productions: S + T + U + [A, B, C], start: "S")
 		
-		XCTAssertTrue(grammar.contains(word: "ccaab"))
-		XCTAssertTrue(grammar.contains(word: "aabcc"))
+		XCTAssertTrue(grammar.contains("ccaab"))
+		XCTAssertTrue(grammar.contains("aabcc"))
 	}
 	
 	func testCYK3() {
@@ -110,11 +110,11 @@ class GrammarTests: XCTestCase {
 		let grammar = Grammar(productions: S + Op + VarStart + Var + [X, Y, U, V, Neg], start: "S")
 		print(grammar)
 		
-		XCTAssertTrue(grammar.contains(word: "(-a+b)*-(b+a)/(((b-a)+(a-b)*(a-b))/-(b-a))"))
-		XCTAssertFalse(grammar.contains(word: "a+b)*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))"))
-		XCTAssertFalse(grammar.contains(word: "()*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))"))
-		XCTAssertFalse(grammar.contains(word: "(a+b)(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))"))
-		XCTAssertFalse(grammar.contains(word: "(a+b)*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a)"))
+		XCTAssertTrue(grammar.contains("(-a+b)*-(b+a)/(((b-a)+(a-b)*(a-b))/-(b-a))"))
+		XCTAssertFalse(grammar.contains("a+b)*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))"))
+		XCTAssertFalse(grammar.contains("()*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))"))
+		XCTAssertFalse(grammar.contains("(a+b)(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))"))
+		XCTAssertFalse(grammar.contains("(a+b)*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a)"))
 	}
 	
 	func testProgrammingLanguage() throws {
@@ -218,23 +218,23 @@ class GrammarTests: XCTestCase {
 		
 		let grammar = Grammar(productions: [whitespaceProduction, assignmentOperator, binaryOperationStart, colon] + binaryOperator + prefixOperator + varDeclarationProductions + varAssignmentProductions + varAssignmentExpressionProductions, start: "VarDeclaration")
 		
-		XCTAssertTrue(grammar.contains(word: "let hello"))
-		XCTAssertTrue(grammar.contains(word: "var hello"))
-		XCTAssertTrue(grammar.contains(word: "let _hello123"))
-		XCTAssertTrue(grammar.contains(word: "let hello=42"))
-		XCTAssertTrue(grammar.contains(word: "let hello= 42"))
-		XCTAssertTrue(grammar.contains(word: "let hello = 42"))
-		XCTAssertTrue(grammar.contains(word: "let hello = 42.1337"))
+		XCTAssertTrue(grammar.contains("let hello"))
+		XCTAssertTrue(grammar.contains("var hello"))
+		XCTAssertTrue(grammar.contains("let _hello123"))
+		XCTAssertTrue(grammar.contains("let hello=42"))
+		XCTAssertTrue(grammar.contains("let hello= 42"))
+		XCTAssertTrue(grammar.contains("let hello = 42"))
+		XCTAssertTrue(grammar.contains("let hello = 42.1337"))
 		
-		XCTAssertFalse(grammar.contains(word: "let 1hello"))
-		XCTAssertFalse(grammar.contains(word: "bar hello"))
-		XCTAssertFalse(grammar.contains(word: "var hello = "))
-		XCTAssertFalse(grammar.contains(word: "var hello 42"))
-		XCTAssertFalse(grammar.contains(word: "varhello = 42"))
-		XCTAssertFalse(grammar.contains(word: "var hello = 42."))
-		XCTAssertFalse(grammar.contains(word: "var hello = .1337"))
+		XCTAssertFalse(grammar.contains("let 1hello"))
+		XCTAssertFalse(grammar.contains("bar hello"))
+		XCTAssertFalse(grammar.contains("var hello = "))
+		XCTAssertFalse(grammar.contains("var hello 42"))
+		XCTAssertFalse(grammar.contains("varhello = 42"))
+		XCTAssertFalse(grammar.contains("var hello = 42."))
+		XCTAssertFalse(grammar.contains("var hello = .1337"))
 		
-		let tree = try grammar.generateSyntaxTree(for: "let hello = \"World\"")
+		let tree = try grammar.syntaxTree(for: "let hello = \"World\"")
 		let optimizedTree = tree
 			.filter{!["Whitespace", "OpenParenthesis", "CloseParenthesis", "Assignment", "Colon"].contains($0)}!
 			.compressed()

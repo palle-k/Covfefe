@@ -49,11 +49,30 @@ extension Sequence {
 			element[keyPath: keyPath]
 		}
 	}
+	
+	func sorted<SortKey: Comparable>(by keyPath: KeyPath<Element, SortKey>) -> [Element] {
+		return self.sorted(by: { first, second -> Bool in
+			return first[keyPath: keyPath] < second[keyPath: keyPath]
+		})
+	}
 }
 
 extension Sequence {
 	func allMatch(_ predicate: (Element) throws -> Bool) rethrows -> Bool {
 		return try !self.contains(where: {try !predicate($0)})
+	}
+	
+	func unique<Property: Hashable>(by property: @escaping (Element) -> Property) -> AnySequence<Element> {
+		return sequence(state: (makeIterator(), [])) { (state: inout (Iterator, Set<Property>)) -> Element? in
+			while let next = state.0.next() {
+				guard !state.1.contains(property(next)) else {
+					continue
+				}
+				state.1.insert(property(next))
+				return next
+			}
+			return nil
+		}.collect(AnySequence.init)
 	}
 }
 
@@ -194,16 +213,7 @@ extension Sequence {
 
 extension Sequence where Element: Hashable {
 	func uniqueElements() -> AnySequence<Element> {
-		return sequence(state: (makeIterator(), [])) { (state: inout (Iterator, Set<Element>)) -> Element? in
-			guard let next = state.0.next() else {
-				return nil
-			}
-			guard !state.1.contains(next) else {
-				return nil
-			}
-			state.1.insert(next)
-			return next
-		}.collect(AnySequence.init)
+		return unique(by: {$0})
 	}
 }
 
@@ -239,6 +249,28 @@ func crossProduct<S1: Sequence, S2: Sequence>(_ lhs: S1, _ rhs: S2) -> AnySequen
 			return (lhsNewElement, rhsElement)
 		}
 	}.collect(AnySequence.init)
+}
+
+func crossMap<S1: Sequence, S2: Sequence, ElementOfResult>(_ lhs: S1, _ rhs: S2, transform: (S1.Element, S2.Element) throws -> ElementOfResult) rethrows -> [ElementOfResult] {
+	var result: [ElementOfResult] = Array()
+	result.reserveCapacity(lhs.underestimatedCount * rhs.underestimatedCount)
+	for e1 in lhs {
+		for e2 in rhs {
+			try result.append(transform(e1, e2))
+		}
+	}
+	return result
+}
+
+func crossFlatMap<S1: Sequence, S2: Sequence, ElementOfResult>(_ lhs: S1, _ rhs: S2, transform: (S1.Element, S2.Element) throws -> [ElementOfResult]) rethrows -> [ElementOfResult] {
+	var result: [ElementOfResult] = Array()
+	result.reserveCapacity(lhs.underestimatedCount * rhs.underestimatedCount)
+	for e1 in lhs {
+		for e2 in rhs {
+			try result.append(contentsOf: transform(e1, e2))
+		}
+	}
+	return result
 }
 
 func unzip<A, B, SequenceType: Sequence>(_ sequence: SequenceType) -> (AnySequence<A>, AnySequence<B>) where SequenceType.Element == (A, B) {

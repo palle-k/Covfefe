@@ -25,14 +25,14 @@
 
 import Foundation
 
-public enum Tree<Element, LeafElement> {
+public enum SyntaxTree<Element, LeafElement> {
 	case leaf(LeafElement)
-	indirect case node(key: Element, children: [Tree<Element, LeafElement>])
+	indirect case node(key: Element, children: [SyntaxTree<Element, LeafElement>])
 }
 
-public extension Tree {
+public extension SyntaxTree {
 	
-	public func map<Result>(_ transform: (Element) throws -> Result) rethrows -> Tree<Result, LeafElement> {
+	public func map<Result>(_ transform: (Element) throws -> Result) rethrows -> SyntaxTree<Result, LeafElement> {
 		switch self {
 		case .leaf(let leaf):
 			return .leaf(leaf)
@@ -42,7 +42,7 @@ public extension Tree {
 		}
 	}
 	
-	public func mapLeafs<Result>(_ transform: (LeafElement) throws -> Result) rethrows -> Tree<Element, Result> {
+	public func mapLeafs<Result>(_ transform: (LeafElement) throws -> Result) rethrows -> SyntaxTree<Element, Result> {
 		switch self {
 		case .leaf(let leaf):
 			return try .leaf(transform(leaf))
@@ -52,7 +52,7 @@ public extension Tree {
 		}
 	}
 	
-	public func filter(_ predicate: (Element) throws -> Bool) rethrows -> Tree<Element, LeafElement>? {
+	public func filter(_ predicate: (Element) throws -> Bool) rethrows -> SyntaxTree<Element, LeafElement>? {
 		switch self {
 		case .leaf(let element):
 			return .leaf(element)
@@ -65,7 +65,7 @@ public extension Tree {
 		}
 	}
 	
-	public func explode(_ shouldExplode: (Element) throws -> Bool) rethrows -> [Tree<Element, LeafElement>] {
+	public func explode(_ shouldExplode: (Element) throws -> Bool) rethrows -> [SyntaxTree<Element, LeafElement>] {
 		switch self {
 		case .leaf:
 			return [self]
@@ -78,7 +78,7 @@ public extension Tree {
 		}
 	}
 	
-	public func compressed() -> Tree<Element, LeafElement> {
+	public func compressed() -> SyntaxTree<Element, LeafElement> {
 		switch self {
 		case .node(key: _, children: let children) where children.count == 1:
 			let child = children[0]
@@ -97,7 +97,7 @@ public extension Tree {
 	}
 }
 
-extension Tree: CustomDebugStringConvertible {
+extension SyntaxTree: CustomDebugStringConvertible {
 	public var debugDescription: String {
 		switch self {
 		case .leaf(let value):
@@ -114,7 +114,7 @@ extension Tree: CustomDebugStringConvertible {
 	}
 }
 
-extension Tree: CustomStringConvertible {
+extension SyntaxTree: CustomStringConvertible {
 	public var description: String {
 		var id = 0
 		let uniqueKeyTree = self.map { element -> (Int, Element) in
@@ -128,7 +128,7 @@ extension Tree: CustomStringConvertible {
 		}
 		
 		
-		func generateDescription(_ tree: Tree<(Int, Element), (Int, LeafElement)>) -> String {
+		func generateDescription(_ tree: SyntaxTree<(Int, Element), (Int, LeafElement)>) -> String {
 			switch tree {
 			case .leaf(let leaf):
 				let (id, leafElement) = leaf
@@ -159,7 +159,7 @@ extension Tree: CustomStringConvertible {
 			}
 		}
 		
-		func allLeafIDs(_ tree: Tree<(Int, Element), (Int, LeafElement)>) -> [Int] {
+		func allLeafIDs(_ tree: SyntaxTree<(Int, Element), (Int, LeafElement)>) -> [Int] {
 			switch tree {
 			case .leaf(let leaf):
 				return [leaf.0]
@@ -173,7 +173,7 @@ extension Tree: CustomStringConvertible {
 		digraph {
 			\(generateDescription(uniqueKeyTree).replacingOccurrences(of: "\n", with: "\n\t"))
 			{
-				rank = same;
+				rank = same
 				\(allLeafIDs(uniqueKeyTree).map(String.init).map{"node\($0)"}.joined(separator: "\n\t\t"))
 			}
 		}
@@ -181,7 +181,7 @@ extension Tree: CustomStringConvertible {
 	}
 }
 
-public func == <Element: Equatable, LeafElement: Equatable>(lhs: Tree<Element, LeafElement>, rhs: Tree<Element, LeafElement>) -> Bool {
+public func == <Element: Equatable, LeafElement: Equatable>(lhs: SyntaxTree<Element, LeafElement>, rhs: SyntaxTree<Element, LeafElement>) -> Bool {
 	switch (lhs, rhs) {
 	case (.leaf, .leaf):
 		return true
@@ -194,8 +194,8 @@ public func == <Element: Equatable, LeafElement: Equatable>(lhs: Tree<Element, L
 	}
 }
 
-public extension Tree {
-	public init(key: Element, children: [Tree<Element, LeafElement>]) {
+public extension SyntaxTree {
+	public init(key: Element, children: [SyntaxTree<Element, LeafElement>]) {
 		self = .node(key: key, children: children)
 	}
 	
@@ -208,13 +208,13 @@ public extension Tree {
 	}
 }
 
-public extension Tree where LeafElement == () {
+public extension SyntaxTree where LeafElement == () {
 	public init() {
 		self = .leaf(())
 	}
 }
 
-public extension Tree {
+public extension SyntaxTree {
 	public var root: Element? {
 		guard case .node(key: let root, children: _) = self else {
 			return nil

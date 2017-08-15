@@ -41,4 +41,25 @@ class StringUtilitiesTest: XCTestCase {
 		XCTAssertFalse(testedString.hasPrefix(["world"], from: testedString.index(testedString.startIndex, offsetBy: 8)))
 	}
 	
+	func testUnique() {
+		let numbers = [1,2,2,1,5,6,7,1,1]
+		let uniqueNumbers = numbers.uniqueElements().collect(Array.init)
+		XCTAssertEqual(uniqueNumbers, [1,2,5,6,7])
+	}
+	
+	func testCrossProduct() {
+		let a = 1...4
+		let b = 5...8
+		let axb = crossProduct(a, b)
+		let axbRef = [(1,5), (1,6), (1,7), (1,8), (2,5), (2,6), (2,7), (2,8), (3,5), (3,6), (3,7), (3,8), (4,5), (4,6), (4,7), (4,8)]
+		XCTAssertTrue(axb.allMatch{el in axbRef.contains(where: {$0 == el})})
+	}
+	
+	func testUnzip() {
+		let aRef = Array(1...10)
+		let bRef = Array(10...19)
+		let (a, b): ([Int], [Int]) = unzip(zip(aRef,bRef))
+		XCTAssertEqual(aRef, a)
+		XCTAssertEqual(bRef, b)
+	}
 }
