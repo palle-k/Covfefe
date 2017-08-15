@@ -51,7 +51,7 @@ extension Grammar {
 			// Generate new patterns which replace the terminals in the existing production
 			let patterns = enumeratedTerminals.map { element -> NonTerminal in
 				let (offset, terminal) = element
-				return (NonTerminal(name: "\(production.pattern.name)_\(terminal.value)_\(offset)"))
+				return NonTerminal(name: "\(production.pattern.name)-\(String(terminal.hashValue % 65526, radix: 16, uppercase: false))-\(offset)")
 			}
 			
 			// Update the existing production by replacing all terminals with the new patterns
@@ -82,13 +82,13 @@ extension Grammar {
 			let newProductions = production.generatedNonTerminals.dropLast().pairs().enumerated().map { element -> Production in
 				let (offset, (nonTerminal, next)) = element
 				return Production(
-					pattern: NonTerminal(name: "\(production.pattern.name)_\(nonTerminal.name)\(offset)"),
-					production: [.nonTerminal(nonTerminal), n("\(production.pattern.name)_\(next.name)\(offset + 1)")]
+					pattern: NonTerminal(name: "\(production.pattern.name)-\(nonTerminal.name)-\(offset)"),
+					production: [.nonTerminal(nonTerminal), n("\(production.pattern.name)-\(next.name)-\(offset + 1)")]
 				)
 			}
 			
 			let lastProduction = Production(
-				pattern: NonTerminal(name: "\(production.pattern.name)_\(production.generatedNonTerminals.dropLast().last!.name)\(production.generatedNonTerminals.count-2)"),
+				pattern: NonTerminal(name: "\(production.pattern.name)-\(production.generatedNonTerminals.dropLast().last!.name)-\(production.generatedNonTerminals.count-2)"),
 				production: production.generatedNonTerminals.suffix(2).map{.nonTerminal($0)}
 			)
 			
@@ -194,26 +194,25 @@ extension Grammar {
 		}
 	}
 	
-	
-	public static func makeChomskyNormalForm(of productions: [Production], start: NonTerminal) -> Grammar {
-		
+	public func chomskyNormalized() -> Grammar {
 		// Generate weak Chomsky Normal Form by eliminating all productions generating a pattern of nonTerminals mixed with terminals
-		let nonMixedProductions = eliminateMixedProductions(productions: productions)
+		let nonMixedProductions = Grammar.eliminateMixedProductions(productions: productions)
 		
 		// Decompose all productions with three or more nonTerminals
-		let decomposedProductions = decomposeProductions(productions: nonMixedProductions)
+		let decomposedProductions = Grammar.decomposeProductions(productions: nonMixedProductions)
 		
 		// Remove empty productions
-		let nonEmptyProductions = eliminateEmptyProductions(productions: decomposedProductions, start: start)
+		let nonEmptyProductions = Grammar.eliminateEmptyProductions(productions: decomposedProductions, start: start)
 		
 		// Remove chains
-		let nonChainedProductions = eliminateChainProductions(productions: nonEmptyProductions)
+		let nonChainedProductions = Grammar.eliminateChainProductions(productions: nonEmptyProductions)
 		
 		// Remove duplicates
 		let uniqueProductions = nonChainedProductions.uniqueElements().collect(Array.init)
 		
 		// Remove unreachable productions
-		let reachableProductions = eliminateUnusedProductions(productions: uniqueProductions, start: start)
+		let reachableProductions = Grammar.eliminateUnusedProductions(productions: uniqueProductions, start: start)
+		//let reachableProductions = uniqueProductions
 		
 		let initialNonTerminals = productions.flatMap{[$0.pattern] + $0.generatedNonTerminals}.collect(Set.init)
 		let generatedNonTerminals = reachableProductions.flatMap{[$0.pattern] + $0.generatedNonTerminals}.collect(Set.init)

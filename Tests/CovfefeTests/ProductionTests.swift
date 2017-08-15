@@ -36,8 +36,8 @@ class ProductionTests: XCTestCase {
 			XCTFail()
 			return
 		}
-		XCTAssertTrue(decomposed.contains("A" --> n("B") <+> n("A_C1")))
-		XCTAssertTrue(decomposed.contains("A_C1" --> n("C") <+> n("D")))
+		XCTAssertTrue(decomposed.contains("A" --> n("B") <+> n("A-C-1")))
+		XCTAssertTrue(decomposed.contains("A-C-1" --> n("C") <+> n("D")))
 	}
 	
 	func testChainElimination() {
