@@ -54,7 +54,6 @@ class ProductionTests: XCTestCase {
 		
 		let pA2 = "A" --> n("A") <|> t("x")
 		let eliminated2 = Grammar.eliminateChainProductions(productions: pA2).uniqueElements().collect(Array.init)
-		print(eliminated2)
 		guard eliminated2.count == 1 else {
 			XCTFail()
 			return

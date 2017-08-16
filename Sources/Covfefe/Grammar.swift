@@ -59,7 +59,10 @@ extension Grammar: CustomStringConvertible {
 			let (pattern, productions) = entry
 			
 			let productionString = productions.map { production in
-				production.production.map { symbol -> String in
+				if production.production.isEmpty {
+					return "\"\""
+				}
+				return production.production.map { symbol -> String in
 					switch symbol {
 					case .nonTerminal(let nonTerminal):
 						return "<\(nonTerminal.name)>"

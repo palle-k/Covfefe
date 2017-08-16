@@ -66,8 +66,10 @@ class SyntaxTreeTests: XCTestCase {
 	
 	func testTreeDescription() throws {
 		let testString = "((-baz-fooBar)/hello)"
-		let tree = try! CYKParser(grammar: expressionGrammar).syntaxTree(for: testString).mapLeafs{String(testString[$0])}
+		let tokenization = try DefaultTokenizer(grammar: expressionGrammar).tokenize(testString)
+		let tree = try CYKParser(grammar: expressionGrammar).syntaxTree(for: tokenization).mapLeafs{String(testString[$0])}
 		let description = tree.description
-		XCTAssertTrue(CYKParser(grammar: dotGrammar).recognizes(description))
+		let descriptionTokenization = try DefaultTokenizer(grammar: dotGrammar).tokenize(description)
+		XCTAssertTrue(CYKParser(grammar: dotGrammar).recognizes(descriptionTokenization))
 	}
 }
