@@ -46,7 +46,10 @@ binary operators always have a left side and a right side operand.
 A syntax tree can be generated, which describes the structure of a given word:
 
  ```swift
- let syntaxTree = try grammar.generateSyntaxTree(for: "(a+b)*(-c)")
+ let tokenizer = DefaultTokenizer(grammar: grammar)
+ let parser = CYKParser(gramar: grammar)
+ 
+ let syntaxTree = try parser.syntaxTree(for: tokenizer.tokenize("(a+b)*(-c)"))
  ```
 
 <img src="example-syntax-tree.png"/>
