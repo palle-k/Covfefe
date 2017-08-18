@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
            Docs
         </a>
-         (21% documented)
+         (59% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -91,12 +91,6 @@
           <li class="nav-group-name">
             <a class="nav-group-name-link" href="../Functions.html">Functions</a>
             <ul class="nav-group-tasks">
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe1poiSaySayAA6SymbolOGGAD_AFtF">+(_:_:)</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe1poiSaySayAA6SymbolOGGAF_ADtF">+(_:_:)</a>
-              </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe3ssgoiAA10ProductionVAA11NonTerminalV_AA0C6StringVtF">--&gt;(_:_:)</a>
               </li>
@@ -172,6 +166,9 @@
             <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Parser.html">Parser</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/Tokenizer.html">Tokenizer</a>
               </li>
             </ul>
@@ -221,7 +218,13 @@
         <section class="section">
           <div class="section-content">
             <h1>Tokenizer</h1>
-            <p>Undocumented</p>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Tokenizer</span></code></pre>
+
+                </div>
+              </div>
+            <p>A string tokenizer which tokenizes a string based on final productions of a context free grammar</p>
 
           </div>
         </section>
@@ -243,8 +246,55 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Tokenizes the given word and returns a sequence of possible tokens for each unit of the string</p>
 
+<p>For a grammar</p>
+<pre class="highlight plaintext"><code>A -&gt; a | A B
+B -&gt; a | B b
+</code></pre>
+
+<p>and a string <q>ab</q></p>
+
+<p>The tokenizer generates the tokenization</p>
+<pre class="highlight plaintext"><code>[[A -&gt; a, B -&gt; a], [B -&gt; b]]
+</code></pre>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    A syntax error if the word could not be tokenized according to rules of the recognized language
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">_</span> <span class="nv">word</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">[[</span><span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/Production.html">Production</a></span><span class="p">,</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;&gt;</span><span class="p">]]</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>word</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Word which should be tokenized</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Tokenization of the word</p>
                       </div>
                     </section>
                   </div>

@@ -25,15 +25,31 @@
 
 import Foundation
 
+/// A syntax error which was generated during parsing or tokenization
 public struct SyntaxError: Error {
+	
+	/// The reason for the syntax error
+	///
+	/// - emptyNotAllowed: An empty string was provided but the grammar does not allow empty productions
+	/// - unknownToken: The tokenization could not be completed because no matching token was found
+	/// - unmatchedPattern: A pattern was found which could not be merged
 	public enum Reason {
 		case emptyNotAllowed
 		case unknownToken
 		case unmatchedPattern
 	}
+	
+	/// Range in which the error occurred
 	public let range: Range<String.Index>
+	
+	/// Reason for the error
 	public let reason: Reason
 	
+	/// Creates a new syntax error with a given range and reason
+	///
+	/// - Parameters:
+	///   - range: String range in which the syntax error occurred
+	///   - reason: Reason why the syntax error occurred
 	public init(range: Range<String.Index>, reason: Reason) {
 		self.range = range
 		self.reason = reason

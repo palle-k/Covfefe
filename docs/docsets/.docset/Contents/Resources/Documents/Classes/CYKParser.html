@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
            Docs
         </a>
-         (21% documented)
+         (59% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -91,12 +91,6 @@
           <li class="nav-group-name">
             <a class="nav-group-name-link" href="../Functions.html">Functions</a>
             <ul class="nav-group-tasks">
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe1poiSaySayAA6SymbolOGGAD_AFtF">+(_:_:)</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe1poiSaySayAA6SymbolOGGAF_ADtF">+(_:_:)</a>
-              </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe3ssgoiAA10ProductionVAA11NonTerminalV_AA0C6StringVtF">--&gt;(_:_:)</a>
               </li>
@@ -172,6 +166,9 @@
             <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Parser.html">Parser</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/Tokenizer.html">Tokenizer</a>
               </li>
             </ul>
@@ -223,7 +220,7 @@
             <h1>CYKParser</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">CYKParser</span></code></pre>
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">CYKParser</span><span class="p">:</span> <span class="kt"><a href="../Protocols/Parser.html">Parser</a></span></code></pre>
 
                 </div>
               </div>
@@ -317,9 +314,9 @@ It requires O(n^3) runtime.</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:7Covfefe9CYKParserC10recognizesSbSaySayAA10SyntaxTreeOyAA10ProductionVs5RangeVySS5IndexVGGGGF"></a>
-                    <a name="//apple_ref/swift/Method/recognizes(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe9CYKParserC10recognizesSbSaySayAA10SyntaxTreeOyAA10ProductionVs5RangeVySS5IndexVGGGGF">recognizes(_:)</a>
+                    <a name="/s:7Covfefe6ParserP10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSaySayAFyAA10ProductionVAMGGG3for_tKF"></a>
+                    <a name="//apple_ref/swift/Method/syntaxTree(for:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:7Covfefe6ParserP10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSaySayAFyAA10ProductionVAMGGG3for_tKF">syntaxTree(for:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -327,14 +324,13 @@ It requires O(n^3) runtime.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Returns true if the recognized language contains the given tokenization.</p>
-
+                        
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">recognizes</span><span class="p">(</span><span class="n">_</span> <span class="nv">tokenization</span><span class="p">:</span> <span class="p">[[</span><span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/Production.html">Production</a></span><span class="p">,</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;&gt;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">syntaxTree</span><span class="p">(</span><span class="k">for</span> <span class="nv">tokenization</span><span class="p">:</span> <span class="p">[[</span><span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/Production.html">Production</a></span><span class="p">,</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;&gt;</span><span class="p">]])</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/NonTerminal.html">NonTerminal</a></span><span class="p">,</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;&gt;</span></code></pre>
 
                         </div>
                       </div>
@@ -350,43 +346,12 @@ It requires O(n^3) runtime.</p>
                               </td>
                               <td>
                                 <div>
-                                  <p>Tokenization of checked word</p>
+                                  
                                 </div>
                               </td>
                             </tr>
                           </tbody>
                         </table>
-                      </div>
-                      <div>
-                        <h4>Return Value</h4>
-                        <p>True, if the word is generated by the grammar, false if not.</p>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:7Covfefe9CYKParserC10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSaySayAFyAA10ProductionVAMGGG3for_Sb5debugtKF"></a>
-                    <a name="//apple_ref/swift/Method/syntaxTree(for:debug:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe9CYKParserC10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSaySayAFyAA10ProductionVAMGGG3for_Sb5debugtKF">syntaxTree(for:debug:)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Undocumented</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">CYKParser</span></code></pre>
-
-                        </div>
                       </div>
                     </section>
                   </div>

@@ -22,7 +22,7 @@
         <a class="header-link" href="index.html">
            Docs
         </a>
-         (21% documented)
+         (59% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -90,12 +90,6 @@
           <li class="nav-group-name">
             <a class="nav-group-name-link" href="Functions.html">Functions</a>
             <ul class="nav-group-tasks">
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe1poiSaySayAA6SymbolOGGAD_AFtF">+(_:_:)</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe1poiSaySayAA6SymbolOGGAF_ADtF">+(_:_:)</a>
-              </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3ssgoiAA10ProductionVAA11NonTerminalV_AA0C6StringVtF">--&gt;(_:_:)</a>
               </li>
@@ -171,6 +165,9 @@
             <a class="nav-group-name-link" href="Protocols.html">Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Parser.html">Parser</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Protocols/Tokenizer.html">Tokenizer</a>
               </li>
             </ul>
@@ -232,6 +229,39 @@
                 <li class="item">
                   <div>
                     <code>
+                    <a name="/s:7Covfefe6ParserP"></a>
+                    <a name="//apple_ref/swift/Protocol/Parser" class="dashAnchor"></a>
+                    <a class="token" href="#/s:7Covfefe6ParserP">Parser</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A parser which can check if a word is in a language
+and generate a syntax tree explaining how a word was derived from a grammar</p>
+
+                        <a href="Protocols/Parser.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Parser</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul class="item-container">
+                <li class="item">
+                  <div>
+                    <code>
                     <a name="/s:7Covfefe9TokenizerP"></a>
                     <a name="//apple_ref/swift/Protocol/Tokenizer" class="dashAnchor"></a>
                     <a class="token" href="#/s:7Covfefe9TokenizerP">Tokenizer</a>
@@ -242,9 +272,17 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A string tokenizer which tokenizes a string based on final productions of a context free grammar</p>
 
                         <a href="Protocols/Tokenizer.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Tokenizer</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>

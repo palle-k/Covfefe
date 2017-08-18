@@ -22,7 +22,7 @@
         <a class="header-link" href="index.html">
            Docs
         </a>
-         (21% documented)
+         (59% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -90,12 +90,6 @@
           <li class="nav-group-name">
             <a class="nav-group-name-link" href="Functions.html">Functions</a>
             <ul class="nav-group-tasks">
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe1poiSaySayAA6SymbolOGGAD_AFtF">+(_:_:)</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe1poiSaySayAA6SymbolOGGAF_ADtF">+(_:_:)</a>
-              </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3ssgoiAA10ProductionVAA11NonTerminalV_AA0C6StringVtF">--&gt;(_:_:)</a>
               </li>
@@ -170,6 +164,9 @@
           <li class="nav-group-name">
             <a class="nav-group-name-link" href="Protocols.html">Protocols</a>
             <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Parser.html">Parser</a>
+              </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="Protocols/Tokenizer.html">Tokenizer</a>
               </li>
@@ -271,9 +268,17 @@ consisting of a set of productions</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A syntax error which was generated during parsing or tokenization</p>
 
                         <a href="Structs/SyntaxError.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">SyntaxError</span><span class="p">:</span> <span class="kt">Error</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -295,9 +300,17 @@ consisting of a set of productions</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A set of terminal or non-terminal symbols</p>
 
                         <a href="Structs/SymbolSet.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">SymbolSet</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -315,9 +328,17 @@ consisting of a set of productions</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A string of symbols which can be used in a production of a grammar</p>
 
                         <a href="Structs/ProductionString.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">ProductionString</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -335,9 +356,17 @@ consisting of a set of productions</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A string of non-terminal symbols</p>
 
                         <a href="Structs/NonTerminalString.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">NonTerminalString</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -355,9 +384,23 @@ consisting of a set of productions</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A production result contains multiple possible production strings
+which can all be generated from a given non-terminal.</p>
+
+<p>A production result can be used when creating a production rule with different possible productions:</p>
+<pre class="highlight plaintext"><code>"A" --&gt; n("B") &lt;|&gt; t("x")
+                ^ generates a production result
+</code></pre>
 
                         <a href="Structs/ProductionResult.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">ProductionResult</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -447,9 +490,17 @@ consisting of a set of productions</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A simple tokenizer which uses a chomsky normalized grammar for tokenization</p>
 
                         <a href="Structs/DefaultTokenizer.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">DefaultTokenizer</span><span class="p">:</span> <span class="kt"><a href="Protocols/Tokenizer.html">Tokenizer</a></span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>

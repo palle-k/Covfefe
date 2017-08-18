@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
            Docs
         </a>
-         (21% documented)
+         (59% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -91,12 +91,6 @@
           <li class="nav-group-name">
             <a class="nav-group-name-link" href="../Functions.html">Functions</a>
             <ul class="nav-group-tasks">
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe1poiSaySayAA6SymbolOGGAD_AFtF">+(_:_:)</a>
-              </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe1poiSaySayAA6SymbolOGGAF_ADtF">+(_:_:)</a>
-              </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe3ssgoiAA10ProductionVAA11NonTerminalV_AA0C6StringVtF">--&gt;(_:_:)</a>
               </li>
@@ -172,6 +166,9 @@
             <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/Parser.html">Parser</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/Tokenizer.html">Tokenizer</a>
               </li>
             </ul>
@@ -221,7 +218,13 @@
         <section class="section">
           <div class="section-content">
             <h1>SymbolSet</h1>
-            <p>Undocumented</p>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">SymbolSet</span></code></pre>
+
+                </div>
+              </div>
+            <p>A set of terminal or non-terminal symbols</p>
 
           </div>
         </section>
@@ -243,8 +246,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Whitespace characters (space, tab and line break)</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">whitespace</span> <span class="o">=</span> <span class="kt"><a href="../Structs/ProductionResult.html">ProductionResult</a></span><span class="p">(</span><span class="kt">SymbolSet</span><span class="p">(</span><span class="s">" </span><span class="se">\t\n</span><span class="s">"</span><span class="o">.</span><span class="nf">map</span><span class="p">(</span><span class="kt">String</span><span class="o">.</span><span class="kd">init</span><span class="p">)</span><span class="o">.</span><span class="nf">map</span><span class="p">(</span><span class="n">t</span><span class="p">)))</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -262,8 +273,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Lower case letters a to z</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">lowercase</span> <span class="o">=</span> <span class="kt"><a href="../Structs/ProductionResult.html">ProductionResult</a></span><span class="p">(</span><span class="kt">SymbolSet</span><span class="p">(</span><span class="s">"abcdefghijklmnopqrstuvwxyz"</span><span class="o">.</span><span class="nf">map</span><span class="p">(</span><span class="kt">String</span><span class="o">.</span><span class="kd">init</span><span class="p">)</span><span class="o">.</span><span class="nf">map</span><span class="p">(</span><span class="n">t</span><span class="p">)))</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -281,8 +300,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Upper case letters A to Z</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">uppercase</span> <span class="o">=</span> <span class="kt"><a href="../Structs/ProductionResult.html">ProductionResult</a></span><span class="p">(</span><span class="kt">SymbolSet</span><span class="p">(</span><span class="s">"ABCDEFGHIJKLMNOPQRSTUVWXYZ"</span><span class="o">.</span><span class="nf">map</span><span class="p">(</span><span class="kt">String</span><span class="o">.</span><span class="kd">init</span><span class="p">)</span><span class="o">.</span><span class="nf">map</span><span class="p">(</span><span class="n">t</span><span class="p">)))</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -300,8 +327,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Decimal digits 0 to 9</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">let</span> <span class="nv">numbers</span> <span class="o">=</span> <span class="kt"><a href="../Structs/ProductionResult.html">ProductionResult</a></span><span class="p">(</span><span class="kt">SymbolSet</span><span class="p">((</span><span class="mi">0</span><span class="o">...</span><span class="mi">9</span><span class="p">)</span><span class="o">.</span><span class="nf">map</span><span class="p">(</span><span class="kt">String</span><span class="o">.</span><span class="kd">init</span><span class="p">)</span><span class="o">.</span><span class="nf">map</span><span class="p">(</span><span class="n">t</span><span class="p">)))</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -319,8 +354,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Lower and upper case letters a to z and A to Z</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">var</span> <span class="nv">letters</span><span class="p">:</span> <span class="kt"><a href="../Structs/ProductionResult.html">ProductionResult</a></span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -338,8 +381,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Alphanumeric characters (Letters and numbers)</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">var</span> <span class="nv">alphanumerics</span><span class="p">:</span> <span class="kt"><a href="../Structs/ProductionResult.html">ProductionResult</a></span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -357,8 +408,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Symbols contained in this symbol set</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">symbols</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Enums/Symbol.html">Symbol</a></span><span class="p">]</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -376,8 +435,35 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Creates a new symbol set given a sequence of symbols</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">init</span><span class="o">&lt;</span><span class="kt">S</span><span class="p">:</span> <span class="kt">Sequence</span><span class="o">&gt;</span><span class="p">(</span><span class="n">_</span> <span class="nv">sequence</span><span class="p">:</span> <span class="kt">S</span><span class="p">)</span> <span class="k">where</span> <span class="kt">S</span><span class="o">.</span><span class="kt">Element</span> <span class="o">==</span> <span class="kt"><a href="../Enums/Symbol.html">Symbol</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>sequence</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Sequence of symbols which the symbol set should contain</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
