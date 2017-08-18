@@ -103,44 +103,96 @@ extension Grammar {
 		//let nonTerminalProducesCanProduceNonEmpty = nonTerminalProductions.mapValues{$0.contains{!$0.production.isEmpty}}
 		
 		func canProduceNonEmpty(pattern: NonTerminal, path: Set<NonTerminal>, state: Dictionary<NonTerminal, Bool>) -> Dictionary<NonTerminal, Bool> {
-			if state[pattern]! || path.contains(pattern) {
+			// Break when a recursive loop has been found
+			if state[pattern, default: false] || path.contains(pattern) {
 				return state
 			}
 			
+			// Find all non terminals which can be reached from the current non-terminal
 			let reachableNonTerminals = nonTerminalProductions[pattern]!.map { $0.generatedNonTerminals.collect(Set.init) }.reduce(Set()) { $0.union($1) }
-			if reachableNonTerminals.contains(where: {state[$0]!}) {
+			
+			let updatedState = reachableNonTerminals.reduce(state) { (partialState, nonTerminal) -> Dictionary<NonTerminal, Bool> in
+				return canProduceNonEmpty(pattern: nonTerminal, path: path.union([pattern]), state: partialState)
+			}
+			
+			// If any reachable non-terminal can produce a non-empty string, the current non-terminal also can
+			if reachableNonTerminals.contains(where: {updatedState[$0]!}) {
+				var mutableState = updatedState
+				mutableState[pattern] = true
+				return mutableState
+			}
+			return updatedState
+		}
+		
+		func canProduceEmpty(pattern: NonTerminal, path: Set<NonTerminal>, state: Dictionary<NonTerminal, Bool>) -> Dictionary<NonTerminal, Bool> {
+			// Return early if the terminal is already known to produce empty or if a loop has been found
+			if path.contains(pattern) || state[pattern, default: false] {
+				return state
+			}
+			
+			
+			let patternProductions = nonTerminalProductions[pattern, default: []]
+			if patternProductions.contains(where: { (production) -> Bool in
+				production.production.isEmpty
+			}) {
 				var mutableState = state
 				mutableState[pattern] = true
 				return mutableState
-			} else {
-				return reachableNonTerminals.reduce(state) { (partialState, nonTerminal) -> Dictionary<NonTerminal, Bool> in
-					guard !partialState[pattern]! else {
-						return partialState
-					}
-					return canProduceNonEmpty(pattern: nonTerminal, path: path.union([pattern]), state: partialState)
-				}
 			}
+			
+			let reachableNonTerminals = nonTerminalProductions[pattern, default: []].map { $0.generatedNonTerminals.collect(Set.init) }.reduce(Set()) { $0.union($1) }
+			
+			let updatedState = reachableNonTerminals.reduce(state) { partialResult, nonTerminal -> Dictionary<NonTerminal, Bool> in
+				return canProduceEmpty(pattern: nonTerminal, path: path.union([pattern]), state: state)
+			}
+			
+			if reachableNonTerminals.contains(where: {updatedState[$0, default: false]}) {
+				var mutableState = updatedState
+				mutableState[pattern] = true
+				return mutableState
+			}
+			return updatedState
 		}
 		
 		let nonTerminalCanProduceNonEmpty = nonTerminalProductions.keys.reduce(
-			nonTerminalProductions.mapValues{$0.contains{!$0.production.isEmpty}}
+			nonTerminalProductions.mapValues {
+				$0.contains{!$0.production.isEmpty}
+			}
 		) { partialResult, nonTerminal -> Dictionary<NonTerminal, Bool> in
 			canProduceNonEmpty(pattern: nonTerminal, path: [], state: partialResult)
 		}
 		
-		return productions.flatMap { production -> Production? in
+		let nonTerminalCanProduceEmpty = nonTerminalProductions.keys.reduce(
+			nonTerminalProductions.mapValues {
+				$0.contains(where: {$0.production.isEmpty})
+			}
+		) { (partialResult, nonTerminal) -> Dictionary<NonTerminal, Bool> in
+			canProduceEmpty(pattern: nonTerminal, path: [], state: partialResult)
+		}
+		
+		return productions.flatMap { production -> [Production] in
 			if production.production.isEmpty {
-				return production.pattern == start ? production : nil
+				return production.pattern == start ? [production] : []
 			} else if production.isFinal {
-				return production
+				return [production]
 			}
 			
 			let filteredProduction = production.generatedNonTerminals.filter {nonTerminalCanProduceNonEmpty[$0] ?? false}
 			
-			if !filteredProduction.isEmpty {
-				return Production(pattern: production.pattern, production: filteredProduction.map{.nonTerminal($0)})
+			// Productions have already been decomposed, so there can only be one or two non-terminals
+			if filteredProduction.count == 2 {
+				var partialResult: [Production] = []
+				if nonTerminalCanProduceEmpty[filteredProduction[0]]! {
+					partialResult += [Production(pattern: production.pattern, production: [.nonTerminal(filteredProduction[1])])]
+				}
+				if nonTerminalCanProduceEmpty[filteredProduction[1]]! {
+					partialResult += [Production(pattern: production.pattern, production: [.nonTerminal(filteredProduction[0])])]
+				}
+				return partialResult + [Production(pattern: production.pattern, production: filteredProduction.map{.nonTerminal($0)})]
+			} else if filteredProduction.count == 1 {
+				return [Production(pattern: production.pattern, production: filteredProduction.map{.nonTerminal($0)})]
 			} else {
-				return nil
+				return []
 			}
 		}
 	}
