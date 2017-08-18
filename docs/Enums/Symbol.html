@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
            Docs
         </a>
-         (59% documented)
+         (100% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -149,7 +149,7 @@
                 <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe3logoiAA16ProductionResultVAD_ADtF">&lt;|&gt;(_:_:)</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe2eeoiSbAA10SyntaxTreeOyxq_G_AEts9EquatableRzsAFR_r0_lF">==(_:_:)</a>
+                <a class="nav-group-task-link" href="../Functions/==(_:_:).html">==(_:_:)</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe1nAA6SymbolOSSF">n(_:)</a>
@@ -218,7 +218,18 @@
         <section class="section">
           <div class="section-content">
             <h1>Symbol</h1>
-            <p>Undocumented</p>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Symbol</span><span class="p">:</span> <span class="kt">Codable</span></code></pre>
+
+                </div>
+              </div>
+            <p>A symbol which can either be a terminal or a non-terminal character</p>
+
+<ul>
+<li>terminal: A terminal character</li>
+<li>nonTerminal: A non-terminal character</li>
+</ul>
 
           </div>
         </section>
@@ -240,8 +251,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A terminal symbol</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">terminal</span><span class="p">(</span><span class="kt"><a href="../Structs/Terminal.html">Terminal</a></span><span class="p">)</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -263,8 +282,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A non-terminal symbol</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">nonTerminal</span><span class="p">(</span><span class="kt"><a href="../Structs/NonTerminal.html">NonTerminal</a></span><span class="p">)</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>

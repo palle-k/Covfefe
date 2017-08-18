@@ -34,8 +34,13 @@ public struct SyntaxError: Error {
 	/// - unknownToken: The tokenization could not be completed because no matching token was found
 	/// - unmatchedPattern: A pattern was found which could not be merged
 	public enum Reason {
+		/// An empty string was provided but the grammar does not allow empty productions
 		case emptyNotAllowed
+		
+		/// The tokenization could not be completed because no matching token was found
 		case unknownToken
+		
+		/// A pattern was found which could not be merged
 		case unmatchedPattern
 	}
 	

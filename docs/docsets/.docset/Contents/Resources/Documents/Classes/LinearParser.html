@@ -23,7 +23,7 @@
         <a class="header-link" href="../index.html">
            Docs
         </a>
-         (59% documented)
+         (100% documented)
       </p>
     
       <p class="header-col--secondary">
@@ -149,7 +149,7 @@
                 <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe3logoiAA16ProductionResultVAD_ADtF">&lt;|&gt;(_:_:)</a>
               </li>
               <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe2eeoiSbAA10SyntaxTreeOyxq_G_AEts9EquatableRzsAFR_r0_lF">==(_:_:)</a>
+                <a class="nav-group-task-link" href="../Functions/==(_:_:).html">==(_:_:)</a>
               </li>
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Functions.html#/s:7Covfefe1nAA6SymbolOSSF">n(_:)</a>
@@ -218,7 +218,18 @@
         <section class="section">
           <div class="section-content">
             <h1>LinearParser</h1>
-            <p>Undocumented</p>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">LinearParser</span></code></pre>
+
+                </div>
+              </div>
+            <p>A parser for linear grammars</p>
+
+<p>Linear grammars can be described by linear productions:</p>
+<pre class="highlight plaintext"><code>A -&gt; x B y
+A -&gt; z
+</code></pre>
 
           </div>
         </section>
@@ -240,8 +251,16 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Grammar parsed by the parser</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">grammar</span><span class="p">:</span> <span class="kt"><a href="../Structs/Grammar.html">Grammar</a></span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
@@ -259,8 +278,41 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Creates a new parser for linear grammars.</p>
 
+<p>The specified grammar has to be linear for this parser to work.
+All productions must have the form</p>
+<pre class="highlight plaintext"><code>A -&gt; x B y
+A -&gt; z
+</code></pre>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">grammar</span><span class="p">:</span> <span class="kt"><a href="../Structs/Grammar.html">Grammar</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>grammar</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Recognized grammar</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
@@ -278,8 +330,39 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Returns true if the recognized language contains the given word.</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">recognizes</span><span class="p">(</span><span class="nv">word</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>word</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Word which should be checked</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>True, if the word is generated by the grammar, false if not.</p>
                       </div>
                     </section>
                   </div>
@@ -297,8 +380,39 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Creates a string describing how the given word was produced</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">syntaxTree</span><span class="p">(</span><span class="k">for</span> <span class="nv">word</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>word</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Input word</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A string explaining how the string was derived by the recognized grammar</p>
                       </div>
                     </section>
                   </div>

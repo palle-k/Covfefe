@@ -246,6 +246,21 @@ extension Grammar {
 		}
 	}
 	
+	/// Generates a context free grammar equal to the current grammar which is in Chomsky Normal Form.
+	/// The grammar is converted by decomposing non-terminal productions of lengths greater than 2,
+	/// introducing new non-terminals to replace terminals in mixed productions, and removing empty productions.
+	///
+	/// Chomsky normal form is required for some parsers (like the CYK parser) to work.
+	///
+	/// In chomsky normal form, all productions must have the following form:
+	///
+	///     A -> B C
+	///     D -> x
+	///     Start -> empty
+	///
+	/// Note that empty productions are only allowed starting from the start non-terminal
+	///
+	/// - Returns: Chomsky normal form of the current grammar
 	public func chomskyNormalized() -> Grammar {
 		// Generate weak Chomsky Normal Form by eliminating all productions generating a pattern of nonTerminals mixed with terminals
 		let nonMixedProductions = Grammar.eliminateMixedProductions(productions: productions)

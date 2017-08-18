@@ -25,9 +25,15 @@
 
 import Foundation
 
+/// A non-terminal symbol, which cannot occurr in a word recognized by a parser
 public struct NonTerminal: Codable {
+	
+	/// Name of the non-terminal
 	public let name: String
 	
+	/// Creates a new non-terminal symbol with a given name
+	///
+	/// - Parameter name: Name of the non-terminal symbol
 	public init(name: String) {
 		self.name = name
 	}
@@ -57,10 +63,25 @@ extension NonTerminal: Hashable {
 	}
 }
 
+/// A terminal symbol which can occur in a string recognized by a parser and which cannot be
+/// replaced by any production
 public struct Terminal: Codable {
+	
+	/// Value of the terminal
 	public let value: String
+	
+	/// Indicates whether the value of the non-terminal is a regular expression
 	public let isRegularExpression: Bool
 	
+	/// Creates a new terminal value which can occurr in a string
+	///
+	/// **Note**: The value of the terminal string may not overlap partially with any other non-terminal
+	/// contained in a grammar. For regular terminals, it it may be deriable to add word boundary markers: `\b`.
+	///
+	/// - Parameters:
+	///   - value: Value of the terminal which can occurr in a string
+	///   - isRegularExpression: Indicates whether the value is a regular expression
+	/// - Throws: An error if the value is an invalid regular expression
 	public init(value: String, isRegularExpression: Bool = false) throws {
 		self.value = value
 		self.isRegularExpression = isRegularExpression
@@ -95,8 +116,15 @@ extension Terminal: CustomStringConvertible {
 	}
 }
 
+/// A symbol which can either be a terminal or a non-terminal character
+///
+/// - terminal: A terminal character
+/// - nonTerminal: A non-terminal character
 public enum Symbol: Codable {
+	/// A terminal symbol
 	case terminal(Terminal)
+	
+	/// A non-terminal symbol
 	case nonTerminal(NonTerminal)
 	
 	public init(from decoder: Decoder) throws {
@@ -127,14 +155,33 @@ public enum Symbol: Codable {
 	}
 }
 
+/// Creates a new non-regular terminal symbol
+///
+/// **Note**: The value of the terminal string may not overlap partially with any other non-terminal
+/// contained in a grammar.
+///
+/// - Parameter value: Value of the terminal symbol
+/// - Returns: A terminal symbol with the given value
 public func t(_ value: String) -> Symbol {
 	return try! Symbol.terminal(Terminal(value: value))
 }
 
+/// Creates a new non-terminal symbol
+///
+/// - Parameter name: Name of the non-terminal symbol
+/// - Returns: A non-terminal symbol with the given name
 public func n(_ name: String) -> Symbol {
 	return Symbol.nonTerminal(NonTerminal(name: name))
 }
 
+/// Creates a new regular terminal symbol
+///
+/// **Note**: The value of the terminal string may not overlap partially with any other non-terminal
+/// contained in a grammar. For regular terminals, it it may be deriable to add word boundary markers: `\b`.
+///
+/// - Parameter value: Regular value of the terminal
+/// - Returns: A regular terminal symbol
+/// - Throws: An error indicating that the given regular expression is invalid
 public func rt(_ value: String) throws -> Symbol {
 	return try Symbol.terminal(Terminal(value: value, isRegularExpression: true))
 }
