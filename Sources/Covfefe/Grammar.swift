@@ -25,10 +25,19 @@
 
 import Foundation
 
-public enum SyntaxError: Error {
-	case unknownSequence(from: String)
-	case unmatchedPattern(pattern: SyntaxTree<NonTerminal, Range<String.Index>>)
-	case emptyWordNotAllowed
+public struct SyntaxError: Error {
+	public enum Reason {
+		case emptyNotAllowed
+		case unknownToken
+		case unmatchedPattern
+	}
+	public let range: Range<String.Index>
+	public let reason: Reason
+	
+	public init(range: Range<String.Index>, reason: Reason) {
+		self.range = range
+		self.reason = reason
+	}
 }
 
 
@@ -55,12 +64,8 @@ public struct Grammar {
 	public init(productions: [Production], start: NonTerminal) {
 		self.init(productions: productions, start: start, normalizationNonTerminals: [])
 		
-		if !unreachableNonTerminals.isEmpty {
-			print("WARNING: Grammar contains unreachable non-terminals (\(unreachableNonTerminals))")
-		}
-		if !unterminatedNonTerminals.isEmpty {
-			print("WARNING: Grammar contains non-terminals which can never reach terminals (\(unterminatedNonTerminals))")
-		}
+		assertNonFatal(!unreachableNonTerminals.isEmpty, "Grammar contains unreachable non-terminals (\(unreachableNonTerminals))")
+		assertNonFatal(!unterminatedNonTerminals.isEmpty, "Grammar contains non-terminals which can never reach terminals (\(unterminatedNonTerminals))")
 	}
 	
 	/// Creates a new grammar with a given set of productions, a start non-terminal and

@@ -54,9 +54,9 @@ public class CYKParser {
 		}
 		
 		if let firstMember = memberRows[0] {
-			return SyntaxError.unmatchedPattern(pattern: unfoldChainProductions(cykTable[0][firstMember+1][0]))
+			return SyntaxError(range: cykTable[0][firstMember+1][0].leafs.first!, reason: .unmatchedPattern)
 		} else {
-			return SyntaxError.unmatchedPattern(pattern: unfoldChainProductions(cykTable[0][0][0]))
+			return SyntaxError(range: cykTable[0][0][0].leafs.first!, reason: .unmatchedPattern)
 		}
 	}
 	
@@ -87,7 +87,7 @@ public class CYKParser {
 			}) {
 				return SyntaxTree.node(key: normalizedGrammar.start, children: [SyntaxTree.leaf("".startIndex ..< "".endIndex)])
 			} else {
-				throw SyntaxError.emptyWordNotAllowed
+				throw SyntaxError(range: "".startIndex ..< "".endIndex, reason: .emptyNotAllowed)
 			}
 		}
 		

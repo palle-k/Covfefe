@@ -30,7 +30,7 @@ public struct DefaultTokenizer: Tokenizer {
 			word.hasPrefix(production.generatedTerminals, from: startIndex)
 		}
 		guard let first = matches.first, let firstMatchRange = word.rangeOfPrefix(first.generatedTerminals, from: startIndex) else {
-			throw SyntaxError.unknownSequence(from: String(word[startIndex...]))
+			throw SyntaxError(range: startIndex ..< word.endIndex, reason: .unknownToken)
 		}
 		
 		let matchTrees = matches.flatMap { production -> SyntaxTree<Production, Range<String.Index>>? in

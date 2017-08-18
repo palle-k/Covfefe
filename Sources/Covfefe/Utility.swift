@@ -280,3 +280,11 @@ func unzip<A, B, SequenceType: Sequence>(_ sequence: SequenceType) -> (AnySequen
 func unzip<A, B, SequenceType: Sequence>(_ sequence: SequenceType) -> ([A], [B]) where SequenceType.Element == (A, B) {
 	return (sequence.map{$0.0}, sequence.map{$0.1})
 }
+
+func assertNonFatal(_ predicate: @autoclosure () -> Bool, _ message: String) {
+#if DEBUG
+	if !predicate() {
+		print("[WARNING] \(message)")
+	}
+#endif
+}

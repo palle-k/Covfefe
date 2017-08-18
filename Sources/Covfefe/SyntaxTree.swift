@@ -52,6 +52,16 @@ public extension SyntaxTree {
 		}
 	}
 	
+	public var leafs: [LeafElement] {
+		switch self {
+		case .leaf(let leaf):
+			return [leaf]
+			
+		case .node(key: _, children: let children):
+			return children.flatMap(\.leafs)
+		}
+	}
+	
 	public func filter(_ predicate: (Element) throws -> Bool) rethrows -> SyntaxTree<Element, LeafElement>? {
 		switch self {
 		case .leaf(let element):

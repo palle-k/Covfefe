@@ -1,0 +1,1006 @@
+{
+  "warnings": [
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/BNFImporter.swift",
+      "line": 28,
+      "symbol": "bnfGrammar",
+      "symbol_kind": "source.lang.swift.decl.var.global",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/BNFImporter.swift",
+      "line": 90,
+      "symbol": "Grammar.init(contentsOf:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CYKParser.swift",
+      "line": 83,
+      "symbol": "CYKParser.syntaxTree(for:debug:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": null,
+      "symbol": "NonTerminalString",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": null,
+      "symbol": "ProductionResult",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": null,
+      "symbol": "ProductionResult",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": null,
+      "symbol": "ProductionString",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 28,
+      "symbol": "SymbolSet",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 29,
+      "symbol": "SymbolSet.whitespace",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 30,
+      "symbol": "SymbolSet.lowercase",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 31,
+      "symbol": "SymbolSet.uppercase",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 32,
+      "symbol": "SymbolSet.numbers",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 34,
+      "symbol": "SymbolSet.letters",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 38,
+      "symbol": "SymbolSet.alphanumerics",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 42,
+      "symbol": "SymbolSet.symbols",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 44,
+      "symbol": "SymbolSet.init(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 49,
+      "symbol": "+(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 53,
+      "symbol": "+(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 57,
+      "symbol": "ProductionString",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 58,
+      "symbol": "ProductionString.characters",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 60,
+      "symbol": "ProductionString.init(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 65,
+      "symbol": "NonTerminalString",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 66,
+      "symbol": "NonTerminalString.characters",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 89,
+      "symbol": "ProductionResult",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 90,
+      "symbol": "ProductionResult.elements",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 92,
+      "symbol": "ProductionResult.init(symbols:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 106,
+      "symbol": "ProductionResult.init(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 125,
+      "symbol": "<+>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 129,
+      "symbol": "<+>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 133,
+      "symbol": "<+>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 137,
+      "symbol": "<+>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 141,
+      "symbol": "<+>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 145,
+      "symbol": "<+>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 149,
+      "symbol": "<+>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 153,
+      "symbol": "<|>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 157,
+      "symbol": "<|>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 161,
+      "symbol": "<|>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 165,
+      "symbol": "<|>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 169,
+      "symbol": "<|>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 173,
+      "symbol": "<|>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 177,
+      "symbol": "<|>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 181,
+      "symbol": "<|>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/CharacterSets.swift",
+      "line": 185,
+      "symbol": "<|>(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Grammar.swift",
+      "line": 28,
+      "symbol": "SyntaxError",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Grammar.swift",
+      "line": 29,
+      "symbol": "SyntaxError.Reason",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Grammar.swift",
+      "line": 30,
+      "symbol": "SyntaxError.Reason.emptyNotAllowed",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Grammar.swift",
+      "line": 31,
+      "symbol": "SyntaxError.Reason.unknownToken",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Grammar.swift",
+      "line": 32,
+      "symbol": "SyntaxError.Reason.unmatchedPattern",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Grammar.swift",
+      "line": 34,
+      "symbol": "SyntaxError.range",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Grammar.swift",
+      "line": 35,
+      "symbol": "SyntaxError.reason",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Grammar.swift",
+      "line": 37,
+      "symbol": "SyntaxError.init(range:reason:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/GrammarCheck.swift",
+      "line": 11,
+      "symbol": "Grammar.unreachableNonTerminals",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/GrammarCheck.swift",
+      "line": 17,
+      "symbol": "Grammar.unterminatedNonTerminals",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/LinearParser.swift",
+      "line": 10,
+      "symbol": "LinearParser",
+      "symbol_kind": "source.lang.swift.decl.class",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/LinearParser.swift",
+      "line": 11,
+      "symbol": "LinearParser.grammar",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/LinearParser.swift",
+      "line": 13,
+      "symbol": "LinearParser.init(grammar:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/LinearParser.swift",
+      "line": 18,
+      "symbol": "LinearParser.recognizes(word:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/LinearParser.swift",
+      "line": 38,
+      "symbol": "LinearParser.syntaxTree(for:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Normalization.swift",
+      "line": 249,
+      "symbol": "Grammar.chomskyNormalized()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": null,
+      "symbol": "Production",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": null,
+      "symbol": "Production",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": null,
+      "symbol": "Production",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 28,
+      "symbol": "Production",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 29,
+      "symbol": "Production.pattern",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 30,
+      "symbol": "Production.production",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 32,
+      "symbol": "Production.nonTerminalChain",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 34,
+      "symbol": "Production.init(pattern:production:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 40,
+      "symbol": "Production.init(pattern:production:chain:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 46,
+      "symbol": "Production.isLinear",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 56,
+      "symbol": "Production.isRightLinear",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 72,
+      "symbol": "Production.isLeftLinear",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 88,
+      "symbol": "Production.isFinal",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 98,
+      "symbol": "Production.isInChomskyNormalForm",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 115,
+      "symbol": "Production.generatedTerminals",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 165,
+      "symbol": "Production.canGenerateSubstring(of:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 177,
+      "symbol": "Production.canFullyGenerate(word:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 184,
+      "symbol": "Production.removingGeneratedSubstring(from:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 258,
+      "symbol": "-->(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 262,
+      "symbol": "-->(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Productions.swift",
+      "line": 268,
+      "symbol": "-->(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": null,
+      "symbol": "NonTerminal",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": null,
+      "symbol": "NonTerminal",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": null,
+      "symbol": "NonTerminal",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": null,
+      "symbol": "Symbol",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": null,
+      "symbol": "Symbol",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": null,
+      "symbol": "Terminal",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": null,
+      "symbol": "Terminal",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": null,
+      "symbol": "Terminal",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 28,
+      "symbol": "NonTerminal",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 29,
+      "symbol": "NonTerminal.name",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 31,
+      "symbol": "NonTerminal.init(name:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 60,
+      "symbol": "Terminal",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 61,
+      "symbol": "Terminal.value",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 62,
+      "symbol": "Terminal.isRegularExpression",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 64,
+      "symbol": "Terminal.init(value:isRegularExpression:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 98,
+      "symbol": "Symbol",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 99,
+      "symbol": "Symbol.terminal",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 100,
+      "symbol": "Symbol.nonTerminal",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 130,
+      "symbol": "t(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 134,
+      "symbol": "n(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Symbols.swift",
+      "line": 138,
+      "symbol": "rt(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": null,
+      "symbol": "SyntaxTree",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": null,
+      "symbol": "SyntaxTree",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": null,
+      "symbol": "SyntaxTree",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": null,
+      "symbol": "SyntaxTree",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": null,
+      "symbol": "SyntaxTree",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": null,
+      "symbol": "SyntaxTree",
+      "symbol_kind": "source.lang.swift.decl.extension",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 28,
+      "symbol": "SyntaxTree",
+      "symbol_kind": "source.lang.swift.decl.enum",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 29,
+      "symbol": "SyntaxTree.leaf",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 30,
+      "symbol": "SyntaxTree.node",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 35,
+      "symbol": "SyntaxTree.map(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 45,
+      "symbol": "SyntaxTree.mapLeafs(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 55,
+      "symbol": "SyntaxTree.leafs",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 65,
+      "symbol": "SyntaxTree.filter(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 78,
+      "symbol": "SyntaxTree.explode(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 91,
+      "symbol": "SyntaxTree.compressed()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 194,
+      "symbol": "==(_:_:)",
+      "symbol_kind": "source.lang.swift.decl.function.free",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 208,
+      "symbol": "SyntaxTree.init(key:children:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 212,
+      "symbol": "SyntaxTree.init(key:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 216,
+      "symbol": "SyntaxTree.init(value:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 222,
+      "symbol": "SyntaxTree.init()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 228,
+      "symbol": "SyntaxTree.root",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/SyntaxTree.swift",
+      "line": 235,
+      "symbol": "SyntaxTree.leaf",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Tokenizer.swift",
+      "line": 10,
+      "symbol": "Tokenizer",
+      "symbol_kind": "source.lang.swift.decl.protocol",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Tokenizer.swift",
+      "line": 11,
+      "symbol": "Tokenizer.tokenize(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Tokenizer.swift",
+      "line": 14,
+      "symbol": "DefaultTokenizer",
+      "symbol_kind": "source.lang.swift.decl.struct",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Tokenizer.swift",
+      "line": 15,
+      "symbol": "DefaultTokenizer.productions",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Tokenizer.swift",
+      "line": 17,
+      "symbol": "DefaultTokenizer.init(grammar:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Tokenizer.swift",
+      "line": 21,
+      "symbol": "DefaultTokenizer.tokenize(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 81,
+      "symbol": "String.matches(for:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 85,
+      "symbol": "String.matches(for:in:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 95,
+      "symbol": "String.hasRegularPrefix(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 99,
+      "symbol": "String.hasRegularPrefix(_:from:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 105,
+      "symbol": "String.rangeOfRegularPrefix(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 109,
+      "symbol": "String.rangeOfRegularPrefix(_:from:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 115,
+      "symbol": "String.hasRegularSuffix(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 121,
+      "symbol": "String.rangeOfRegularSuffix(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 127,
+      "symbol": "String.hasPrefix(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 131,
+      "symbol": "String.hasPrefix(_:from:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 141,
+      "symbol": "String.rangeOfPrefix(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 145,
+      "symbol": "String.rangeOfPrefix(_:from:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 155,
+      "symbol": "String.hasSuffix(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/Palle/Developer/Grammar/Sources/Covfefe/Utility.swift",
+      "line": 165,
+      "symbol": "String.rangeOfSuffix(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    }
+  ],
+  "source_directory": "/Users/Palle/Developer/Grammar"
+}
