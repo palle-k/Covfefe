@@ -63,7 +63,7 @@ class ProductionTests: XCTestCase {
 	
 	func testEmptyElimination() {
 		let pA = "A" --> t("x") <|> [[]] <|> n("A")
-		let eliminated = Grammar.eliminateEmptyProductions(productions: pA, start: "SomethingElse")
+		let eliminated = Grammar.eliminateEmpty(productions: pA, start: "SomethingElse")
 		
 		guard eliminated.count == 2 else {
 			XCTFail()
@@ -74,7 +74,7 @@ class ProductionTests: XCTestCase {
 		
 		let p1 = "A" --> [[]] <|> n("B") <+> n("A")
 		let p2 = "B" --> t("x")
-		let eliminated2 = Grammar.eliminateEmptyProductions(productions: p1 + [p2], start: "A")
+		let eliminated2 = Grammar.eliminateEmpty(productions: p1 + [p2], start: "A")
 		
 		XCTAssertTrue(eliminated2.contains("A" --> []))
 		XCTAssertTrue(eliminated2.contains("A" --> n("B")))

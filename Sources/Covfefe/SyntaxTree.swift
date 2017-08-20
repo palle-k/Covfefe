@@ -132,6 +132,26 @@ public extension SyntaxTree {
 			return self
 		}
 	}
+	
+	/// Returns all nodes which match the given predicate.
+	///
+	///
+	/// - Parameter predicate: Predicate to match
+	/// - Returns: A collection of nodes which match the given predicate
+	public func allNodes(where predicate: (Element) throws -> Bool) rethrows -> [SyntaxTree<Element, LeafElement>] {
+		switch self {
+		case .leaf:
+			return []
+			
+		case .node(key: let key, children: let children) where try predicate(key):
+			return try [self] + children.flatMap{try $0.allNodes(where: predicate)}
+			
+		case .node(key: _, children: let children):
+			return try children.flatMap{try $0.allNodes(where: predicate)}
+		}
+	}
+	
+	
 }
 
 extension SyntaxTree: CustomDebugStringConvertible {
@@ -288,5 +308,16 @@ public extension SyntaxTree {
 			return nil
 		}
 		return leaf
+	}
+	
+	/// Returns the direct children of the root node
+	public var children: [SyntaxTree<Element, LeafElement>]? {
+		switch self {
+		case .leaf:
+			return nil
+			
+		case .node(key: _, children: let children):
+			return children
+		}
 	}
 }
