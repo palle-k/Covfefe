@@ -110,7 +110,7 @@ var bnfGrammar: Grammar {
 	let concatenation = "concatenation" --> n("expression-element") <|> n("expression-element") <+> n("optional-whitespace") <+> n("concatenation")
 	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container")
 	let literal = "literal" --> t("'") <+> n("string") <+> t("'") <|> t("\"") <+> n("string") <+> t("\"")
-	let string = "string" --> n("string-char") <|> n("string-char") <+> [n("string")]
+	let string = "string" --> n("string-char") <|> n("string-char") <+> [n("string")] <|> [[]]
 	let stringChar = "string-char" --> SymbolSet.alphanumerics <|> symbols
 	
 	
@@ -205,11 +205,16 @@ public extension Grammar {
 				switch children[0].root!.name {
 				case "literal":
 					let terminalValue = string(from: children[0])
-					return [Production(pattern: NonTerminal(name: name), production: [t(terminalValue)])]
+					if terminalValue.isEmpty {
+						return [Production(pattern: NonTerminal(name: name), production: [])]
+					} else {
+						return [Production(pattern: NonTerminal(name: name), production: [t(terminalValue)])]
+					}
 					
 				case "rule-name-container":
 					let nonTerminalName = ruleName(from: children[0])
 					return [Production(pattern: NonTerminal(name: name), production: [n(nonTerminalName)])]
+					
 				default:
 					fatalError()
 				}

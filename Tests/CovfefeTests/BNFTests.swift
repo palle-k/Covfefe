@@ -22,5 +22,4 @@ class BNFTests: XCTestCase {
 		XCTAssertTrue(grammar.productions.contains("hello" --> t("xyz")))
 		XCTAssertTrue(grammar.productions.contains("world" --> t("world")))
 	}
-    
 }

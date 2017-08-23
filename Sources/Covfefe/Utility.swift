@@ -284,6 +284,16 @@ extension Sequence {
 			return (first, second)
 		}.collect(AnySequence.init)
 	}
+
+	func prefixes() -> AnySequence<[Element]> {
+		return sequence(state: (self.makeIterator(), [])) { (state: inout (Iterator, [Element])) -> [Element]? in
+			guard let next = state.0.next() else {
+				return nil
+			}
+			state.1.append(next)
+			return state.1
+		}.collect(AnySequence.init)
+	}
 }
 
 extension Sequence where Element: Hashable {
