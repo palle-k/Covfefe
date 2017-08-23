@@ -7,8 +7,16 @@
 
 import Foundation
 
-extension Grammar {
-	func prefixGrammar() -> Grammar {
+public extension Grammar {
+	
+	/// Generates a grammar which recognizes all prefixes of the original grammar.
+	///
+	/// For example if a grammar would generate `a*(b+c)`,
+	/// the prefix grammar would generate the empty string, `a`, `a*`, `a*(`, `a*(b`
+	/// `a*(b+` `a*(b+c` and `a*(b+c)`
+	///
+	/// - Returns: A grammar generating all prefixes of the original grammar
+	public func prefixGrammar() -> Grammar {
 		let prefixProductions = productions.flatMap { (production) -> [Production] in
 			let prefixes = production.production.prefixes().map { sequence -> [Symbol] in
 				guard let last = sequence.last else {
