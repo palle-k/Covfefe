@@ -22,4 +22,14 @@ class BNFTests: XCTestCase {
 		XCTAssertTrue(grammar.productions.contains("hello" --> t("xyz")))
 		XCTAssertTrue(grammar.productions.contains("world" --> t("world")))
 	}
+	
+	func testImportQuotes() throws {
+		let grammarString = """
+		<s> ::= "'" | '"'
+		"""
+		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		XCTAssertEqual(grammar.description, grammarString)
+		XCTAssertTrue(grammar.productions.contains("s" --> t("'")))
+		XCTAssertTrue(grammar.productions.contains("s" --> t("\"")))
+	}
 }

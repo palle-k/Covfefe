@@ -109,9 +109,12 @@ var bnfGrammar: Grammar {
 	let alternation = "alternation" --> n("concatenation") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("expression")
 	let concatenation = "concatenation" --> n("expression-element") <|> n("expression-element") <+> n("optional-whitespace") <+> n("concatenation")
 	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container")
-	let literal = "literal" --> t("'") <+> n("string") <+> t("'") <|> t("\"") <+> n("string") <+> t("\"")
-	let string = "string" --> n("string-char") <|> n("string-char") <+> [n("string")] <|> [[]]
+	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"")
+	let string1 = "string-1" --> n("string-char-1") <|> n("string-char-1") <+> [n("string-1")] <|> [[]]
+	let string2 = "string-2" --> n("string-char-2") <|> n("string-char-2") <+> [n("string-2")] <|> [[]]
 	let stringChar = "string-char" --> SymbolSet.alphanumerics <|> symbols
+	let stringChar1 = "string-char-1" --> n("string-char") <|> t("\"")
+	let stringChar2 = "string-char-2" --> n("string-char") <|> t("'")
 	
 	
 	var productions: [Production] = []
@@ -128,8 +131,11 @@ var bnfGrammar: Grammar {
 	productions.append(contentsOf: concatenation)
 	productions.append(contentsOf: expressionElement)
 	productions.append(contentsOf: literal)
-	productions.append(contentsOf: string)
+	productions.append(contentsOf: string1)
+	productions.append(contentsOf: string2)
 	productions.append(contentsOf: stringChar)
+	productions.append(contentsOf: stringChar1)
+	productions.append(contentsOf: stringChar2)
 	
 	return Grammar(productions: productions, start: "syntax")
 }
@@ -167,7 +173,7 @@ public extension Grammar {
 		
 		func string(from literal: SyntaxTree<NonTerminal, Range<String.Index>>) -> String {
 			return literal
-				.allNodes(where: {$0.name == "string-char"})
+				.allNodes(where: {$0.name == "string-char-1" || $0.name == "string-char-2"})
 				.flatMap{$0.leafs}
 				.reduce("") { partialResult, range -> String in
 					partialResult.appending(bnfString[range])
