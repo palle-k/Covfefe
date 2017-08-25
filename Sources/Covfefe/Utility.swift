@@ -311,12 +311,12 @@ func crossProduct<S1: Sequence, S2: Sequence>(_ lhs: S1, _ rhs: S2) -> AnySequen
 			rhsIteratorBase: rhs.makeIterator()
 		)
 	) { (state: (
-		inout (
-		lhsIterator: S1.Iterator,
-		lhsElement: S1.Element?,
-		rhsIterator: S2.Iterator,
-		rhsIteratorBase: S2.Iterator
-		)
+			inout (
+				lhsIterator: S1.Iterator,
+				lhsElement: S1.Element?,
+				rhsIterator: S2.Iterator,
+				rhsIteratorBase: S2.Iterator
+			)
 		)) -> (S1.Element, S2.Element)? in
 		guard let lhsElement = state.lhsElement ?? state.lhsIterator.next() else {
 			return nil
@@ -373,3 +373,16 @@ func assertNonFatal(_ predicate: @autoclosure () -> Bool, _ message: String) {
 	}
 #endif
 }
+
+extension Sequence {
+	func partition(_ isInFirstPartition: (Element) throws -> Bool) rethrows -> ([Element], [Element]){
+		return try reduce(into: ([],[])) { (partitions: inout ([Element], [Element]), element: Element) in
+			if try isInFirstPartition(element) {
+				partitions.0.append(element)
+			} else {
+				partitions.1.append(element)
+			}
+		}
+	}
+}
+
