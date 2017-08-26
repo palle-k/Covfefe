@@ -18,16 +18,16 @@ A grammar can be specified in Backus-Naur Form:
 
 ```swift
 let grammarString = """
-<expression> ::= <binary-operation> | <brackets> | <unary-operation> | <number> | <variable>
-<brackets>   ::= '(' <expression> ')'
+<expression>       ::= <binary-operation> | <brackets> | <unary-operation> | <number> | <variable>
+<brackets>         ::= '(' <expression> ')'
 <binary-operation> ::= <expression> <binary-operator> <expression>
-<binary-operator> ::= '+' | '-' | '*' | '/'
-<unary-operation> ::= <unary-operator> <expression>
-<unary-operator> ::= '+' | '-'
-<number> ::= <digit> | <digit> <number>
-<digit> ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
-<variable> ::= <letter> | <letter> <variable>
-<letter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+<binary-operator>  ::= '+' | '-' | '*' | '/'
+<unary-operation>  ::= <unary-operator> <expression>
+<unary-operator>   ::= '+' | '-'
+<number>           ::= <digit> | <digit> <number>
+<digit>            ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+<variable>         ::= <letter> | <letter> <variable>
+<letter>           ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
 """
 let grammar = Grammar(bnfString: grammarString, start: "expression")
 ```
