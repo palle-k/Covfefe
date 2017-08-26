@@ -34,7 +34,7 @@ var bnfGrammar: Grammar {
 	let optionalWhitespace = "optional-whitespace" --> [[]] <|> SymbolSet.whitespace <|> SymbolSet.whitespace <+> [n("optional-whitespace")]
 	let newlines = "newlines" --> t("\n") <|> t("\n") <+> n("optional-whitespace") <+> n("newlines")
 	
-	let assignmentOperator = "assignment-operator" --> t(":") <+> t(":") <+> t("=")
+	let assignmentOperator = "assignment-operator" --> t("::=")
 	
 	let ruleNameContainer = "rule-name-container" --> t("<") <+> n("rule-name") <+> t(">")
 	let ruleName = try! "rule-name" --> rt("[a-zA-Z0-9-_]+")

@@ -385,4 +385,3 @@ extension Sequence {
 		}
 	}
 }
-

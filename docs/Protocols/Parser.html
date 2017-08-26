@@ -229,9 +229,9 @@ and generate a syntax tree explaining how a word was derived from a grammar</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:7Covfefe6ParserP10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSaySayAFyAA10ProductionVAMGGG3for_tKF"></a>
+                    <a name="/s:7Covfefe6ParserP10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSaySayAA0G0V8terminal_AM5rangetGG3for_tKF"></a>
                     <a name="//apple_ref/swift/Method/syntaxTree(for:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe6ParserP10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSaySayAFyAA10ProductionVAMGGG3for_tKF">syntaxTree(for:)</a>
+                    <a class="token" href="#/s:7Covfefe6ParserP10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSaySayAA0G0V8terminal_AM5rangetGG3for_tKF">syntaxTree(for:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -251,7 +251,7 @@ and generate a syntax tree explaining how a word was derived from a grammar</p>
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">syntaxTree</span><span class="p">(</span><span class="k">for</span> <span class="nv">tokenization</span><span class="p">:</span> <span class="p">[[</span><span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/Production.html">Production</a></span><span class="p">,</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;&gt;</span><span class="p">]])</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/NonTerminal.html">NonTerminal</a></span><span class="p">,</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;&gt;</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">syntaxTree</span><span class="p">(</span><span class="k">for</span> <span class="nv">tokenization</span><span class="p">:</span> <span class="p">[[(</span><span class="nv">terminal</span><span class="p">:</span> <span class="kt"><a href="../Structs/Terminal.html">Terminal</a></span><span class="p">,</span> <span class="nv">range</span><span class="p">:</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;</span><span class="p">)]])</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/NonTerminal.html">NonTerminal</a></span><span class="p">,</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;&gt;</span></code></pre>
 
                         </div>
                       </div>
@@ -288,9 +288,9 @@ and generate a syntax tree explaining how a word was derived from a grammar</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:7Covfefe6ParserPAAE10recognizesSbSaySayAA10SyntaxTreeOyAA10ProductionVs5RangeVySS5IndexVGGGGF"></a>
+                    <a name="/s:7Covfefe6ParserPAAE10recognizesSbSaySayAA8TerminalV8terminal_s5RangeVySS5IndexVG5rangetGGF"></a>
                     <a name="//apple_ref/swift/Method/recognizes(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe6ParserPAAE10recognizesSbSaySayAA10SyntaxTreeOyAA10ProductionVs5RangeVySS5IndexVGGGGF">recognizes(_:)</a>
+                    <a class="token" href="#/s:7Covfefe6ParserPAAE10recognizesSbSaySayAA8TerminalV8terminal_s5RangeVySS5IndexVG5rangetGGF">recognizes(_:)</a>
                     </code>
                       <span class="declaration-note">
                         Extension method
@@ -308,7 +308,7 @@ and generate a syntax tree explaining how a word was derived from a grammar</p>
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">recognizes</span><span class="p">(</span><span class="n">_</span> <span class="nv">tokenization</span><span class="p">:</span> <span class="p">[[</span><span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/Production.html">Production</a></span><span class="p">,</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;&gt;</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">recognizes</span><span class="p">(</span><span class="n">_</span> <span class="nv">tokenization</span><span class="p">:</span> <span class="p">[[(</span><span class="nv">terminal</span><span class="p">:</span> <span class="kt"><a href="../Structs/Terminal.html">Terminal</a></span><span class="p">,</span> <span class="nv">range</span><span class="p">:</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;</span><span class="p">)]])</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
 
                         </div>
                       </div>
@@ -346,7 +346,7 @@ and generate a syntax tree explaining how a word was derived from a grammar</p>
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="https://github.com/palle-k" target="_blank" rel="external">palle-k</a>. All rights reserved. (Last updated: 2017-08-23)</p>
+      <p>&copy; 2017 <a class="link" href="https://github.com/palle-k" target="_blank" rel="external">palle-k</a>. All rights reserved. (Last updated: 2017-08-26)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.3</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
