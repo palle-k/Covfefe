@@ -56,9 +56,6 @@
               <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Classes/CYKParser.html">CYKParser</a>
               </li>
-              <li class="nav-group-task">
-                <a class="nav-group-task-link" href="../Classes/LinearParser.html">LinearParser</a>
-              </li>
             </ul>
           </li>
           <li class="nav-group-name">
@@ -437,87 +434,6 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:7Covfefe10ProductionV8isLinearSbv"></a>
-                    <a name="//apple_ref/swift/Property/isLinear" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe10ProductionV8isLinearSbv">isLinear</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A production is linear if the generated symbol sequence contains zero or one non-terminal</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">isLinear</span><span class="p">:</span> <span class="kt">Bool</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:7Covfefe10ProductionV13isRightLinearSbv"></a>
-                    <a name="//apple_ref/swift/Property/isRightLinear" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe10ProductionV13isRightLinearSbv">isRightLinear</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A production is right linear if it only generates terminal symbols or if it is linear and the non-terminal is in the last position</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">isRightLinear</span><span class="p">:</span> <span class="kt">Bool</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:7Covfefe10ProductionV12isLeftLinearSbv"></a>
-                    <a name="//apple_ref/swift/Property/isLeftLinear" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe10ProductionV12isLeftLinearSbv">isLeftLinear</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A production is right linear if it only generates terminal symbols or if it is linear and the non-terminal is in the first position</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">isLeftLinear</span><span class="p">:</span> <span class="kt">Bool</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
                     <a name="/s:7Covfefe10ProductionV7isFinalSbv"></a>
                     <a name="//apple_ref/swift/Property/isFinal" class="dashAnchor"></a>
                     <a class="token" href="#/s:7Covfefe10ProductionV7isFinalSbv">isFinal</a>
@@ -593,156 +509,6 @@ exclusive or one or zero terminal symbols</p>
                           <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">generatedTerminals</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Structs/Terminal.html">Terminal</a></span><span class="p">]</span></code></pre>
 
                         </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:7Covfefe10ProductionV20canGenerateSubstringSbSS2of_tF"></a>
-                    <a name="//apple_ref/swift/Method/canGenerateSubstring(of:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe10ProductionV20canGenerateSubstringSbSS2of_tF">canGenerateSubstring(of:)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Returns wether the production can be used to generate parts of the given string</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">canGenerateSubstring</span><span class="p">(</span><span class="n">of</span> <span class="nv">word</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>word</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>String to check</p>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                      <div>
-                        <h4>Return Value</h4>
-                        <p>A boolean value indicating whether the string can be generated in part by this production</p>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:7Covfefe10ProductionV16canFullyGenerateSbSS4word_tF"></a>
-                    <a name="//apple_ref/swift/Method/canFullyGenerate(word:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe10ProductionV16canFullyGenerateSbSS4word_tF">canFullyGenerate(word:)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Returns true if the production is final and the generated string is equal to the given word</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">canFullyGenerate</span><span class="p">(</span><span class="nv">word</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>word</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Word to check</p>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                      <div>
-                        <h4>Return Value</h4>
-                        <p>A boolean value indicating whether the given word can be fully generated by the production</p>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:7Covfefe10ProductionV26removingGeneratedSubstringS2S4from_tF"></a>
-                    <a name="//apple_ref/swift/Method/removingGeneratedSubstring(from:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe10ProductionV26removingGeneratedSubstringS2S4from_tF">removingGeneratedSubstring(from:)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Removes prefixes and suffixes of the given word which can be generated by the terminal prefix and suffix of this production</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">removingGeneratedSubstring</span><span class="p">(</span><span class="n">from</span> <span class="nv">word</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>word</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Word to trim</p>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                      <div>
-                        <h4>Return Value</h4>
-                        <p>Trimmed word</p>
                       </div>
                     </section>
                   </div>
@@ -902,7 +668,7 @@ exclusive or one or zero terminal symbols</p>
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="https://github.com/palle-k" target="_blank" rel="external">palle-k</a>. All rights reserved. (Last updated: 2017-08-26)</p>
+      <p>&copy; 2017 <a class="link" href="https://github.com/palle-k" target="_blank" rel="external">palle-k</a>. All rights reserved. (Last updated: 2017-08-27)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.3</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>

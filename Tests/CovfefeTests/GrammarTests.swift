@@ -27,23 +27,6 @@ import XCTest
 @testable import Covfefe
 
 class GrammarTests: XCTestCase {
-	
-    func testLinearGrammar() {
-		let productions = "S" --> (t("(") <+> n("S") <+> t(")")) <|> (t("[") <+> n("S") <+> t("]")) <|> (t("{") <+> n("S") <+> t("}")) <|> [[]]
-		let grammar = Grammar(productions: productions, start: "S")
-		let parser = LinearParser(grammar: grammar)
-		for string in ["", "()", "[]", "{}", "(())", "[[]]", "{{}}"] {
-			XCTAssertTrue(parser.recognizes(word: string))
-			if !parser.recognizes(word: string) {
-				print("Expected \(string) to be in grammar.")
-			}
-		}
-		
-		for string in ["(()"] {
-			XCTAssertFalse(parser.recognizes(word: string))
-		}
-    }
-	
 	func testCYKEmpty() {
 		let S = "S" --> [[]]
 		let grammar = Grammar(productions: S, start: "S")
@@ -268,7 +251,6 @@ class GrammarTests: XCTestCase {
 	}
 
     static var allTests = [
-        ("testLinearGrammar", testLinearGrammar),
         ("testCYK1", testCYK),
         ("testCYK2", testCYK2),
         ("testCYK3", testCYK3),

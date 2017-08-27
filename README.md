@@ -32,7 +32,7 @@ let grammarString = """
 let grammar = Grammar(bnfString: grammarString, start: "expression")
 ```
 
-This grammar describes simple mathematical expressions consisting of unary and binary operations and parentheses
+This grammar describes simple mathematical expressions consisting of unary and binary operations and parentheses.
 A syntax tree can be generated, which describes the structure of a given word:
 
  ```swift
@@ -43,3 +43,18 @@ A syntax tree can be generated, which describes the structure of a given word:
  ```
 
 ![Example Syntax Tree](https://raw.githubusercontent.com/palle-k/Covfefe/master/example-syntax-tree.png)
+
+## Usage
+
+This framework can be imported as a Swift Package by adding it as a dependency to the `Package.swift` file:
+```swift
+.package(url: "https://github.com/palle-k/Covfefe.git", from: "0.1.0")
+```
+
+To add this package to a non-Swift Package Manager project:
+
+1. `git clone https://github.com/palle-k/Covfefe.git`
+2. `cd Covfefe`
+3. `swift package generate-xcodeproj`
+4. Drag the generated project file into your project
+5. Add `Covfefe.framework` in the Embedded Binaries section of your project settings
