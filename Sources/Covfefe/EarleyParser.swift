@@ -26,25 +26,25 @@
 import Foundation
 
 /// Represents a partial parse of a production
-fileprivate struct ParseState {
+fileprivate struct ParseStateItem {
 	/// The partially parsed production
 	let production: Production
 	
 	/// The index of the next symbol to be parsed
-	var productionPosition: Int
+	let productionPosition: Int
 	
 	/// The index of the first token parsed in this partial parse
 	let startTokenIndex: Int
 }
 
-extension ParseState {
+extension ParseStateItem {
 	var isCompleted: Bool {
 		return !production.production.indices.contains(productionPosition)
 	}
 }
 
-extension ParseState: Hashable {
-	static func ==(lhs: ParseState, rhs: ParseState) -> Bool {
+extension ParseStateItem: Hashable {
+	static func ==(lhs: ParseStateItem, rhs: ParseStateItem) -> Bool {
 		return lhs.production == rhs.production
 			&& lhs.productionPosition == rhs.productionPosition
 			&& lhs.startTokenIndex == rhs.startTokenIndex
@@ -55,7 +55,7 @@ extension ParseState: Hashable {
 	}
 }
 
-extension ParseState: CustomStringConvertible {
+extension ParseStateItem: CustomStringConvertible {
 	var description: String {
 		let producedString = production.production.map { symbol -> String in
 			switch symbol {
@@ -80,6 +80,41 @@ extension ParseState: CustomStringConvertible {
 	}
 }
 
+/// A parse edge
+fileprivate struct ParseEdge {
+	/// The production
+	let production: Production
+	
+	/// State index at which the item was completed
+	let completedIndex: Int
+}
+
+extension ParseEdge: Hashable {
+	var hashValue: Int {
+		return production.hashValue ^ completedIndex.hashValue
+	}
+	
+	static func ==(lhs: ParseEdge, rhs: ParseEdge) -> Bool {
+		return lhs.production == rhs.production && lhs.completedIndex == rhs.completedIndex
+	}
+}
+
+extension ParseEdge: CustomStringConvertible {
+	var description: String {
+		let producedString = production.production.reduce("") { (partialResult, symbol) -> String in
+			switch symbol {
+			case .nonTerminal(let nonTerminal):
+				return partialResult.appending(" <\(nonTerminal.name)>")
+				
+			case .terminal(let terminal):
+				return partialResult.appending(" '\(terminal.value)'")
+			}
+		}
+		return "<\(production.pattern.name)> ::=\(producedString) \(completedIndex)"
+	}
+}
+
+
 /// A parser generator implementation that internally uses
 /// the Earley algorithm.
 ///
@@ -100,107 +135,165 @@ public struct EarleyParser: Parser {
 		self.grammar = grammar
 	}
 	
-	public func syntaxTree(for tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]) throws -> SyntaxTree<NonTerminal, Range<String.Index>> {
+	// Collects productions which can be reached indirectly.
+	// e.g. for a production A -> BC which is not already partially parsed, all productions starting from B will be collected.
+	private func predict(productions: [NonTerminal: [Production]], state: Set<ParseStateItem>, currentIndex: Int, known: Set<ParseStateItem> = []) -> Set<ParseStateItem> {
+		let newItems: Set<ParseStateItem> = state.reduce([]) { partialResult, item -> Set<ParseStateItem> in
+			// Prediction can only occur when a production has unparsed non terminal items left
+			guard !item.isCompleted else {
+				return partialResult
+			}
+			guard case .nonTerminal(let nonTerminal) = item.production.production[item.productionPosition] else {
+				return partialResult
+			}
+			// Create new parse states for each non terminal which has been reached and filter out every known state
+			let addedItems = productions[nonTerminal, default: []].map {
+				ParseStateItem(production: $0, productionPosition: 0, startTokenIndex: currentIndex)
+			}.filter{!state.contains($0) && !known.contains($0)}
+			
+			return partialResult.union(addedItems)
+		}
+		// If no new items have been found, prediction is done.
+		if newItems.isEmpty {
+			return known.union(state)
+		} else {
+			// If new items have been found, these items may lead to more items,
+			// so prediction is performed again on the new items.
+			
+			// Tail recursive call
+			return predict(productions: productions, state: newItems, currentIndex: currentIndex, known: known.union(state))
+		}
+	}
+	
+	// Finds productions which produce a non terminal and checks,
+	// if the expected terminal matches the observed one.
+	private func scan(state: Set<ParseStateItem>, token: Terminal) -> Set<ParseStateItem> {
+		return state.reduce(into: []) { partialResult, item in
+			// Bound checking
+			guard !item.isCompleted else {
+				return
+			}
+			// Check that the current symbol of the production is a terminal and if yes
+			// check that it matches the current token
+			guard
+				case .terminal(let terminal) = item.production.production[item.productionPosition],
+				terminal == token
+				else {
+					return
+			}
+			// Create a new state with an advanced production position.
+			let newState = ParseStateItem(
+				production: item.production,
+				productionPosition: item.productionPosition + 1,
+				startTokenIndex: item.startTokenIndex
+			)
+			partialResult.insert(newState)
+		}
+	}
+	
+	// Finds completed items
+	private func complete(state: Set<ParseStateItem>, allStates: [Set<ParseStateItem>], knownItems: Set<ParseStateItem> = []) -> Set<ParseStateItem> {
+		let completedItems = state.filter(\.isCompleted)
+		// Find the items which were used to enqueue the completed items
+		let generatingItems = completedItems.flatMap { item in
+			allStates[item.startTokenIndex].filter{ stateItem in
+				stateItem.production.production[stateItem.productionPosition] == Symbol.nonTerminal(item.production.pattern)
+			}
+		}
+		// Create new state items for those items and remove every item that is already known
+		let completedStates = generatingItems.map{ item in
+			ParseStateItem(production: item.production, productionPosition: item.productionPosition + 1, startTokenIndex: item.startTokenIndex)
+			}.collect(Set.init).subtracting(knownItems)
 		
-		var stateCollection: [Set<ParseState>] = []
+		// If no new states have been added, we are done
+		if completedStates.isEmpty {
+			return knownItems
+		} else {
+			// If we found new states, these may also be completed so we call the function again with the newly found items.
+			// Tail recursive call
+			return complete(state: completedStates, allStates: allStates, knownItems: knownItems.union(completedStates))
+		}
+	}
+	
+	private func buildSyntaxTree(
+		stateCollection: [Set<ParseStateItem>],
+		tokenization: [[(terminal: Terminal, range: Range<String.Index>)]],
+		rootItem: ParseStateItem,
+		endIndex: Int
+	) -> SyntaxTree<NonTerminal, Range<String.Index>> {
+		
+		guard !rootItem.production.production.isEmpty else {
+			return SyntaxTree(key: rootItem.production.pattern)
+		}
+		
+		let childTrees = rootItem.production.production.enumerated().reversed().reduce((endIndex, [])) { (partialResult, element) -> (Int, [SyntaxTree<NonTerminal, Range<String.Index>>]) in
+			let (upperBound, children) = partialResult
+			let (offset, symbol) = element
+			
+			switch symbol {
+			case .terminal:
+				let leaf = SyntaxTree<NonTerminal, Range<String.Index>>(value: tokenization[upperBound-1].first!.range)
+				return (upperBound - 1, children + [leaf])
+				
+			case .nonTerminal(let nonTerminal):
+				let parseItem = stateCollection[endIndex].first(where: { candidate -> Bool in
+					candidate.isCompleted
+						&& candidate.production.pattern == nonTerminal
+						&& stateCollection[candidate.startTokenIndex].contains(
+							ParseStateItem(
+								production: rootItem.production,
+								productionPosition: offset,
+								startTokenIndex: rootItem.startTokenIndex
+							)
+						)
+				})!
+				let childTree = buildSyntaxTree(stateCollection: stateCollection, tokenization: tokenization, rootItem: parseItem, endIndex: upperBound)
+				return (parseItem.startTokenIndex, children + [childTree])
+			}
+		}.1.reversed().collect(Array.init)
+		
+		return SyntaxTree(key: rootItem.production.pattern, children: childTrees)
+	}
+	
+	public func syntaxTree(for tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]) throws -> SyntaxTree<NonTerminal, Range<String.Index>> {
+		//TODO: Support empty productions
+		//TODO: Better support for right recursion
+		//TODO: Generate syntax tree
+		
+		var stateCollection: [Set<ParseStateItem>] = []
 		stateCollection.reserveCapacity(tokenization.count+1)
 		
 		let nonTerminalProductions = Dictionary(grouping: grammar.productions, by: {$0.pattern})
 		
-		stateCollection.append(nonTerminalProductions[grammar.start, default: []].map({ (production) -> ParseState in
-			ParseState(production: production, productionPosition: 0, startTokenIndex: 0)
+		// The start state contains all productions which can be reached directly from the starting non terminal
+		stateCollection.append(nonTerminalProductions[grammar.start, default: []].map({ (production) -> ParseStateItem in
+			ParseStateItem(production: production, productionPosition: 0, startTokenIndex: 0)
 		}).collect(Set.init))
 		
-		func predict(state: Set<ParseState>, currentIndex: Int, known: Set<ParseState> = []) -> Set<ParseState> {
-			let newItems: Set<ParseState> = state.reduce([]) { partialResult, item -> Set<ParseState> in
-				// Prediction can only occur when a production has unparsed non terminal items left
-				guard !item.isCompleted else {
-					return partialResult
-				}
-				guard case .nonTerminal(let nonTerminal) = item.production.production[item.productionPosition] else {
-					return partialResult
-				}
-				// Create new parse states for each non terminal which has been reached and filter out every known state
-				let addedItems = nonTerminalProductions[nonTerminal, default: []].map {
-					ParseState(production: $0, productionPosition: 0, startTokenIndex: currentIndex)
-				}.filter{!state.contains($0) && !known.contains($0)}
-				
-				return partialResult.union(addedItems)
-			}
-			// If no new items have been found, prediction is done.
-			if newItems.isEmpty {
-				return known.union(state)
-			} else {
-				// If new items have been found, these items may lead to more items,
-				// so prediction is performed again on the new items.
-				
-				// Tail recursive call
-				return predict(state: newItems, currentIndex: currentIndex, known: known.union(state))
-			}
-		}
+		stateCollection[0] = predict(productions: nonTerminalProductions, state: stateCollection[0], currentIndex: 0)
+		print("State \(0): [\n\t\(stateCollection[0].map(\.description).joined(separator: "\n\t"))\n]")
 		
-		func scan(state: Set<ParseState>, token: Terminal) -> Set<ParseState> {
-			return state.reduce(into: []) { partialResult, item in
-				// Bound checking
-				guard !item.isCompleted else {
-					return
-				}
-				// Check that the current symbol of the production is a terminal and if yes
-				// check that it matches the current token
-				guard
-					case .terminal(let terminal) = item.production.production[item.productionPosition],
-					terminal == token
-				else {
-					return
-				}
-				// Create a new state with an advanced production position.
-				let newState = ParseState(
-					production: item.production,
-					productionPosition: item.productionPosition + 1,
-					startTokenIndex: item.startTokenIndex
-				)
-				partialResult.insert(newState)
-			}
-		}
-		
-		func complete(state: Set<ParseState>, allStates: [Set<ParseState>], knownStates: Set<ParseState> = []) -> Set<ParseState> {
-			let completedItems = state.filter(\.isCompleted)
-			// Find the items which were used to enqueue the completed items
-			let generatingItems = completedItems.flatMap { item in
-				allStates[item.startTokenIndex].filter{ stateItem in
-					stateItem.production.production[stateItem.productionPosition] == Symbol.nonTerminal(item.production.pattern)
-				}
-			}
-			let completedStates = generatingItems.map{ item in
-				ParseState(production: item.production, productionPosition: item.productionPosition + 1, startTokenIndex: item.startTokenIndex)
-			}.collect(Set.init).subtracting(knownStates)
-			
-			if completedStates.isEmpty {
-				return knownStates
-			} else {
-				return complete(state: completedStates, allStates: allStates, knownStates: knownStates.union(completedStates))
-			}
-		}
-		
-		stateCollection[0] = predict(state: stateCollection[0], currentIndex: 0)
-		
-		for (index, tokens) in tokenization.enumerated() {
-			stateCollection.append(tokens.reduce([]) { partialResult, token -> Set<ParseState> in
+		// Parse loop: Scan token, find finished productions and update dependent productions and find new productions
+		stateCollection = tokenization.enumerated().reduce(into: stateCollection) { (stateCollection, element) in
+			let (index, tokens) = element
+			let newItems = tokens.reduce([]) { partialResult, token -> Set<ParseStateItem> in
 				partialResult.union(scan(state: stateCollection[index], token: token.terminal))
-			})
-			stateCollection[index+1] = complete(state: stateCollection[index+1], allStates: stateCollection, knownStates: stateCollection[index+1])
-			stateCollection[index+1] = predict(state: stateCollection[index+1], currentIndex: index+1)
+			}
+			let completed = complete(state: newItems, allStates: stateCollection, knownItems: newItems)
+			let predicted = predict(productions: nonTerminalProductions, state: completed, currentIndex: index + 1)
+			stateCollection.append(predicted)
+			
+			print("State \(index+1): [\n\t\(predicted.map(\.description).joined(separator: "\n\t"))\n]")
 		}
 		
-		if stateCollection.last!.contains(where: { (parseState) -> Bool in
-			parseState.production.pattern == self.grammar.start
-			&& parseState.isCompleted
-		}) {
-			print("Parsing successful.")
-		} else {
-			print("Parsing failed.")
+		guard let match = stateCollection.last!.first(where: { (parseState) -> Bool in
+			parseState.startTokenIndex == 0
+				&& parseState.isCompleted
+				&& parseState.production.pattern == self.grammar.start
+		}) else {
+			throw SyntaxError(range: "".startIndex ..< "".endIndex, reason: .unmatchedPattern)
 		}
 		
-		fatalError()
+		return buildSyntaxTree(stateCollection: stateCollection, tokenization: tokenization, rootItem: match, endIndex: stateCollection.count - 1)
 	}
 }
