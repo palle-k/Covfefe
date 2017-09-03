@@ -22,6 +22,6 @@ class EarleyParserTests: XCTestCase {
 		let tokenizer = DefaultTokenizer(grammar: grammar)
 		let parser = EarleyParser(grammar: grammar)
 		let expression = "1+(2*3-4)"
-		try print(parser.syntaxTree(for: tokenizer.tokenize(expression)))
+		try print(parser.syntaxTree(for: tokenizer.tokenize(expression)).mapLeafs{String(expression[$0])})
 	}
 }

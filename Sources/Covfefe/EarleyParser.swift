@@ -81,7 +81,7 @@ extension ParseStateItem: CustomStringConvertible {
 }
 
 /// A parse edge
-fileprivate struct ParseEdge {
+fileprivate struct ParsedItem {
 	/// The production
 	let production: Production
 	
@@ -89,17 +89,17 @@ fileprivate struct ParseEdge {
 	let completedIndex: Int
 }
 
-extension ParseEdge: Hashable {
+extension ParsedItem: Hashable {
 	var hashValue: Int {
 		return production.hashValue ^ completedIndex.hashValue
 	}
 	
-	static func ==(lhs: ParseEdge, rhs: ParseEdge) -> Bool {
+	static func ==(lhs: ParsedItem, rhs: ParsedItem) -> Bool {
 		return lhs.production == rhs.production && lhs.completedIndex == rhs.completedIndex
 	}
 }
 
-extension ParseEdge: CustomStringConvertible {
+extension ParsedItem: CustomStringConvertible {
 	var description: String {
 		let producedString = production.production.reduce("") { (partialResult, symbol) -> String in
 			switch symbol {
@@ -216,43 +216,64 @@ public struct EarleyParser: Parser {
 	}
 	
 	private func buildSyntaxTree(
-		stateCollection: [Set<ParseStateItem>],
+		stateCollection: [Set<ParsedItem>],
 		tokenization: [[(terminal: Terminal, range: Range<String.Index>)]],
-		rootItem: ParseStateItem,
-		endIndex: Int
+		rootItem: ParsedItem,
+		startIndex: Int
 	) -> SyntaxTree<NonTerminal, Range<String.Index>> {
 		
 		guard !rootItem.production.production.isEmpty else {
 			return SyntaxTree(key: rootItem.production.pattern)
 		}
 		
-		let childTrees = rootItem.production.production.enumerated().reversed().reduce((endIndex, [])) { (partialResult, element) -> (Int, [SyntaxTree<NonTerminal, Range<String.Index>>]) in
-			let (upperBound, children) = partialResult
-			let (offset, symbol) = element
-			
-			switch symbol {
-			case .terminal:
-				let leaf = SyntaxTree<NonTerminal, Range<String.Index>>(value: tokenization[upperBound-1].first!.range)
-				return (upperBound - 1, children + [leaf])
-				
-			case .nonTerminal(let nonTerminal):
-				let parseItem = stateCollection[endIndex].first(where: { candidate -> Bool in
-					candidate.isCompleted
-						&& candidate.production.pattern == nonTerminal
-						&& stateCollection[candidate.startTokenIndex].contains(
-							ParseStateItem(
-								production: rootItem.production,
-								productionPosition: offset,
-								startTokenIndex: rootItem.startTokenIndex
-							)
-						)
-				})!
-				let childTree = buildSyntaxTree(stateCollection: stateCollection, tokenization: tokenization, rootItem: parseItem, endIndex: upperBound)
-				return (parseItem.startTokenIndex, children + [childTree])
+		func resolveTokenization(unresolved: ArraySlice<Symbol>, position: Int) -> [SyntaxTree<NonTerminal, Range<String.Index>>]? {
+			guard position <= rootItem.completedIndex else {
+				return nil
 			}
-		}.1.reversed().collect(Array.init)
+			
+			guard let first = unresolved.first else {
+				if position == rootItem.completedIndex {
+					return []
+				} else {
+					return nil
+				}
+			}
+			switch first {
+			case .nonTerminal(let nonTerminal):
+				let candidates = stateCollection[position].lazy.filter { candidate -> Bool in
+					candidate.production.pattern == nonTerminal
+				}
+				return candidates.flatMap { candidate -> [SyntaxTree<NonTerminal, Range<String.Index>>]? in
+					guard let resolved = resolveTokenization(unresolved: unresolved.dropFirst(), position: candidate.completedIndex) else {
+						return nil
+					}
+					let node = self.buildSyntaxTree(
+						stateCollection: stateCollection,
+						tokenization: tokenization,
+						rootItem: candidate,
+						startIndex: position
+					)
+					return resolved + [node]
+				}.first
+				
+			case .terminal(let terminal):
+				guard position < tokenization.count else {
+					return nil
+				}
+				guard let range = tokenization[position].first(where: { element -> Bool in
+					element.terminal == terminal
+				})?.range else {
+					return nil
+				}
+				guard let rest = resolveTokenization(unresolved: unresolved.dropFirst(), position: position + 1) else {
+					return nil
+				}
+				return rest + [.leaf(range)]
+			}
+		}
 		
-		return SyntaxTree(key: rootItem.production.pattern, children: childTrees)
+		let children:[SyntaxTree<NonTerminal, Range<String.Index>>] = resolveTokenization(unresolved: ArraySlice(rootItem.production.production), position: startIndex)!.reversed()
+		return SyntaxTree.node(key: rootItem.production.pattern, children: children)
 	}
 	
 	public func syntaxTree(for tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]) throws -> SyntaxTree<NonTerminal, Range<String.Index>> {
@@ -271,7 +292,7 @@ public struct EarleyParser: Parser {
 		}).collect(Set.init))
 		
 		stateCollection[0] = predict(productions: nonTerminalProductions, state: stateCollection[0], currentIndex: 0)
-		print("State \(0): [\n\t\(stateCollection[0].map(\.description).joined(separator: "\n\t"))\n]")
+		//print("State \(0): [\n\t\(stateCollection[0].map(\.description).joined(separator: "\n\t"))\n]")
 		
 		// Parse loop: Scan token, find finished productions and update dependent productions and find new productions
 		stateCollection = tokenization.enumerated().reduce(into: stateCollection) { (stateCollection, element) in
@@ -283,17 +304,26 @@ public struct EarleyParser: Parser {
 			let predicted = predict(productions: nonTerminalProductions, state: completed, currentIndex: index + 1)
 			stateCollection.append(predicted)
 			
-			print("State \(index+1): [\n\t\(predicted.map(\.description).joined(separator: "\n\t"))\n]")
+			//print("State \(index+1): [\n\t\(predicted.map(\.description).joined(separator: "\n\t"))\n]")
 		}
 		
-		guard let match = stateCollection.last!.first(where: { (parseState) -> Bool in
-			parseState.startTokenIndex == 0
-				&& parseState.isCompleted
-				&& parseState.production.pattern == self.grammar.start
+		let parseStates = stateCollection.enumerated().reduce(Array<Set<ParsedItem>>(repeating: [], count: stateCollection.count)) { (parseStates, element) in
+			let (index, state) = element
+			let completed = state.filter(\.isCompleted)
+			return completed.reduce(into: parseStates) { (parseStates, item) in
+				parseStates[item.startTokenIndex].insert(ParsedItem(production: item.production, completedIndex: index))
+			}
+		}
+		
+		guard let match = parseStates.first!.first(where: { (item) -> Bool in
+			item.completedIndex == parseStates.count - 1 &&
+			item.production.pattern == grammar.start
 		}) else {
 			throw SyntaxError(range: "".startIndex ..< "".endIndex, reason: .unmatchedPattern)
 		}
 		
-		return buildSyntaxTree(stateCollection: stateCollection, tokenization: tokenization, rootItem: match, endIndex: stateCollection.count - 1)
+		print(parseStates.enumerated().map {print("State \($0.offset): [\n\t\($0.element.map(\.description).joined(separator: "\n\t"))\n]")})
+		
+		return buildSyntaxTree(stateCollection: parseStates, tokenization: tokenization, rootItem: match, startIndex: 0)
 	}
 }
