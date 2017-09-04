@@ -28,7 +28,7 @@ import Foundation
 /// A grammar describing the Backus-Naur form
 var bnfGrammar: Grammar {
 	
-	let syntax = "syntax" --> n("rule") <|> n("rule") <+> n("newlines") <|> n("rule") <+> n("newlines") <+> n("syntax")
+	let syntax = "syntax" --> n("rule") <|> n("rule") <+> n("newlines") <|> n("syntax") <+> n("newlines") <+> n("rule") <+> (n("newlines") <|> [[]])
 	let rule = "rule" --> n("optional-whitespace") <+> n("rule-name-container") <+> n("optional-whitespace") <+> n("assignment-operator") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace")
 	
 	let optionalWhitespace = "optional-whitespace" --> [[]] <|> SymbolSet.whitespace <|> SymbolSet.whitespace <+> [n("optional-whitespace")]
@@ -40,8 +40,8 @@ var bnfGrammar: Grammar {
 	let ruleName = try! "rule-name" --> rt("[a-zA-Z0-9-_]+")
 	
 	let expression = "expression" --> n("concatenation") <|> n("alternation")
-	let alternation = "alternation" --> n("concatenation") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("expression")
-	let concatenation = "concatenation" --> n("expression-element") <|> n("expression-element") <+> n("optional-whitespace") <+> n("concatenation")
+	let alternation = "alternation" --> n("expression") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("concatenation")
+	let concatenation = "concatenation" --> n("expression-element") <|> n("concatenation") <+> n("optional-whitespace") <+> n("expression-element")
 	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container")
 	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"")
 	let string1 = try! "string-1" --> rt("[^']+(?=')") <|> [[]]
