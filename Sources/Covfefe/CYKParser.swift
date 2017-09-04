@@ -51,13 +51,13 @@ public extension Parser {
 ///
 /// The parser can parse non-deterministic and deterministic grammars.
 /// It requires O(n^3) runtime.
-public class CYKParser: Parser {
+public struct CYKParser: Parser {
 	
 	/// The grammar which the parser recognizes
 	public let grammar: Grammar
 	
 	/// The parser requires the grammar to be in chomsky normal form
-	private lazy var normalizedGrammar: Grammar = grammar.chomskyNormalized()
+	private let normalizedGrammar: Grammar
 	
 	/// Initializes a CYK parser which recognizes the given grammar.
 	///
@@ -66,6 +66,7 @@ public class CYKParser: Parser {
 	/// - Parameter grammar: The grammar which the parser recognizes.
 	public init(grammar: Grammar) {
 		self.grammar = grammar
+		self.normalizedGrammar = grammar.chomskyNormalized()
 	}
 	
 	/// Generates an error from a CYK table if the grammar cannot be used to generate a given word.

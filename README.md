@@ -36,7 +36,7 @@ let grammarString = """
 <variable>         ::= <letter> | <letter> <variable>
 <letter>           ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
 """
-let grammar = Grammar(bnfString: grammarString, start: "expression")
+let grammar = try Grammar(bnfString: grammarString, start: "expression")
 ```
 
 This grammar describes simple mathematical expressions consisting of unary and binary operations and parentheses.
@@ -44,7 +44,7 @@ A syntax tree can be generated, which describes the structure of a given word:
 
  ```swift
  let tokenizer = DefaultTokenizer(grammar: grammar)
- let parser = CYKParser(gramar: grammar)
+ let parser = EarleyParser(gramar: grammar)
  
  let syntaxTree = try parser.syntaxTree(for: tokenizer.tokenize("(a+b)*(-c)"))
  ```

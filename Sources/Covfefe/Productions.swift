@@ -137,6 +137,37 @@ public struct Production: Codable {
 			return nonTerminal
 		}
 	}
+	
+	func generatesEmpty(in grammar: Grammar) -> Bool {
+		let groupedProductions = Dictionary(grouping: grammar.productions, by: {$0.pattern})
+		
+		func generatesEmpty(_ nonTerminal: NonTerminal, path: Set<NonTerminal>) -> Bool {
+			if path.contains(nonTerminal) {
+				return false
+			}
+			
+			let directProductions = groupedProductions[nonTerminal, default: []]
+			return directProductions.contains { production -> Bool in
+				if production.production.isEmpty {
+					return true
+				}
+				return production.generatedNonTerminals.count == production.production.count
+					&& production.generatedNonTerminals.allMatch { pattern -> Bool in
+						generatesEmpty(pattern, path: path.union([nonTerminal]))
+				}
+			}
+		}
+		
+		return self.production.allMatch { symbol -> Bool in
+			switch symbol {
+			case .terminal:
+				return false
+				
+			case .nonTerminal(let nonTerminal):
+				return generatesEmpty(nonTerminal, path: [])
+			}
+		}
+	}
 }
 
 extension Production: Hashable {
