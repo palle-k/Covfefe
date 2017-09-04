@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>==(_:_:) Function Reference</title>
+    <title>CYKParser Struct Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset="utf-8">
@@ -14,9 +14,9 @@
   </head>
   <body>
 
-    <a name="//apple_ref/swift/Function/==(_:_:)" class="dashAnchor"></a>
+    <a name="//apple_ref/swift/Struct/CYKParser" class="dashAnchor"></a>
 
-    <a title="==(_:_:) Function Reference"></a>
+    <a title="CYKParser Struct Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
@@ -44,7 +44,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html"> Reference</a>
       <img class="carat" src="../img/carat.png" />
-      ==(_:_:) Function Reference
+      CYKParser Struct Reference
     </p>
 
     <div class="content-wrapper">
@@ -204,16 +204,17 @@
 
         <section class="section">
           <div class="section-content">
-            <h1>==(_:_:)</h1>
+            <h1>CYKParser</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="o">==</span> <span class="o">&lt;</span><span class="kt">Element</span><span class="p">:</span> <span class="kt">Equatable</span><span class="p">,</span> <span class="kt">LeafElement</span><span class="p">:</span> <span class="kt">Equatable</span><span class="o">&gt;</span><span class="p">(</span><span class="nv">lhs</span><span class="p">:</span> <span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt">Element</span><span class="p">,</span> <span class="kt">LeafElement</span><span class="o">&gt;</span><span class="p">,</span> <span class="nv">rhs</span><span class="p">:</span> <span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt">Element</span><span class="p">,</span> <span class="kt">LeafElement</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">CYKParser</span><span class="p">:</span> <span class="kt"><a href="../Protocols/Parser.html">Parser</a></span></code></pre>
 
                 </div>
               </div>
-            <p>Determines if two syntax trees are equal to each other.</p>
+            <p>A parser based on the CYK algorithm.</p>
 
-<p>This function returns true, if both trees have the same structure, equal keys in equal nodes and equal leafs</p>
+<p>The parser can parse non-deterministic and deterministic grammars.
+It requires O(n^3) runtime.</p>
 
           </div>
         </section>
@@ -225,9 +226,84 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:7Covfefe2eeoiSbAA10SyntaxTreeOyxq_G_AEts9EquatableRzsAFR_r0_lF7ElementL_xmfp"></a>
-                    <a name="//apple_ref/swift/Parameter/Element" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe2eeoiSbAA10SyntaxTreeOyxq_G_AEts9EquatableRzsAFR_r0_lF7ElementL_xmfp">Element</a>
+                    <a name="/s:7Covfefe9CYKParserV7grammarAA7GrammarVv"></a>
+                    <a name="//apple_ref/swift/Property/grammar" class="dashAnchor"></a>
+                    <a class="token" href="#/s:7Covfefe9CYKParserV7grammarAA7GrammarVv">grammar</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The grammar which the parser recognizes</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">let</span> <span class="nv">grammar</span><span class="p">:</span> <span class="kt"><a href="../Structs/Grammar.html">Grammar</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:7Covfefe9CYKParserVAcA7GrammarV7grammar_tcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(grammar:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:7Covfefe9CYKParserVAcA7GrammarV7grammar_tcfc">init(grammar:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initializes a CYK parser which recognizes the given grammar.</p>
+
+<p>The parser can parse non-deterministic and deterministic context free languages in O(n^3).</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">grammar</span><span class="p">:</span> <span class="kt"><a href="../Structs/Grammar.html">Grammar</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>grammar</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The grammar which the parser recognizes.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:7Covfefe6ParserP10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSaySayAA0G0V8terminal_AM5rangetGG3for_tKF"></a>
+                    <a name="//apple_ref/swift/Method/syntaxTree(for:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:7Covfefe6ParserP10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSaySayAA0G0V8terminal_AM5rangetGG3for_tKF">syntaxTree(for:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -241,9 +317,28 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="o">==</span> <span class="o">&lt;</span><span class="kt">Element</span><span class="p">:</span> <span class="kt">Equatable</span><span class="p">,</span> <span class="kt">LeafElement</span><span class="p">:</span> <span class="kt">Equatable</span><span class="o">&gt;</span><span class="p">(</span><span class="nv">lhs</span><span class="p">:</span> <span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt">Element</span><span class="p">,</span> <span class="kt">LeafElement</span><span class="o">&gt;</span><span class="p">,</span> <span class="nv">rhs</span><span class="p">:</span> <span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt">Element</span><span class="p">,</span> <span class="kt">LeafElement</span><span class="o">&gt;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">syntaxTree</span><span class="p">(</span><span class="k">for</span> <span class="nv">tokens</span><span class="p">:</span> <span class="p">[[(</span><span class="nv">terminal</span><span class="p">:</span> <span class="kt"><a href="../Structs/Terminal.html">Terminal</a></span><span class="p">,</span> <span class="nv">range</span><span class="p">:</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;</span><span class="p">)]])</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/NonTerminal.html">NonTerminal</a></span><span class="p">,</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;&gt;</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>tokenization</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>

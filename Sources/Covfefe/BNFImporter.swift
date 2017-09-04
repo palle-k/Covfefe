@@ -79,7 +79,7 @@ public extension Grammar {
 	public init(bnfString: String, start: String) throws {
 		let grammar = bnfGrammar
 		let tokenizer = DefaultTokenizer(grammar: grammar)
-		let parser = CYKParser(grammar: grammar)
+		let parser = EarleyParser(grammar: grammar)
 		let syntaxTree = try parser
 			.syntaxTree(for: tokenizer.tokenize(bnfString))
 			.explode{["expression"].contains($0)}
@@ -165,6 +165,15 @@ public extension Grammar {
 			return makeProductions(from: children[2], named: name)
 		}
 		
-		self.init(productions: productions, start: NonTerminal(name: start))
+		if productions.contains(where: { (production: Production) -> Bool in
+			production.generatedNonTerminals.contains("EOL")
+		}) && !productions.contains(where: { (production: Production) -> Bool in
+			production.pattern == "EOL"
+		}) {
+			self.init(productions: productions + ["EOL" --> t("\n")], start: NonTerminal(name: start))
+		} else {
+			self.init(productions: productions, start: NonTerminal(name: start))
+		}
+		
 	}
 }
