@@ -10,7 +10,7 @@ It can recognize any context free grammar in Backus-Naur form.
 
 This framework can be imported as a Swift Package by adding it as a dependency to the `Package.swift` file:
 ```swift
-.package(url: "https://github.com/palle-k/Covfefe.git", from: "0.1.0")
+.package(url: "https://github.com/palle-k/Covfefe.git", from: "0.2.0")
 ```
 
 To add this package to a non-Swift Package Manager project:
