@@ -128,7 +128,7 @@ extension ParsedItem: CustomStringConvertible {
 				return partialResult.appending(" '\(terminal.value.replacingOccurrences(of: "\n", with: "\\n"))'")
 			}
 		}
-		return "<\(production.pattern.name)> ::=\(producedString) \(completedIndex)"
+		return "<\(production.pattern.name)> ::=\(producedString) (\(completedIndex))"
 	}
 }
 
@@ -231,7 +231,7 @@ public struct EarleyParser: Parser {
 			}
 		
 		// Create new state items for those items and remove every item that is already known
-		let completedItems = generatingItems.map { item in
+		let completedItems = generatingItems.subtracting(knownItems).map { item in
 			item.advanced()
 		}.collect(Set.init).subtracting(knownItems)
 		
@@ -282,10 +282,10 @@ public struct EarleyParser: Parser {
 			return SyntaxTree(key: rootItem.production.pattern)
 		}
 		
-		func resolveTokenization(
+		func resolve(
 			unresolved: ArraySlice<Symbol>,
 			position: Int
-		) -> [SyntaxTree<NonTerminal, Range<String.Index>>]? {
+		) -> [(Int, Either<ParsedItem, Terminal>)]? {
 			guard position <= rootItem.completedIndex else {
 				return nil
 			}
@@ -300,41 +300,50 @@ public struct EarleyParser: Parser {
 			switch first {
 			case .nonTerminal(let nonTerminal):
 				let candidates = stateCollection[position].lazy.filter { candidate -> Bool in
-					candidate.production.pattern == nonTerminal && (candidate != rootItem || startIndex != position)
+					candidate.production.pattern == nonTerminal
+						&& (candidate != rootItem || startIndex != position)
+						&& candidate.completedIndex <= rootItem.completedIndex
 				}
-				return candidates.flatMap { candidate -> [SyntaxTree<NonTerminal, Range<String.Index>>]? in
-					guard let resolved = resolveTokenization(
+				return candidates.flatMap { candidate -> [(Int, Either<ParsedItem, Terminal>)]? in
+					guard let resolved = resolve(
 						unresolved: unresolved.dropFirst(),
 						position: candidate.completedIndex
 					) else {
 						return nil
 					}
-					let node = self.buildSyntaxTree(
-						stateCollection: stateCollection,
-						tokenization: tokenization,
-						rootItem: candidate,
-						startIndex: position
-					)
-					return resolved + [node]
+					return resolved + [(position, .first(candidate))]
 				}.first
 				
 			case .terminal(let terminal):
+				// A terminal can only be scanned if there is at least one token left.
 				guard position < tokenization.count else {
 					return nil
 				}
-				guard let range = tokenization[position].first(where: { element -> Bool in
-					element.terminal == terminal
-				})?.range else {
+				// The position might be wrong, so we check that the terminal actually occurred at the current position
+				guard tokenization[position].contains(where: {$0.terminal == terminal}) else {
 					return nil
 				}
-				guard let rest = resolveTokenization(unresolved: unresolved.dropFirst(), position: position + 1) else {
+				// Try to resolve the rest.
+				guard let rest = resolve(unresolved: unresolved.dropFirst(), position: position + 1) else {
 					return nil
 				}
-				return rest + [.leaf(range)]
+				return rest + [(position, .second(terminal))]
 			}
 		}
 		
-		let children:[SyntaxTree<NonTerminal, Range<String.Index>>] = resolveTokenization(unresolved: ArraySlice(rootItem.production.production), position: startIndex)!.reversed()
+		let childRoots:[(Int, Either<ParsedItem, Terminal>)] = resolve(unresolved: ArraySlice(rootItem.production.production), position: startIndex)!.reversed()
+		
+//		print("Child roots of \(rootItem): [\n\t\(childRoots.map{"\($0.0): \($0.1.combine({$0.description}, {$0.value}))"}.joined(separator: "\n\t"))\n]")
+		
+		let children = childRoots.map { element -> SyntaxTree<NonTerminal, Range<String.Index>> in
+			let (position, root) = element
+			return root.combine({ (item) -> SyntaxTree<NonTerminal, Range<String.Index>> in
+				buildSyntaxTree(stateCollection: stateCollection, tokenization: tokenization, rootItem: item, startIndex: position)
+			}, { (terminal) -> SyntaxTree<NonTerminal, Range<String.Index>> in
+				SyntaxTree.leaf(tokenization[position].first!.range)
+			})
+		}
+		
 		return SyntaxTree.node(key: rootItem.production.pattern, children: children)
 	}
 	
@@ -401,7 +410,7 @@ public struct EarleyParser: Parser {
 			}
 		}
 		
-//		print(parseStates.enumerated().map {print("State \($0.offset): [\n\t\($0.element.map(\.description).joined(separator: "\n\t"))\n]")})
+//		print(parseStates.enumerated().map {"State \($0.offset): [\n\t\($0.element.map(\.description).joined(separator: "\n\t"))\n]"}.joined(separator: "\n"))
 		
 		return buildSyntaxTree(stateCollection: parseStates, tokenization: tokenization, rootItem: match, startIndex: 0)
 	}

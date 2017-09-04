@@ -79,7 +79,7 @@ public extension Grammar {
 	public init(bnfString: String, start: String) throws {
 		let grammar = bnfGrammar
 		let tokenizer = DefaultTokenizer(grammar: grammar)
-		let parser = CYKParser(grammar: grammar)
+		let parser = EarleyParser(grammar: grammar)
 		let syntaxTree = try parser
 			.syntaxTree(for: tokenizer.tokenize(bnfString))
 			.explode{["expression"].contains($0)}

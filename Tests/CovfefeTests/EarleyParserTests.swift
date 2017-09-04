@@ -22,7 +22,7 @@ class EarleyParserTests: XCTestCase {
 		let tokenizer = DefaultTokenizer(grammar: grammar)
 		let parser = EarleyParser(grammar: grammar)
 		let expression = "1+(2*3-4)"
-		try print(parser.syntaxTree(for: tokenizer.tokenize(expression)).mapLeafs{String(expression[$0])})
+		_ = try parser.syntaxTree(for: tokenizer.tokenize(expression)).mapLeafs{String(expression[$0])}
 	}
 	
 	func testEarleyParser2() throws {
@@ -42,7 +42,7 @@ class EarleyParserTests: XCTestCase {
 		let tokenizer = DefaultTokenizer(grammar: grammar)
 		let parser = EarleyParser(grammar: grammar)
 		let expression = "(a+b)*(-c)"
-		try print(parser.syntaxTree(for: tokenizer.tokenize(expression)).mapLeafs{String(expression[$0])})
+		_ = try parser.syntaxTree(for: tokenizer.tokenize(expression)).mapLeafs{String(expression[$0])}
 	}
 	
 	func testEarleyEmpty() throws {
@@ -63,7 +63,7 @@ class EarleyParserTests: XCTestCase {
 		let expression = """
 		hello=1337
 		"""
-		try print(parser.syntaxTree(for: tokenizer.tokenize(expression)).mapLeafs{String(expression[$0])})
+		_ = try parser.syntaxTree(for: tokenizer.tokenize(expression)).mapLeafs{String(expression[$0])}
 	}
 	
 	func testEarleyJSON() throws {
@@ -129,11 +129,32 @@ class EarleyParserTests: XCTestCase {
 		}
 		"""
 		do {
-			print("Beginning parse...")
 			let tokenized = try tokenizer.tokenize(expression)
-			let syntaxTree = try parser.syntaxTree(for: tokenized)
-			print("Finished parsing.")
-			print(syntaxTree.mapLeafs{String(expression[$0])})
+			_ = try parser.syntaxTree(for: tokenized)
+		} catch let error as SyntaxError {
+			print("Error: \(error.reason) at \(NSRange(error.range, in: expression)): \(expression[error.range])")
+			XCTFail()
+		}
+	}
+	
+	func testEarleyBNF() throws {
+		let grammar = bnfGrammar
+		let parser = EarleyParser(grammar: grammar)
+		let tokenizer = DefaultTokenizer(grammar: grammar)
+		
+		let expression = """
+		<sum>     ::= <sum> '+' <product> | <sum> '-' <product>
+		<sum>     ::= <product>
+		<product> ::= <product> '*' <factor> | <product> '/' <factor>
+		<product> ::= <factor>
+		<factor>  ::= '(' <sum> ')'
+		<factor>  ::= <number>
+		<number>  ::= <number> <digit> | <digit>
+		<digit>  ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+		"""
+		do {
+			let tokenized = try tokenizer.tokenize(expression)
+			_ = try parser.syntaxTree(for: tokenized)
 		} catch let error as SyntaxError {
 			print("Error: \(error.reason) at \(NSRange(error.range, in: expression)): \(expression[error.range])")
 			XCTFail()
