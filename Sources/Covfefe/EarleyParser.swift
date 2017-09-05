@@ -172,7 +172,7 @@ public struct EarleyParser: Parser {
 		item: ParseStateItem,
 		currentIndex: Int,
 		knownItems: Set<ParseStateItem>
-	) -> Set<ParseStateItem> {
+	) -> [ParseStateItem] {
 		guard
 			let symbol = item.nextSymbol,
 			case .nonTerminal(let nonTerminal) = symbol
@@ -182,31 +182,28 @@ public struct EarleyParser: Parser {
 		// Create new parse states for each non terminal which has been reached and filter out every known state
 		let addedItems = productions[nonTerminal, default: []].map {
 			ParseStateItem(production: $0, productionPosition: 0, startTokenIndex: currentIndex)
-		}.collect(Set.init).subtracting(knownItems)
+		}
 		
 		// If a nullable symbol was added, advance the production that added this symbol
 		if nullableNonTerminals.contains(nonTerminal) {
-			return Set(addedItems + [item.advanced()])
+			return addedItems + [item.advanced()]
 		}
 		
-		return Set(addedItems)
+		return addedItems
 	}
 	
 	// Finds productions which produce a non terminal and checks,
 	// if the expected terminal matches the observed one.
 	private func scan(state: Set<ParseStateItem>, token: Terminal) -> Set<ParseStateItem> {
 		return state.reduce(into: []) { partialResult, item in
-			// Bound checking
-			guard !item.isCompleted else {
-				return
-			}
 			// Check that the current symbol of the production is a terminal and if yes
 			// check that it matches the current token
 			guard
-				case .terminal(let terminal) = item.production.production[item.productionPosition],
+				let next = item.nextSymbol,
+				case .terminal(let terminal) = next,
 				terminal == token
-				else {
-					return
+			else {
+				return
 			}
 			// Create a new state with an advanced production position.
 			partialResult.insert(item.advanced())
@@ -218,24 +215,21 @@ public struct EarleyParser: Parser {
 		item: ParseStateItem,
 		allStates: [Set<ParseStateItem>],
 		knownItems: Set<ParseStateItem>
-	) -> Set<ParseStateItem> {
+	) -> [ParseStateItem] {
 		guard item.isCompleted else {
 			return []
 		}
 		
 		// Find the items which were used to enqueue the completed items
 		let generatingItems = (allStates.indices.contains(item.startTokenIndex) ? allStates[item.startTokenIndex] : [])
-			.union(knownItems).filter { stateItem in
+			.filter { stateItem in
 				!stateItem.isCompleted
 					&& stateItem.nextSymbol == Symbol.nonTerminal(item.production.pattern)
 			}
 		
-		// Create new state items for those items and remove every item that is already known
-		let completedItems = generatingItems.subtracting(knownItems).map { item in
+		return generatingItems.map { item in
 			item.advanced()
-		}.collect(Set.init).subtracting(knownItems)
-		
-		return completedItems
+		}
 	}
 	
 	private func processState(
@@ -255,7 +249,7 @@ public struct EarleyParser: Parser {
 			case .some(.nonTerminal):
 				return addedItems.union(predict(productions: productions, item: item, currentIndex: allStates.count, knownItems: knownItems))
 			}
-		}.collect(Set.init).subtracting(knownItems)
+		}.subtracting(knownItems)
 		
 		if addedItems.isEmpty {
 			// No new items have been found so we are done.

@@ -97,7 +97,6 @@ public extension String {
 	public func matches(for pattern: String, in range: Range<String.Index>) throws -> [Range<String.Index>] {
 		let expression = try NSRegularExpression(pattern: pattern, options: [])
 		let range = NSRange(range, in: self)
-		
 		let matches = expression.matches(in: self, options: [], range: range)
 		return matches.flatMap { match -> Range<String.Index>? in
 			return Range(match.range, in: self)
@@ -141,10 +140,13 @@ public extension String {
 	/// - Parameter startIndex: Start index for the search
 	/// - Returns: Range of the prefix matched by the regular expression or nil, if no match was found
 	/// - Throws: An error indicating that the provided regular expression is invalid
-	public func rangeOfRegularPrefix(_ pattern: String, from startIndex: String.Index) throws -> Range<String.Index>? {
-		return try matches(for: pattern, in: startIndex ..< self.endIndex).first(where: { range -> Bool in
-			range.lowerBound == startIndex
-		})
+	public func rangeOfRegularPrefix(_ pattern: String, from lowerBound: String.Index) throws -> Range<String.Index>? {
+		let expression = try NSRegularExpression(pattern: pattern, options: [])
+		let range = NSRange(lowerBound ..< self.endIndex, in: self)
+		guard let match = expression.firstMatch(in: self, options: .anchored, range: range) else {
+			return nil
+		}
+		return Range(match.range, in: self)
 	}
 	
 	/// Returns a boolean value indicating that the string ends with a substring matched by the given regular expression

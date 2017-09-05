@@ -41,6 +41,38 @@ class StringUtilitiesTest: XCTestCase {
 		XCTAssertFalse(testedString.hasPrefix(["world"], from: testedString.index(testedString.startIndex, offsetBy: 8)))
 	}
 	
+	func testRegularPrefix() {
+		let testedString = "1+2+3+4+5"
+		
+		XCTAssertTrue(try testedString.hasRegularPrefix("1\\+2"))
+		XCTAssertTrue(try testedString.hasRegularPrefix("(\\d\\+)*\\d"))
+		XCTAssertFalse(try testedString.hasRegularPrefix("\\+"))
+		XCTAssertFalse(try testedString.hasRegularPrefix("\\d\\d"))
+		XCTAssertFalse(try testedString.hasRegularPrefix("5"))
+		
+		XCTAssertNotNil(try testedString.rangeOfRegularPrefix("1\\+2"))
+		XCTAssertNotNil(try testedString.rangeOfRegularPrefix("(\\d\\+)*\\d"))
+		XCTAssertNil(try testedString.rangeOfRegularPrefix("\\+"))
+		XCTAssertNil(try testedString.rangeOfRegularPrefix("\\d\\d"))
+		XCTAssertNil(try testedString.rangeOfRegularPrefix("5"))
+		
+		XCTAssertEqual(try testedString.rangeOfRegularPrefix("1\\+2"), try testedString.matches(for: "1\\+2").first(where: {$0.lowerBound == testedString.startIndex}))
+		XCTAssertEqual(try testedString.rangeOfRegularPrefix("(\\d\\+)*\\d"), try testedString.matches(for: "(\\d\\+)*\\d").first(where: {$0.lowerBound == testedString.startIndex}))
+		XCTAssertEqual(try testedString.rangeOfRegularPrefix("\\+"), try testedString.matches(for: "\\+").first(where: {$0.lowerBound == testedString.startIndex}))
+		XCTAssertEqual(try testedString.rangeOfRegularPrefix("\\d\\d"), try testedString.matches(for: "\\d\\d").first(where: {$0.lowerBound == testedString.startIndex}))
+		XCTAssertEqual(try testedString.rangeOfRegularPrefix("5"), try testedString.matches(for: "5").first(where: {$0.lowerBound == testedString.startIndex}))
+		
+		let startIndex = testedString.index(testedString.startIndex, offsetBy: 2)
+		
+		XCTAssertTrue(try testedString.hasRegularPrefix("2", from: startIndex))
+		XCTAssertTrue(try testedString.hasRegularPrefix("(\\d\\+)*\\d", from: startIndex))
+		XCTAssertFalse(try testedString.hasRegularPrefix("\\+3", from: startIndex))
+		XCTAssertFalse(try testedString.hasRegularPrefix("1", from: startIndex))
+		
+		XCTAssertEqual(try testedString.rangeOfRegularPrefix("2", from: startIndex), testedString.range(of: "2"))
+		XCTAssertEqual(try testedString.rangeOfRegularPrefix("(\\d\\+)*\\d", from: startIndex), testedString.range(of: "2+3+4+5"))
+	}
+	
 	func testUnique() {
 		let numbers = [1,2,2,1,5,6,7,1,1]
 		let uniqueNumbers = numbers.uniqueElements().collect(Array.init)
