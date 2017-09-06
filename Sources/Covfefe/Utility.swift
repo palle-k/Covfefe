@@ -120,9 +120,7 @@ public extension String {
 	/// - Returns: True, if the regular expression matches a substring beginning at the start index of the string
 	/// - Throws: An error indicating that the provided regular expression is invalid
 	public func hasRegularPrefix(_ pattern: String, from startIndex: String.Index) throws -> Bool {
-		return try matches(for: pattern).contains(where: { range -> Bool in
-			range.lowerBound == startIndex
-		})
+		return try rangeOfRegularPrefix(pattern, from: startIndex) != nil
 	}
 	
 	/// Returns the range of a match for the given regular expression beginning at the start of the string

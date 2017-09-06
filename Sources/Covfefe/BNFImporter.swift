@@ -34,18 +34,22 @@ var bnfGrammar: Grammar {
 	let optionalWhitespace = "optional-whitespace" --> [[]] <|> SymbolSet.whitespace <|> SymbolSet.whitespace <+> [n("optional-whitespace")]
 	let newlines = "newlines" --> t("\n") <|> t("\n") <+> n("optional-whitespace") <+> n("newlines")
 	
-	let assignmentOperator = "assignment-operator" --> t("::=")
+	let assignmentOperator = "assignment-operator" --> t(":") <+> t(":") <+> t("=")
 	
 	let ruleNameContainer = "rule-name-container" --> t("<") <+> n("rule-name") <+> t(">")
-	let ruleName = try! "rule-name" --> rt("[a-zA-Z0-9-_]+")
+	let ruleName = "rule-name" --> n("rule-name") <+> n("rule-name-char") <|> [[]]
+	let ruleNameChar = try! "rule-name-char" --> rt("[a-zA-Z0-9-_]")
 	
 	let expression = "expression" --> n("concatenation") <|> n("alternation")
 	let alternation = "alternation" --> n("expression") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("concatenation")
 	let concatenation = "concatenation" --> n("expression-element") <|> n("concatenation") <+> n("optional-whitespace") <+> n("expression-element")
 	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container")
 	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"")
-	let string1 = try! "string-1" --> rt("[^']+(?=')") <|> [[]]
-	let string2 = try! "string-2" --> rt("[^\"]+(?=\")") <|> [[]]
+	let string1 = "string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
+	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
+	
+	let string1char = try! "string-1-char" --> rt("[^']")
+	let string2char = try! "string-2-char" --> rt("[^\"]")
 	
 	var productions: [Production] = []
 	productions.append(contentsOf: syntax)
@@ -54,7 +58,8 @@ var bnfGrammar: Grammar {
 	productions.append(contentsOf: newlines)
 	productions.append(assignmentOperator)
 	productions.append(ruleNameContainer)
-	productions.append(ruleName)
+	productions.append(contentsOf: ruleName)
+	productions.append(ruleNameChar)
 	productions.append(contentsOf: expression)
 	productions.append(alternation)
 	productions.append(contentsOf: concatenation)
@@ -62,6 +67,8 @@ var bnfGrammar: Grammar {
 	productions.append(contentsOf: literal)
 	productions.append(contentsOf: string1)
 	productions.append(contentsOf: string2)
+	productions.append(string1char)
+	productions.append(string2char)
 	
 	return Grammar(productions: productions, start: "syntax")
 }
@@ -90,9 +97,8 @@ public extension Grammar {
 		
 		func ruleName(from container: SyntaxTree<NonTerminal, Range<String.Index>>) -> String {
 			return container
-				.allNodes(where: {$0.name == "rule-name"})
+				.allNodes(where: {$0.name == "rule-name-char"})
 				.flatMap{$0.leafs}
-//				.leafs
 				.reduce("") { partialResult, range -> String in
 					partialResult.appending(bnfString[range])
 			}
@@ -100,7 +106,7 @@ public extension Grammar {
 		
 		func string(from literal: SyntaxTree<NonTerminal, Range<String.Index>>) -> String {
 			return literal
-				.allNodes(where: {$0.name == "string-1" || $0.name == "string-2"})
+				.allNodes(where: {$0.name == "string-1-char" || $0.name == "string-2-char"})
 				.flatMap{$0.leafs}
 				.reduce("") { partialResult, range -> String in
 					partialResult.appending(bnfString[range])
