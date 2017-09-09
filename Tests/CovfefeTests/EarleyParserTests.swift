@@ -37,10 +37,9 @@ class EarleyParserTests: XCTestCase {
 		<digit> ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 		"""
 		let grammar = try Grammar(bnfString: grammarString, start: "sum")
-		let tokenizer = DefaultTokenizer(grammar: grammar)
 		let parser = EarleyParser(grammar: grammar)
 		let expression = "1+(2*3-4)"
-		_ = try parser.syntaxTree(for: tokenizer.tokenize(expression)).mapLeafs{String(expression[$0])}
+		_ = try parser.syntaxTree(for: (expression)).mapLeafs{String(expression[$0])}
 	}
 	
 	func testEarleyParser2() throws {
@@ -57,10 +56,9 @@ class EarleyParserTests: XCTestCase {
 		<letter>           ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
 		"""
 		let grammar = try Grammar(bnfString: grammarString, start: "expression")
-		let tokenizer = DefaultTokenizer(grammar: grammar)
 		let parser = EarleyParser(grammar: grammar)
 		let expression = "(a+b)*(-c)"
-		_ = try parser.syntaxTree(for: tokenizer.tokenize(expression)).mapLeafs{String(expression[$0])}
+		_ = try parser.syntaxTree(for: (expression)).mapLeafs{String(expression[$0])}
 	}
 	
 	func testEarleyEmpty() throws {
@@ -76,12 +74,11 @@ class EarleyParserTests: XCTestCase {
 		"""
 		let grammar = try Grammar(bnfString: grammarString, start: "start")
 		let parser = EarleyParser(grammar: grammar)
-		let tokenizer = DefaultTokenizer(grammar: grammar)
 		
 		let expression = """
 		hello=1337
 		"""
-		_ = try parser.syntaxTree(for: tokenizer.tokenize(expression)).mapLeafs{String(expression[$0])}
+		_ = try parser.syntaxTree(for: (expression)).mapLeafs{String(expression[$0])}
 	}
 	
 	func testEarleyJSON() throws {
@@ -118,7 +115,6 @@ class EarleyParserTests: XCTestCase {
 
 		let grammar = try Grammar(bnfString: grammarString, start: "any")
 		let parser = EarleyParser(grammar: grammar)
-		let tokenizer = DefaultTokenizer(grammar: grammar)
 		let expression = """
 		{
 			"firstName": "John",
@@ -150,8 +146,7 @@ class EarleyParserTests: XCTestCase {
 		}
 		"""
 		do {
-			let tokenized = try tokenizer.tokenize(expression)
-			_ = try parser.syntaxTree(for: tokenized)
+			_ = try parser.syntaxTree(for: expression)
 		} catch let error as SyntaxError {
 			print("Error: \(error.reason) at \(NSRange(error.range, in: expression)): \(expression[error.range])")
 			XCTFail()
@@ -161,7 +156,6 @@ class EarleyParserTests: XCTestCase {
 	func testEarleyBNF() throws {
 		let grammar = bnfGrammar
 		let parser = EarleyParser(grammar: grammar)
-		let tokenizer = DefaultTokenizer(grammar: grammar)
 		
 		let expression = """
 		<sum>     ::= <sum> '+' <product> | <sum> '-' <product>
@@ -174,8 +168,7 @@ class EarleyParserTests: XCTestCase {
 		<digit>  ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 		"""
 		do {
-			let tokenized = try tokenizer.tokenize(expression)
-			_ = try parser.syntaxTree(for: tokenized)
+			_ = try parser.syntaxTree(for: expression)
 		} catch let error as SyntaxError {
 			print("Error: \(error.reason) at \(NSRange(error.range, in: expression)): \(expression[error.range])")
 			XCTFail()

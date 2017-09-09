@@ -31,8 +31,7 @@ class GrammarTests: XCTestCase {
 		let S = "S" --> [[]]
 		let grammar = Grammar(productions: S, start: "S")
 		let parser = CYKParser(grammar: grammar)
-		let tokenizer = DefaultTokenizer(grammar: grammar)
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("")))
+		XCTAssertTrue(parser.recognizes(""))
 	}
 	
 	func testCYK() {
@@ -48,14 +47,12 @@ class GrammarTests: XCTestCase {
 		let grammar = Grammar(productions: S + [T, U, A, B, C, D], start: "S")
 		let parser = CYKParser(grammar: grammar)
 		
-		let tokenizer = DefaultTokenizer(grammar: grammar)
-		
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("(){()}")))
-		XCTAssertFalse(try parser.recognizes(tokenizer.tokenize("(){")))
-		XCTAssertFalse(try parser.recognizes(tokenizer.tokenize("){}")))
+		XCTAssertTrue(parser.recognizes("(){()}"))
+		XCTAssertFalse(parser.recognizes("(){"))
+		XCTAssertFalse(parser.recognizes("){}"))
 		
 		do {
-			let _ = try CYKParser(grammar: grammar).syntaxTree(for: tokenizer.tokenize("(){()}"))
+			let _ = try CYKParser(grammar: grammar).syntaxTree(for: "(){()}")
 		} catch {
 			XCTFail()
 		}
@@ -71,10 +68,8 @@ class GrammarTests: XCTestCase {
 		
 		let grammar = Grammar(productions: S + T + U + [A, B, C], start: "S")
 		let parser = CYKParser(grammar: grammar)
-		let tokenizer = DefaultTokenizer(grammar: grammar)
-		
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("ccaab")))
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("aabcc")))
+		XCTAssertTrue(parser.recognizes(("ccaab")))
+		XCTAssertTrue(parser.recognizes(("aabcc")))
 	}
 	
 	func testCYK3() {
@@ -90,13 +85,12 @@ class GrammarTests: XCTestCase {
 		
 		let grammar = Grammar(productions: S + Op + VarStart + Var + [X, Y, U, V, Neg], start: "S")
 		let parser = CYKParser(grammar: grammar)
-		let tokenizer = DefaultTokenizer(grammar: grammar)
 		
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("(-a+b)*-(b+a)/(((b-a)+(a-b)*(a-b))/-(b-a))")))
-		XCTAssertFalse(try parser.recognizes(tokenizer.tokenize("a+b)*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))")))
-		XCTAssertFalse(try parser.recognizes(tokenizer.tokenize("()*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))")))
-		XCTAssertFalse(try parser.recognizes(tokenizer.tokenize("(a+b)(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))")))
-		XCTAssertFalse(try parser.recognizes(tokenizer.tokenize("(a+b)*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a)")))
+		XCTAssertTrue(parser.recognizes(("(-a+b)*-(b+a)/(((b-a)+(a-b)*(a-b))/-(b-a))")))
+		XCTAssertFalse(parser.recognizes(("a+b)*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))")))
+		XCTAssertFalse(parser.recognizes(("()*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))")))
+		XCTAssertFalse(parser.recognizes(("(a+b)(b+a)/(((b-a)+(a-b)*(a-b))/(b-a))")))
+		XCTAssertFalse(parser.recognizes(("(a+b)*(b+a)/(((b-a)+(a-b)*(a-b))/(b-a)")))
 	}
 	
 	func testProgrammingLanguage() throws {
@@ -200,26 +194,25 @@ class GrammarTests: XCTestCase {
 		
 		let grammar = Grammar(productions: [whitespaceProduction, assignmentOperator, binaryOperationStart, colon] + binaryOperator + prefixOperator + varDeclarationProductions + varAssignmentProductions + varAssignmentExpressionProductions, start: "VarDeclaration")
 		let parser = CYKParser(grammar: grammar)
-		let tokenizer = DefaultTokenizer(grammar: grammar)
 		
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("let hello")))
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("var hello")))
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("let _hello123")))
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("let hello=42")))
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("let hello= 42")))
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("let hello = 42")))
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("let hello = 42.1337")))
+		XCTAssertTrue(parser.recognizes("let hello"))
+		XCTAssertTrue(parser.recognizes("var hello"))
+		XCTAssertTrue(parser.recognizes("let _hello123"))
+		XCTAssertTrue(parser.recognizes("let hello=42"))
+		XCTAssertTrue(parser.recognizes("let hello= 42"))
+		XCTAssertTrue(parser.recognizes("let hello = 42"))
+		XCTAssertTrue(parser.recognizes("let hello = 42.1337"))
 		
-		XCTAssertFalse((try? parser.recognizes(tokenizer.tokenize("let 1hello"))) ?? false)
-		XCTAssertFalse((try? parser.recognizes(tokenizer.tokenize("bar hello"))) ?? false)
-		XCTAssertFalse((try? parser.recognizes(tokenizer.tokenize("var hello = "))) ?? false)
-		XCTAssertFalse((try? parser.recognizes(tokenizer.tokenize("var hello 42"))) ?? false)
-		XCTAssertFalse((try? parser.recognizes(tokenizer.tokenize("varhello = 42"))) ?? false)
-		XCTAssertFalse((try? parser.recognizes(tokenizer.tokenize("var hello = 42."))) ?? false)
-		XCTAssertFalse((try? parser.recognizes(tokenizer.tokenize("var hello = .1337"))) ?? false)
+		XCTAssertFalse(parser.recognizes("let 1hello"))
+		XCTAssertFalse(parser.recognizes("bar hello"))
+		XCTAssertFalse(parser.recognizes("var hello = "))
+		XCTAssertFalse(parser.recognizes("var hello 42"))
+		XCTAssertFalse(parser.recognizes("varhello = 42"))
+		XCTAssertFalse(parser.recognizes("var hello = 42."))
+		XCTAssertFalse(parser.recognizes("var hello = .1337"))
 		
-		let tree = try parser.syntaxTree(for: tokenizer.tokenize("let hello = \"World\""))
-		let optimizedTree = tree
+		let tree = try parser.syntaxTree(for: ("let hello = \"World\""))
+		_ = tree
 			.filter{!["Whitespace", "OpenParenthesis", "CloseParenthesis", "Assignment", "Colon"].contains($0)}!
 			.compressed()
 			.explode{["BinaryOperationStart", "ParenthesisExpressionBegin", "VarNameAssignment", "VarNameAssignmentRest", "VarNameType", "VarTypeBegin"].contains($0)}
@@ -228,7 +221,7 @@ class GrammarTests: XCTestCase {
 	}
 	
 	func testNonNormalizedGrammar() {
-		let expression = try! "Expr" -->
+		let expression = "Expr" -->
 			n("BinOperation")
 			<|> n("Brackets")
 			<|> n("UnOperation")

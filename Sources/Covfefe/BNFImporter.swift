@@ -88,7 +88,7 @@ public extension Grammar {
 		let tokenizer = DefaultTokenizer(grammar: grammar)
 		let parser = EarleyParser(grammar: grammar)
 		let syntaxTree = try parser
-			.syntaxTree(for: tokenizer.tokenize(bnfString))
+			.syntaxTree(for: bnfString)
 			.explode{["expression"].contains($0)}
 			.first!
 			.filter{!["optional-whitespace", "newlines"].contains($0)}!

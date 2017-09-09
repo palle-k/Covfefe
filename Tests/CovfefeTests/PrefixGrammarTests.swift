@@ -49,11 +49,10 @@ class PrefixGrammarTests: XCTestCase {
 		
 		let grammar = Grammar(productions: expression + BinOp + UnOp + [Num, Var, BracketExpr, BinOperation, UnOperation, Whitespace], start: "Expr")
 		let prefixGrammar = grammar.prefixGrammar()
-		let tokenizer = DefaultTokenizer(grammar: prefixGrammar)
 		let parser = CYKParser(grammar: prefixGrammar)
 		
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("(a+b)-")))
-		XCTAssertTrue(try parser.recognizes(tokenizer.tokenize("(a+b)/(c")))
-		XCTAssertFalse((try? parser.recognizes(tokenizer.tokenize("(a+)"))) ?? false)
+		XCTAssertTrue(parser.recognizes("(a+b)-"))
+		XCTAssertTrue(parser.recognizes("(a+b)/(c"))
+		XCTAssertFalse(parser.recognizes("(a+)"))
 	}
 }

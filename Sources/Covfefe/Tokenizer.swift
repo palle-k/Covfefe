@@ -90,6 +90,6 @@ public struct DefaultTokenizer: Tokenizer {
 		}
 		
 		let terminalRanges = matches.map{($0, firstMatchRange)}
-		return try tokenize(word: word, from: firstMatchRange.upperBound,partialResult: partialResult + [terminalRanges])
+		return try tokenize(word: word, from: firstMatchRange.upperBound, partialResult: partialResult + [terminalRanges])
 	}
 }

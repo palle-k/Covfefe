@@ -341,44 +341,90 @@ public struct EarleyParser: Parser {
 		return SyntaxTree.node(key: rootItem.production.pattern, children: children)
 	}
 	
-	public func syntaxTree(for tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]) throws -> SyntaxTree<NonTerminal, Range<String.Index>> {
+	public func syntaxTree(for string: String) throws -> SyntaxTree<NonTerminal, Range<String.Index>> {
 		//TODO: Better support for right recursion
 		
-		var stateCollection: [Set<ParseStateItem>] = []
-		stateCollection.reserveCapacity(tokenization.count+1)
+		
+//		var stateCollection: [Set<ParseStateItem>] = []
+//		stateCollection.reserveCapacity(string.count + 1)
 		
 		let nonTerminalProductions = Dictionary(grouping: grammar.productions, by: {$0.pattern})
 		
-		// The start state contains all productions which can be reached directly from the starting non terminal
-		stateCollection.append(nonTerminalProductions[grammar.start, default: []].map({ (production) -> ParseStateItem in
-			ParseStateItem(production: production, productionPosition: 0, startTokenIndex: 0)
-		}).collect(Set.init))
+//		stateCollection.append(nonTerminalProductions[grammar.start, default: []].map({ (production) -> ParseStateItem in
+//			ParseStateItem(production: production, productionPosition: 0, startTokenIndex: 0)
+//		}).collect(Set.init))
 		
-		stateCollection[0] = processState(
-			productions: nonTerminalProductions,
-			allStates: [],
-			knownItems: stateCollection[0],
-			newItems: stateCollection[0]
-		)
+		// The start state contains all productions which can be reached directly from the starting non terminal
+		let initState = nonTerminalProductions[grammar.start, default: []].map({ (production) -> ParseStateItem in
+			ParseStateItem(production: production, productionPosition: 0, startTokenIndex: 0)
+		}).collect(Set.init).collect { initState in
+			processState(productions: nonTerminalProductions, allStates: [], knownItems: initState, newItems: initState)
+		}
+		
+//		stateCollection[0] = processState(
+//			productions: nonTerminalProductions,
+//			allStates: [],
+//			knownItems: stateCollection[0],
+//			newItems: stateCollection[0]
+//		)
 //		print("State \(0): [\n\t\(stateCollection[0].map(\.description).sorted().joined(separator: "\n\t"))\n]")
 		
-		// Parse loop: Scan token, find finished productions and update dependent productions and find new productions
-		stateCollection = try tokenization.reduce(into: stateCollection) { (stateCollection, tokens) in
-			let newItems = tokens.reduce([]) { partialResult, token -> Set<ParseStateItem> in
-				partialResult.union(scan(state: stateCollection.last!, token: token.terminal))
-			}
-			guard !newItems.isEmpty else {
-				throw SyntaxError(range: tokens.first!.range, reason: .unexpectedToken)
-			}
-			let processed = processState(
-				productions: nonTerminalProductions,
-				allStates: stateCollection,
-				knownItems: newItems,
-				newItems: newItems
-			)
-			stateCollection.append(processed)
+		var tokenization: [[(terminal: Terminal, range: Range<String.Index>)]] = []
+		tokenization.reserveCapacity(string.count)
+		
+		var stateCollection: [Set<ParseStateItem>] = [initState]
+		stateCollection.reserveCapacity(string.count + 1)
+		
+//		print("State \(0): [\n\t\(stateCollection[0].map(\.description).sorted().joined(separator: "\n\t"))\n]")
+		
+		var currentIndex = string.startIndex
+		
+		while currentIndex < string.endIndex {
+			let lastState = stateCollection.last!
 			
-//			print("State \(stateCollection.indices.last!): [\n\t\(processed.map(\.description).sorted().joined(separator: "\n\t"))\n]")
+			let expectedTerminals = Dictionary(
+				grouping: lastState.flatMap { item -> (item: ParseStateItem, terminal: Terminal)? in
+					guard case .some(.terminal(let terminal)) = item.nextSymbol else {
+						return nil
+					}
+					return (item: item, terminal: terminal)
+				},
+				by: { pair in
+					pair.terminal
+				}
+			).mapValues { pairs in
+				pairs.map { pair in
+					pair.item
+				}
+			}
+			
+			let (newItems, tokens): ([[ParseStateItem]], [(terminal: Terminal, range: Range<String.Index>)]) =
+				expectedTerminals.flatMap { (terminal, items) -> (items: [ParseStateItem], token: (terminal: Terminal, range: Range<String.Index>))? in
+					guard let range = string.rangeOfPrefix([terminal], from: currentIndex), range.lowerBound == currentIndex else {
+						return nil
+					}
+					return (items.map{$0.advanced()}, (terminal, range))
+				}.collect(unzip)
+			
+			guard !newItems.isEmpty else {
+				throw SyntaxError(range: currentIndex ..< string.index(after: currentIndex), reason: .unexpectedToken)
+			}
+			
+			let newItemSet = newItems.flatMap{$0}.collect(Set.init)
+			
+			tokenization.append(tokens)
+			stateCollection.append(
+				processState(
+					productions: nonTerminalProductions,
+					allStates: stateCollection,
+					knownItems: newItemSet,
+					newItems: newItemSet
+				)
+			)
+			
+//			print("State \(stateCollection.indices.last!): [\n\t\(stateCollection.last!.map(\.description).sorted().joined(separator: "\n\t"))\n]")
+			
+			currentIndex = tokens.first!.range.upperBound
 		}
 		
 		let parseStates = stateCollection.enumerated().reduce(Array<Set<ParsedItem>>(repeating: [], count: stateCollection.count)) { (parseStates, element) in

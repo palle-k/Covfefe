@@ -43,10 +43,9 @@ This grammar describes simple mathematical expressions consisting of unary and b
 A syntax tree can be generated, which describes the structure of a given word:
 
  ```swift
- let tokenizer = DefaultTokenizer(grammar: grammar)
- let parser = EarleyParser(gramar: grammar)
+let parser = EarleyParser(grammar: grammar)
  
- let syntaxTree = try parser.syntaxTree(for: tokenizer.tokenize("(a+b)*(-c)"))
+let syntaxTree = try parser.syntaxTree(for: "(a+b)*(-c)")
  ```
 
 ![Example Syntax Tree](https://raw.githubusercontent.com/palle-k/Covfefe/master/example-syntax-tree.png)
