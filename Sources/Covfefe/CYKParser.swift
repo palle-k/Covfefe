@@ -76,7 +76,7 @@ public struct CYKParser: Parser {
 	///
 	/// - Parameter cykTable: Table containing unfinished syntax trees
 	/// - Returns: An error pointing towards the first invalid token in the string.
-	private func generateError(_ cykTable: Array<[[SyntaxTree<Production, Range<String.Index>>]]>) -> SyntaxError {
+	private func generateError(_ cykTable: Array<[[SyntaxTree<Production, Range<String.Index>>]]>, string: String) -> SyntaxError {
 		let memberRows = (0..<cykTable.count).map { columnIndex -> Int? in
 			(0 ..< (cykTable.count - columnIndex)).reduce(nil) { maxIndex, rowIndex -> Int? in
 				if cykTable[rowIndex][columnIndex].contains(where: { tree -> Bool in
@@ -89,9 +89,9 @@ public struct CYKParser: Parser {
 		}
 		
 		if let firstMember = memberRows[0] {
-			return SyntaxError(range: cykTable[0][firstMember+1][0].leafs.first!, reason: .unmatchedPattern)
+			return SyntaxError(range: cykTable[0][firstMember+1][0].leafs.first!, in: string, reason: .unmatchedPattern)
 		} else {
-			return SyntaxError(range: cykTable[0][0][0].leafs.first!, reason: .unmatchedPattern)
+			return SyntaxError(range: cykTable[0][0][0].leafs.first!, in: string, reason: .unmatchedPattern)
 		}
 	}
 	
@@ -137,7 +137,7 @@ public struct CYKParser: Parser {
 			}) {
 				return SyntaxTree.node(key: normalizedGrammar.start, children: [SyntaxTree.leaf("".startIndex ..< "".endIndex)])
 			} else {
-				throw SyntaxError(range: "".startIndex ..< "".endIndex, reason: .emptyNotAllowed)
+				throw SyntaxError(range: string.startIndex ..< string.endIndex, in: string, reason: .emptyNotAllowed)
 			}
 		}
 		
@@ -194,7 +194,7 @@ public struct CYKParser: Parser {
 		guard let syntaxTree = cykTable[cykTable.count-1][0].first(where: { tree -> Bool in
 			tree.root?.pattern == normalizedGrammar.start
 		}) else {
-			throw generateError(cykTable)
+			throw generateError(cykTable, string: string)
 		}
 		return unfoldChainProductions(syntaxTree).explode(normalizedGrammar.normalizationNonTerminals.contains)[0]
 	}
