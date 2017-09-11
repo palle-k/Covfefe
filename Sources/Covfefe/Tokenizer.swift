@@ -86,7 +86,7 @@ public struct DefaultTokenizer: Tokenizer {
 			let first = matches.first,
 			let firstMatchRange = word.rangeOfPrefix([first], from: startIndex)
 		else {
-			throw SyntaxError(range: startIndex ..< word.endIndex, reason: .unknownToken)
+			throw SyntaxError(range: startIndex ..< word.endIndex, in: word, reason: .unknownToken)
 		}
 		
 		let terminalRanges = matches.map{($0, firstMatchRange)}

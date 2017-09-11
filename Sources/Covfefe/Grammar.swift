@@ -53,14 +53,47 @@ public struct SyntaxError: Error {
 	/// Reason for the error
 	public let reason: Reason
 	
+	/// The context around the error
+	public let context: NonTerminal?
+	
+	public let string: String
+	
 	/// Creates a new syntax error with a given range and reason
 	///
 	/// - Parameters:
 	///   - range: String range in which the syntax error occurred
 	///   - reason: Reason why the syntax error occurred
-	public init(range: Range<String.Index>, reason: Reason) {
+	public init(range: Range<String.Index>, in string: String, reason: Reason, context: NonTerminal? = nil) {
 		self.range = range
+		self.string = string
 		self.reason = reason
+		self.context = context
+	}
+}
+
+extension SyntaxError: CustomStringConvertible {
+	public var description: String {
+		let main = "Error: \(reason) at \(NSRange(range, in: string)): '\(string[range])'"
+		if let context = context {
+			return "\(main), expected: \(context.name)"
+		} else {
+			return main
+		}
+	}
+}
+
+extension SyntaxError.Reason: CustomStringConvertible {
+	public var description: String {
+		switch self {
+		case .emptyNotAllowed:
+			return "Empty string not accepted"
+		case .unknownToken:
+			return "Unknown token"
+		case .unmatchedPattern:
+			return "Unmatched pattern"
+		case .unexpectedToken:
+			return "Unexpected token"
+		}
 	}
 }
 

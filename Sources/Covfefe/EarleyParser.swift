@@ -407,7 +407,22 @@ public struct EarleyParser: Parser {
 				}.collect(unzip)
 			
 			guard !newItems.isEmpty else {
-				throw SyntaxError(range: currentIndex ..< string.index(after: currentIndex), reason: .unexpectedToken)
+				let context = lastState.lazy.flatMap { item -> NonTerminal? in
+					switch item.nextSymbol {
+					case .none:
+						return nil
+					case .some(.terminal):
+						return nil
+					case .some(.nonTerminal(let nonTerminal)):
+						return nonTerminal
+					}
+				}.first
+				throw SyntaxError(
+					range: currentIndex ..< string.index(after: currentIndex),
+					in: string,
+					reason: context == nil ? .unexpectedToken : .unmatchedPattern,
+					context: context
+				)
 			}
 			
 			let newItemSet = newItems.flatMap{$0}.collect(Set.init)
@@ -444,9 +459,9 @@ public struct EarleyParser: Parser {
 			}
 			if let longestMatch = startItems.max(by: {$0.completedIndex < $1.completedIndex}) {
 				let range = tokenization[longestMatch.completedIndex].first!.range
-				throw SyntaxError(range: range, reason: .unmatchedPattern)
+				throw SyntaxError(range: range, in: string, reason: .unmatchedPattern)
 			} else {
-				throw SyntaxError(range: tokenization.first?.first?.range ?? ("".startIndex ..< "".endIndex), reason: .unmatchedPattern)
+				throw SyntaxError(range: tokenization.first?.first?.range ?? (string.startIndex ..< string.endIndex), in: string, reason: .unmatchedPattern)
 			}
 		}
 		
