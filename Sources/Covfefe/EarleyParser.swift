@@ -327,8 +327,6 @@ public struct EarleyParser: Parser {
 		
 		let childRoots:[(Int, Either<ParsedItem, Terminal>)] = resolve(unresolved: ArraySlice(rootItem.production.production), position: startIndex)!.reversed()
 		
-//		print("Child roots of \(rootItem): [\n\t\(childRoots.map{"\($0.0): \($0.1.combine({$0.description}, {$0.value}))"}.joined(separator: "\n\t"))\n]")
-		
 		let children = childRoots.map { element -> SyntaxTree<NonTerminal, Range<String.Index>> in
 			let (position, root) = element
 			return root.combine({ (item) -> SyntaxTree<NonTerminal, Range<String.Index>> in
@@ -344,15 +342,7 @@ public struct EarleyParser: Parser {
 	public func syntaxTree(for string: String) throws -> SyntaxTree<NonTerminal, Range<String.Index>> {
 		//TODO: Better support for right recursion
 		
-		
-//		var stateCollection: [Set<ParseStateItem>] = []
-//		stateCollection.reserveCapacity(string.count + 1)
-		
 		let nonTerminalProductions = Dictionary(grouping: grammar.productions, by: {$0.pattern})
-		
-//		stateCollection.append(nonTerminalProductions[grammar.start, default: []].map({ (production) -> ParseStateItem in
-//			ParseStateItem(production: production, productionPosition: 0, startTokenIndex: 0)
-//		}).collect(Set.init))
 		
 		// The start state contains all productions which can be reached directly from the starting non terminal
 		let initState = nonTerminalProductions[grammar.start, default: []].map({ (production) -> ParseStateItem in
@@ -361,21 +351,11 @@ public struct EarleyParser: Parser {
 			processState(productions: nonTerminalProductions, allStates: [], knownItems: initState, newItems: initState)
 		}
 		
-//		stateCollection[0] = processState(
-//			productions: nonTerminalProductions,
-//			allStates: [],
-//			knownItems: stateCollection[0],
-//			newItems: stateCollection[0]
-//		)
-//		print("State \(0): [\n\t\(stateCollection[0].map(\.description).sorted().joined(separator: "\n\t"))\n]")
-		
 		var tokenization: [[(terminal: Terminal, range: Range<String.Index>)]] = []
 		tokenization.reserveCapacity(string.count)
 		
 		var stateCollection: [Set<ParseStateItem>] = [initState]
 		stateCollection.reserveCapacity(string.count + 1)
-		
-//		print("State \(0): [\n\t\(stateCollection[0].map(\.description).sorted().joined(separator: "\n\t"))\n]")
 		
 		var currentIndex = string.startIndex
 		
@@ -445,8 +425,6 @@ public struct EarleyParser: Parser {
 				)
 			)
 			
-//			print("State \(stateCollection.indices.last!): [\n\t\(stateCollection.last!.map(\.description).sorted().joined(separator: "\n\t"))\n]")
-			
 			currentIndex = tokens.first!.range.upperBound
 		}
 		
@@ -472,8 +450,6 @@ public struct EarleyParser: Parser {
 				throw SyntaxError(range: tokenization.first?.first?.range ?? (string.startIndex ..< string.endIndex), in: string, reason: .unmatchedPattern)
 			}
 		}
-		
-//		print(parseStates.enumerated().map {"State \($0.offset): [\n\t\($0.element.map(\.description).joined(separator: "\n\t"))\n]"}.joined(separator: "\n"))
 		
 		return buildSyntaxTree(stateCollection: parseStates, tokenization: tokenization, rootItem: match, startIndex: 0)
 	}
