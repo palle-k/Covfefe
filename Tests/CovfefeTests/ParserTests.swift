@@ -66,7 +66,18 @@ class ParserTests: XCTestCase {
 				("(()))", false),
 				("({()))", false)
 			]
-		)
+		),
+		(
+			grammar: Grammar(productions: "start" --> [[]], start: "start"),
+			testCases: [
+				("", true),
+				("hello", false),
+				("a", false),
+				("-", false),
+				("\\", false),
+				("'", false)
+			]
+		),
 	]
 	
 	func testAll() {
