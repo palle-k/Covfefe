@@ -142,6 +142,12 @@ extension ParsedItem: CustomStringConvertible {
 /// For unambiguous grammars, the run time is O(n^2).
 /// For almost all LR(k) grammars, the run time is O(n).
 /// Best performance can be achieved with left recursive grammars.
+///
+/// For ambiguous grammars, the runtime for parses may increase,
+/// as some expressions have exponentially many possible parse trees depending on expression length.
+/// This exponential growth can be avoided by only generating a single parse tree with `syntaxTree(for:)`.
+///
+/// For unambiguous grammars, the Earley parser performs better than the CYK parser.
 public struct EarleyParser: AmbiguousGrammarParser {
 	
 	/// The grammar recognized by the parser
