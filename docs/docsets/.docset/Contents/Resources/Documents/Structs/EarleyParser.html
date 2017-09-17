@@ -147,6 +147,9 @@
             <a class="nav-group-name-link" href="../Protocols.html">Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a class="nav-group-task-link" href="../Protocols/AmbiguousGrammarParser.html">AmbiguousGrammarParser</a>
+              </li>
+              <li class="nav-group-task">
                 <a class="nav-group-task-link" href="../Protocols/Parser.html">Parser</a>
               </li>
               <li class="nav-group-task">
@@ -207,7 +210,7 @@
             <h1>EarleyParser</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">EarleyParser</span><span class="p">:</span> <span class="kt"><a href="../Protocols/Parser.html">Parser</a></span></code></pre>
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">EarleyParser</span><span class="p">:</span> <span class="kt"><a href="../Protocols/AmbiguousGrammarParser.html">AmbiguousGrammarParser</a></span></code></pre>
 
                 </div>
               </div>
@@ -218,6 +221,12 @@ the Earley algorithm.</p>
 For unambiguous grammars, the run time is O(n^2).
 For almost all LR(k) grammars, the run time is O(n).
 Best performance can be achieved with left recursive grammars.</p>
+
+<p>For ambiguous grammars, the runtime for parses may increase,
+as some expressions have exponentially many possible parse trees depending on expression length.
+This exponential growth can be avoided by only generating a single parse tree with <code>syntaxTree(for:)</code>.</p>
+
+<p>For unambiguous grammars, the Earley parser performs better than the CYK parser.</p>
 
           </div>
         </section>
@@ -304,7 +313,7 @@ Best performance can be achieved with left recursive grammars.</p>
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">syntaxTree</span><span class="p">(</span><span class="k">for</span> <span class="nv">string</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Enums/SyntaxTree.html">SyntaxTree</a></span><span class="o">&lt;</span><span class="kt"><a href="../Structs/NonTerminal.html">NonTerminal</a></span><span class="p">,</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;&gt;</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">syntaxTree</span><span class="p">(</span><span class="k">for</span> <span class="nv">string</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">ParseTree</span></code></pre>
 
                         </div>
                       </div>
@@ -315,7 +324,52 @@ Best performance can be achieved with left recursive grammars.</p>
                             <tr>
                               <td>
                                 <code>
-                                <em>tokenization</em>
+                                <em>string</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:7Covfefe22AmbiguousGrammarParserP14allSyntaxTreesSayAA0F4TreeOyAA11NonTerminalVs5RangeVySS5IndexVGGGSS3for_tKF"></a>
+                    <a name="//apple_ref/swift/Method/allSyntaxTrees(for:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:7Covfefe22AmbiguousGrammarParserP14allSyntaxTreesSayAA0F4TreeOyAA11NonTerminalVs5RangeVySS5IndexVGGGSS3for_tKF">allSyntaxTrees(for:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">allSyntaxTrees</span><span class="p">(</span><span class="k">for</span> <span class="nv">string</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="kt">ParseTree</span><span class="p">]</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>string</em>
                                 </code>
                               </td>
                               <td>
@@ -338,7 +392,7 @@ Best performance can be achieved with left recursive grammars.</p>
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="https://github.com/palle-k" target="_blank" rel="external">palle-k</a>. All rights reserved. (Last updated: 2017-09-09)</p>
+      <p>&copy; 2017 <a class="link" href="https://github.com/palle-k" target="_blank" rel="external">palle-k</a>. All rights reserved. (Last updated: 2017-09-17)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.3</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>

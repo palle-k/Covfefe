@@ -302,6 +302,19 @@ extension Sequence where Element: Hashable {
 	}
 }
 
+extension Sequence where Element: Sequence {
+	func combinations() -> [[Element.Element]] {
+		func combine(_ iterator: Iterator, partialResult: [[Element.Element]]) -> [[Element.Element]] {
+			var iterator = iterator
+			guard let next = iterator.next() else {
+				return partialResult
+			}
+			return combine(iterator, partialResult: crossProduct(partialResult, next).map{$0 + [$1]})
+		}
+		return combine(makeIterator(), partialResult: [[]])
+	}
+}
+
 func crossProduct<S1: Sequence, S2: Sequence>(_ lhs: S1, _ rhs: S2) -> AnySequence<(S1.Element, S2.Element)> {
 	return sequence(
 		state: (

@@ -25,7 +25,7 @@
 
 import Foundation
 
-/// A string tokenizer which tokenizes a string based on final productions of a context free grammar
+/// A string tokenizer which tokenizes a string based on final productions of a context free grammar.
 public protocol Tokenizer {
 
 	/// Tokenizes the given word and returns a sequence of possible tokens for each unit of the string
@@ -47,19 +47,20 @@ public protocol Tokenizer {
 	func tokenize(_ word: String) throws -> [[(terminal: Terminal, range: Range<String.Index>)]]
 }
 
-/// A simple tokenizer which uses a chomsky normalized grammar for tokenization
+/// A simple tokenizer which uses a all terminals in a grammar for tokenization.
+///
+/// Terminals may not overlap partially.
+/// If two terminals, `ab` and `bc` exist and `abc` is tokenized,
+/// the tokenizer will not find an occurrence of the second terminal.
 public struct DefaultTokenizer: Tokenizer {
 	
-	/// Final productions of the chomsky normalized grammar recognized by this tokenizer
-	public let productions: [Production]
-	
+    /// All terminals which the tokenizer can recognize
 	private let terminals: [Terminal]
 	
 	/// Creates a new tokenizer using a Chomsky normalized grammar
 	///
 	/// - Parameter grammar: Grammar specifying the rules with which a string should be tokenized.
 	public init(grammar: Grammar) {
-		self.productions = grammar.chomskyNormalized().productions.filter(\.isFinal).filter{!$0.production.isEmpty}
 		self.terminals = grammar.productions.flatMap(\.generatedTerminals)
 	}
 	
