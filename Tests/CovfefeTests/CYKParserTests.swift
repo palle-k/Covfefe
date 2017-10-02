@@ -174,22 +174,6 @@ class GrammarTests: XCTestCase {
 			t(")")
 			<|> n("Whitespace") <+> n("CloseParenthesis")
 		
-		
-		let functionCall = "FunctionCall" --> n("FunctionName") <+> n("FunctionArguments")
-		let functionName = "FunctionName" -->
-			n("Whitespace") <+> n("FunctionName")
-			<|> n("FunctionName") <+> n("Whitespace")
-			<|> anyIdentifier
-		
-		let functionArguments = "FunctionArguments" --> n("FunctionArgumentsStart") <+> n("CloseParenthesis")
-		let functionArgumentsStart = "FunctionArgumentsStart" -->
-			n("OpenParenthesis") <+> n("FunctionArgumentList")
-			<|> n("OpenParenthesis") <+> n("ValueExpression")
-		
-		let functionArgumentList = "FunctionArgumentList" -->
-			n("FunctionArgument") <+> n("FunctionArgumentSeparator")
-		
-		
 		let varAssignmentExpressionProductions = valueExpression + [valueExpressionBegin] + openParenthesis + closeParenthesis
 		
 		let grammar = Grammar(productions: [whitespaceProduction, assignmentOperator, binaryOperationStart, colon] + binaryOperator + prefixOperator + varDeclarationProductions + varAssignmentProductions + varAssignmentExpressionProductions, start: "VarDeclaration")
@@ -240,7 +224,24 @@ class GrammarTests: XCTestCase {
 		let Var = try! "Var" --> rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
 		let Whitespace = try! "Whitespace" --> rt("\\s+")
 		
-		let grammar = Grammar(productions: expression + BinOp + UnOp + [Num, Var, BracketExpr, BinOperation, UnOperation, Whitespace], start: "Expr")
+		let grammar = Grammar(productions: expression + BinOp + UnOp + [Num, Var, BracketExpr, BinOperation, UnOperation, Whitespace], start: "Expr").chomskyNormalized()
+		
+		XCTAssertTrue(grammar.productions.allMatch { production -> Bool in
+			(production.production.count == 2 && production.production.allMatch({ symbol -> Bool in
+				if case .nonTerminal = symbol {
+					return true
+				} else {
+					return false
+				}
+			})) || (production.production.count == 1 && production.production.allMatch({ symbol -> Bool in
+				if case .terminal = symbol {
+					return true
+				} else {
+					return false
+				}
+			})) || (production.production.isEmpty && production.pattern == grammar.start)
+		})
+		XCTAssertTrue(grammar.isInChomskyNormalForm)
 	}
 
     static var allTests = [

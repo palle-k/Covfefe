@@ -32,14 +32,14 @@ public protocol Tokenizer {
 	///
 	/// For a grammar
 	///
-	///     A -> a | A B
-	///     B -> a | B b
+	///		A -> a | A B
+	///		B -> a | B b
 	///
 	/// and a string "ab"
 	///
 	/// The tokenizer generates the tokenization
 	///
-	///     [[a], [b]]
+	///		[[a], [b]]
 	///
 	/// - Parameter word: Word which should be tokenized
 	/// - Returns: Tokenization of the word
@@ -54,7 +54,7 @@ public protocol Tokenizer {
 /// the tokenizer will not find an occurrence of the second terminal.
 public struct DefaultTokenizer: Tokenizer {
 	
-    /// All terminals which the tokenizer can recognize
+	/// All terminals which the tokenizer can recognize
 	private let terminals: [Terminal]
 	
 	/// Creates a new tokenizer using a Chomsky normalized grammar

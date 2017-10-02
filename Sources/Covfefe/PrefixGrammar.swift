@@ -44,13 +44,14 @@ public extension Grammar {
 					return sequence
 				}
 				return sequence.dropLast() + [.nonTerminal(NonTerminal(name: "\(nonTerminal.name)-pre"))]
-			} + []
+			} + [[]]
 			
-			return prefixes.map {Production(pattern: NonTerminal(name: "\(production.pattern)-pre"), production: $0)}
+			return prefixes.map {Production(pattern: NonTerminal(name: "\(production.pattern.name)-pre"), production: $0)}
 		}
+		let allProductions: [Production] = self.productions + prefixProductions + (NonTerminal(name: "\(self.start.name)-pre-start") --> n("\(self.start.name)-pre") <|> .nonTerminal(self.start))
 		return Grammar(
-			productions: self.productions + prefixProductions + (NonTerminal(name: "\(self.start)-pre-start") --> n("\(self.start.name)-pre") <|> .nonTerminal(self.start)),
-			start: NonTerminal(name: "\(self.start)-pre-start"),
+			productions: allProductions.uniqueElements().collect(Array.init),
+			start: NonTerminal(name: "\(self.start.name)-pre-start"),
 			normalizationNonTerminals: self.normalizationNonTerminals
 		)
 	}

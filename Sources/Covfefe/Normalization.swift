@@ -227,9 +227,9 @@ extension Grammar {
 	///
 	/// In chomsky normal form, all productions must have the following form:
 	///
-	///     A -> B C
-	///     D -> x
-	///     Start -> empty
+	/// 	A -> B C
+	/// 	D -> x
+	/// 	Start -> empty
 	///
 	/// Note that empty productions are only allowed starting from the start non-terminal
 	///
@@ -258,6 +258,6 @@ extension Grammar {
 		let generatedNonTerminals = reachableProductions.flatMap{[$0.pattern] + $0.generatedNonTerminals}.collect(Set.init)
 		let newNonTerminals = generatedNonTerminals.subtracting(initialNonTerminals)
 		
-		return Grammar(productions: reachableProductions, start: start, normalizationNonTerminals: newNonTerminals)
+		return Grammar(productions: reachableProductions, start: start, normalizationNonTerminals: self.normalizationNonTerminals.union(newNonTerminals))
 	}
 }

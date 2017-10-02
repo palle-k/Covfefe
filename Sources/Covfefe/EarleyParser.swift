@@ -25,8 +25,6 @@
 
 import Foundation
 
-public typealias ParseTree = SyntaxTree<NonTerminal, Range<String.Index>>
-
 /// Represents a partial parse of a production
 fileprivate struct ParseStateItem {
 	/// The partially parsed production

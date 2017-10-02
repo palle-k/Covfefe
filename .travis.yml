@@ -5,7 +5,6 @@ sudo: required
 dist: trusty
 osx_image: xcode9
 script:
-  - swift build
   - swift test -c release -Xswiftc -enable-testing
 notifications:
   email:

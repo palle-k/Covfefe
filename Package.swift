@@ -4,14 +4,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "Covfefe",
-    products: [
-        .library(name: "Covfefe", type: .dynamic, targets: ["Covfefe"]),
-    ],
-    dependencies: [
-    ],
-    targets: [
-        .target(name: "Covfefe", dependencies: []),
-        .testTarget(name: "CovfefeTests", dependencies: ["Covfefe"]),
-    ]
+	name: "Covfefe",
+	products: [
+		.library(name: "Covfefe", type: .dynamic, targets: ["Covfefe"]),
+	],
+	dependencies: [
+	],
+	targets: [
+		.target(name: "Covfefe", dependencies: []),
+		.testTarget(name: "CovfefeTests", dependencies: ["Covfefe"]),
+	]
 )

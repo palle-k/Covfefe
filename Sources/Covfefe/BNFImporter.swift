@@ -77,7 +77,7 @@ public extension Grammar {
 	
 	/// Creates a new grammar from a specification in Backus-Naur Form (BNF)
 	///
-	///     <pattern1> ::= <alternative1> | <alternative2>
+	/// 	<pattern1> ::= <alternative1> | <alternative2>
 	///		<pattern2> ::= 'con' 'catenation'
 	///
 	/// - Parameters:

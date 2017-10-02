@@ -33,6 +33,7 @@ public struct SyntaxError: Error {
 	/// - emptyNotAllowed: An empty string was provided but the grammar does not allow empty productions
 	/// - unknownToken: The tokenization could not be completed because no matching token was found
 	/// - unmatchedPattern: A pattern was found which could not be merged
+	/// - unexpectedToken: A token was found that was not expected
 	public enum Reason {
 		/// An empty string was provided but the grammar does not allow empty productions
 		case emptyNotAllowed
@@ -43,7 +44,7 @@ public struct SyntaxError: Error {
 		/// A pattern was found which could not be merged
 		case unmatchedPattern
 		
-		/// A token was found that could not be parsed
+		/// A token was found that was not expected
 		case unexpectedToken
 	}
 	
@@ -56,14 +57,16 @@ public struct SyntaxError: Error {
 	/// The context around the error
 	public let context: [NonTerminal]
 	
-    /// The string for which the parsing was unsuccessful
+	/// The string for which the parsing was unsuccessful
 	public let string: String
 	
 	/// Creates a new syntax error with a given range and reason
 	///
 	/// - Parameters:
 	///   - range: String range in which the syntax error occurred
+	///   - string: String which was unsuccessfully parsed
 	///   - reason: Reason why the syntax error occurred
+	///   - context: Non-terminals which were expected at the location of the error.
 	public init(range: Range<String.Index>, in string: String, reason: Reason, context: [NonTerminal] = []) {
 		self.range = range
 		self.string = string
@@ -108,7 +111,7 @@ extension SyntaxError.Reason: CustomStringConvertible {
 ///
 /// Grammars might be ambiguous. For example, the grammar
 ///
-///     <expr> ::= <expr> '+' <expr> | 'a'
+///		<expr> ::= <expr> '+' <expr> | 'a'
 ///
 /// can recognize the expression `a+a+a+a` in 5 different ways:
 /// `((a+a)+a)+a`, `(a+(a+a))+a`, `a+(a+(a+a))`, `a+((a+a)+a)`, `(a+a)+(a+a)`.
@@ -194,8 +197,8 @@ public extension Grammar {
 	/// - A production generates exactly one terminal symbol
 	/// - A production generates exactly two non-terminal symbols
 	/// - A production generates an empty string and is generated from the start non-terminal
-    ///
-    /// Certain parsing algorithms, such as the CYK parser, require the recognized grammar to be in Chomsky normal form.
+	///
+	/// Certain parsing algorithms, such as the CYK parser, require the recognized grammar to be in Chomsky normal form.
 	public var isInChomskyNormalForm: Bool {
 		return productions.allMatch { production -> Bool in
 			(production.isFinal && production.production.count == 1)
