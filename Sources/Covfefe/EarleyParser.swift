@@ -411,9 +411,11 @@ public struct EarleyParser: AmbiguousGrammarParser {
 		
 		var currentIndex = string.startIndex
 		
+		// Tokenize string while parsing it
 		while currentIndex < string.endIndex {
 			let lastState = stateCollection.last!
 			
+			// Collect all terminals which could occur at the current location according to the grammar
 			let expectedTerminals = Dictionary(
 				grouping: lastState.flatMap { item -> (item: ParseStateItem, terminal: Terminal)? in
 					guard case .some(.terminal(let terminal)) = item.nextSymbol else {
@@ -430,6 +432,7 @@ public struct EarleyParser: AmbiguousGrammarParser {
 					}
 			}
 			
+			// Find the tokens which match the string
 			let (newItems, tokens): ([[ParseStateItem]], [(terminal: Terminal, range: Range<String.Index>)]) =
 				expectedTerminals.flatMap { (terminal, items) -> (items: [ParseStateItem], token: (terminal: Terminal, range: Range<String.Index>))? in
 					guard let range = string.rangeOfPrefix([terminal], from: currentIndex), range.lowerBound == currentIndex else {
@@ -438,7 +441,9 @@ public struct EarleyParser: AmbiguousGrammarParser {
 					return (items.map{$0.advanced()}, (terminal, range))
 					}.collect(unzip)
 			
+			// Check if tokens have been found. Report a syntax error if none have been found
 			guard !newItems.isEmpty else {
+				// Find non terminals which are expected at the current location
 				let context = lastState.flatMap { item -> NonTerminal? in
 					switch item.nextSymbol {
 					case .none:
@@ -480,6 +485,7 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			currentIndex = tokens.first!.range.upperBound
 		}
 		
+		// Find all successfully parsed Earley items
 		let parseStates = stateCollection.enumerated().reduce(Array<Set<ParsedItem>>(repeating: [], count: stateCollection.count)) { (parseStates, element) in
 			let (index, state) = element
 			let completed = state.filter(\.isCompleted)
@@ -491,6 +497,11 @@ public struct EarleyParser: AmbiguousGrammarParser {
 		return (parseStates, tokenization)
 	}
 	
+	/// Creates a syntax tree which explains how a word was derived from a grammar
+	///
+	/// - Parameter string: Input word, for which a parse tree should be generated
+	/// - Returns: A syntax tree explaining how the grammar can be used to derive the word described by the given tokenization
+	/// - Throws: A syntax error if the word is not in the language recognized by the parser
 	public func syntaxTree(for string: String) throws -> ParseTree {
 		let (parseStates, tokenization) = try parse(string)
 		
@@ -512,6 +523,16 @@ public struct EarleyParser: AmbiguousGrammarParser {
 		return buildSyntaxTrees(stateCollection: parseStates, tokenization: tokenization, rootItem: match, startIndex: 0, ignoreAmbiguousItems: true)[0]
 	}
 	
+	/// Generates all syntax trees explaining how a word can be derived from a grammar.
+	///
+	/// This function should only be used for ambiguous grammars and if it is necessary to
+	/// retrieve all parse trees, as it comes with an additional cost in runtime.
+	///
+	/// For unambiguous grammars, this function should return the same results as `syntaxTree(for:)`.
+	///
+	/// - Parameter string: Input word, for which all parse trees should be generated
+	/// - Returns: All syntax trees which explain how the input was derived from the recognized grammar
+	/// - Throws: A syntax error if the word is not in the language recognized by the parser
 	public func allSyntaxTrees(for string: String) throws -> [ParseTree] {
 		let (parseStates, tokenization) = try parse(string)
 		let matches = parseStates.first!.filter { item -> Bool in

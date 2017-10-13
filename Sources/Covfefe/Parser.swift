@@ -52,7 +52,6 @@ public extension Parser {
 
 /// A parser that can parse ambiguous grammars and retrieve every possible syntax tree
 public protocol AmbiguousGrammarParser: Parser {
-	
 	/// Generates all syntax trees explaining how a word can be derived from a grammar.
 	///
 	/// This function should only be used for ambiguous grammars and if it is necessary to

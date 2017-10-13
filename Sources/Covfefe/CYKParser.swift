@@ -174,10 +174,25 @@ public struct CYKParser: AmbiguousGrammarParser {
 		return syntaxTrees.map{unfoldChainProductions($0).explode(normalizedGrammar.normalizationNonTerminals.contains)[0]}
 	}
 	
+	/// Creates a syntax tree which explains how a word was derived from a grammar
+	///
+	/// - Parameter string: Input word, for which a parse tree should be generated
+	/// - Returns: A syntax tree explaining how the grammar can be used to derive the word described by the given tokenization
+	/// - Throws: A syntax error if the word is not in the language recognized by the parser
 	public func syntaxTree(for string: String) throws -> ParseTree {
 		return try self.syntaxTree(for: string, ignoreAmbiguousItems: true)[0]
 	}
 	
+	/// Generates all syntax trees explaining how a word can be derived from a grammar.
+	///
+	/// This function should only be used for ambiguous grammars and if it is necessary to
+	/// retrieve all parse trees, as it comes with an additional cost in runtime.
+	///
+	/// For unambiguous grammars, this function should return the same results as `syntaxTree(for:)`.
+	///
+	/// - Parameter string: Input word, for which all parse trees should be generated
+	/// - Returns: All syntax trees which explain how the input was derived from the recognized grammar
+	/// - Throws: A syntax error if the word is not in the language recognized by the parser
 	public func allSyntaxTrees(for string: String) throws -> [ParseTree] {
 		return try self.syntaxTree(for: string, ignoreAmbiguousItems: false)
 	}

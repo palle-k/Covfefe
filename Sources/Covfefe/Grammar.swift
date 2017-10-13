@@ -162,7 +162,7 @@ extension Grammar: CustomStringConvertible {
 		}
 		return groupedProductions.sorted(by: {$0.key.name < $1.key.name}).map { entry -> String in
 			let (pattern, productions) = entry
-			
+
 			let productionString = productions.map { production in
 				if production.production.isEmpty {
 					return "\"\""
@@ -171,18 +171,18 @@ extension Grammar: CustomStringConvertible {
 					switch symbol {
 					case .nonTerminal(let nonTerminal):
 						return "<\(nonTerminal.name)>"
-						
+
 					case .terminal(let terminal) where terminal.value.contains("\""):
 						let escapedValue = terminal.value.replacingOccurrences(of: "\n", with: "\\n").replacingOccurrences(of: "\t", with: "\\t")
 						return "'\(escapedValue)'"
-					
+
 					case .terminal(let terminal):
 						let escapedValue = terminal.value.replacingOccurrences(of: "\n", with: "\\n").replacingOccurrences(of: "\t", with: "\\t")
 						return "\"\(escapedValue)\""
 					}
 				}.joined(separator: " ")
 			}.joined(separator: " | ")
-			
+
 			return "<\(pattern.name)> ::= \(productionString)"
 		}.joined(separator: "\n")
 	}

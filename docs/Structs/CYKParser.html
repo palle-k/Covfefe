@@ -323,9 +323,9 @@ parse tree of the CYK parser.</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:7Covfefe6ParserP10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSS3for_tKF"></a>
+                    <a name="/s:7Covfefe9CYKParserV10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSS3for_tKF"></a>
                     <a name="//apple_ref/swift/Method/syntaxTree(for:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe6ParserP10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSS3for_tKF">syntaxTree(for:)</a>
+                    <a class="token" href="#/s:7Covfefe9CYKParserV10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSS3for_tKF">syntaxTree(for:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -333,7 +333,13 @@ parse tree of the CYK parser.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        
+                        <p>Creates a syntax tree which explains how a word was derived from a grammar</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    A syntax error if the word is not in the language recognized by the parser
+
+</div>
+
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
@@ -355,12 +361,16 @@ parse tree of the CYK parser.</p>
                               </td>
                               <td>
                                 <div>
-                                  
+                                  <p>Input word, for which a parse tree should be generated</p>
                                 </div>
                               </td>
                             </tr>
                           </tbody>
                         </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>A syntax tree explaining how the grammar can be used to derive the word described by the given tokenization</p>
                       </div>
                     </section>
                   </div>
@@ -368,9 +378,9 @@ parse tree of the CYK parser.</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:7Covfefe22AmbiguousGrammarParserP14allSyntaxTreesSayAA0F4TreeOyAA11NonTerminalVs5RangeVySS5IndexVGGGSS3for_tKF"></a>
+                    <a name="/s:7Covfefe9CYKParserV14allSyntaxTreesSayAA0D4TreeOyAA11NonTerminalVs5RangeVySS5IndexVGGGSS3for_tKF"></a>
                     <a name="//apple_ref/swift/Method/allSyntaxTrees(for:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe22AmbiguousGrammarParserP14allSyntaxTreesSayAA0F4TreeOyAA11NonTerminalVs5RangeVySS5IndexVGGGSS3for_tKF">allSyntaxTrees(for:)</a>
+                    <a class="token" href="#/s:7Covfefe9CYKParserV14allSyntaxTreesSayAA0D4TreeOyAA11NonTerminalVs5RangeVySS5IndexVGGGSS3for_tKF">allSyntaxTrees(for:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -378,7 +388,18 @@ parse tree of the CYK parser.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        
+                        <p>Generates all syntax trees explaining how a word can be derived from a grammar.</p>
+
+<p>This function should only be used for ambiguous grammars and if it is necessary to
+retrieve all parse trees, as it comes with an additional cost in runtime.</p>
+
+<p>For unambiguous grammars, this function should return the same results as <code><a href="../Structs/CYKParser.html#/s:7Covfefe9CYKParserV10syntaxTreeAA06SyntaxD0OyAA11NonTerminalVs5RangeVySS5IndexVGGSS3for_tKF">syntaxTree(for:)</a></code>.</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    A syntax error if the word is not in the language recognized by the parser
+
+</div>
+
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
@@ -400,12 +421,16 @@ parse tree of the CYK parser.</p>
                               </td>
                               <td>
                                 <div>
-                                  
+                                  <p>Input word, for which all parse trees should be generated</p>
                                 </div>
                               </td>
                             </tr>
                           </tbody>
                         </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>All syntax trees which explain how the input was derived from the recognized grammar</p>
                       </div>
                     </section>
                   </div>
@@ -418,7 +443,7 @@ parse tree of the CYK parser.</p>
       </article>
     </div>
     <section class="footer">
-      <p>&copy; 2017 <a class="link" href="https://github.com/palle-k" target="_blank" rel="external">palle-k</a>. All rights reserved. (Last updated: 2017-10-02)</p>
+      <p>&copy; 2017 <a class="link" href="https://github.com/palle-k" target="_blank" rel="external">palle-k</a>. All rights reserved. (Last updated: 2017-10-13)</p>
       <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.3</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
     </section>
   </body>
