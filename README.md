@@ -21,7 +21,7 @@ target 'Your-App-Name' do
 end
 ```
 
-To add this package to a non-Swift Package Manager project:
+To add this framework manually:
 
 1. `git clone https://github.com/palle-k/Covfefe.git`
 2. `cd Covfefe`
