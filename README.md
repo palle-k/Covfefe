@@ -10,7 +10,15 @@ It uses the [Earley](https://en.wikipedia.org/wiki/Earley_parser) or [CYK](https
 
 This framework can be imported as a Swift Package by adding it as a dependency to the `Package.swift` file:
 ```swift
-.package(url: "https://github.com/palle-k/Covfefe.git", from: "0.3.0")
+.package(url: "https://github.com/palle-k/Covfefe.git", from: "0.3.2")
+```
+
+Alternatively, it can be added as a dependency via CocoaPods (iOS, tvOS, watchOS and macOS):
+```ruby
+target 'Your-App-Name' do
+  use_frameworks!
+  pod 'Covfefe'
+end
 ```
 
 To add this package to a non-Swift Package Manager project:
