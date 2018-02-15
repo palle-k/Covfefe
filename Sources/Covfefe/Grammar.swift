@@ -136,8 +136,8 @@ public struct Grammar {
 	public init(productions: [Production], start: NonTerminal) {
 		self.init(productions: productions, start: start, normalizationNonTerminals: [])
 		
-		assertNonFatal(!unreachableNonTerminals.isEmpty, "Grammar contains unreachable non-terminals (\(unreachableNonTerminals))")
-		assertNonFatal(!unterminatedNonTerminals.isEmpty, "Grammar contains non-terminals which can never reach terminals (\(unterminatedNonTerminals))")
+		assertNonFatal(unreachableNonTerminals.isEmpty, "Grammar contains unreachable non-terminals (\(unreachableNonTerminals))")
+		assertNonFatal(unterminatedNonTerminals.isEmpty, "Grammar contains non-terminals which can never reach terminals (\(unterminatedNonTerminals))")
 	}
 	
 	/// Creates a new grammar with a given set of productions, a start non-terminal and
