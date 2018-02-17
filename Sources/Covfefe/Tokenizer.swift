@@ -61,7 +61,7 @@ public struct DefaultTokenizer: Tokenizer {
 	///
 	/// - Parameter grammar: Grammar specifying the rules with which a string should be tokenized.
 	public init(grammar: Grammar) {
-		self.terminals = grammar.productions.flatMap(\.generatedTerminals)
+		self.terminals = grammar.productions.flatMap{$0.generatedTerminals}
 	}
 	
 	public func tokenize(_ word: String) throws -> [[(terminal: Terminal, range: Range<String.Index>)]] {

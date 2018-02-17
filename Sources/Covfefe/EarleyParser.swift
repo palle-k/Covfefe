@@ -488,7 +488,7 @@ public struct EarleyParser: AmbiguousGrammarParser {
 		// Find all successfully parsed Earley items
 		let parseStates = stateCollection.enumerated().reduce(Array<Set<ParsedItem>>(repeating: [], count: stateCollection.count)) { (parseStates, element) in
 			let (index, state) = element
-			let completed = state.filter(\.isCompleted)
+			let completed = state.filter {$0.isCompleted}
 			return completed.reduce(into: parseStates) { (parseStates, item) in
 				parseStates[item.startTokenIndex].insert(ParsedItem(production: item.production, completedIndex: index))
 			}

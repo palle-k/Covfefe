@@ -134,7 +134,7 @@ public extension String {
 	///   - startIndex: Index from which the search should start
 	/// - Returns: True, if the string has a prefix from the given start index described by the given non-terminal sequence
 	func hasPrefix(_ prefix: [Terminal], from startIndex: String.Index) -> Bool {
-		let prefixString = prefix.map(\Terminal.value).joined()
+		let prefixString = prefix.map{$0.value}.joined()
 		
 		if prefix.contains(where: {$0.isRegularExpression}) {
 			return try! self.hasRegularPrefix("\(prefixString)", from: startIndex)
@@ -159,7 +159,7 @@ public extension String {
 	///   - startIndex: Index from which the search should start
 	/// - Returns: The range of the prefix or nil, if no matching prefix has been found
 	func rangeOfPrefix(_ prefix: [Terminal], from startIndex: String.Index) -> Range<String.Index>? {
-		let prefixString = prefix.map(\Terminal.value).joined()
+		let prefixString = prefix.map{$0.value}.joined()
 		
 		if prefix.contains(where: {$0.isRegularExpression}) {
 			return try! self.rangeOfRegularPrefix(prefixString, from: startIndex)
@@ -173,7 +173,7 @@ public extension String {
 	/// - Parameter suffix: Sequence of terminal symbols
 	/// - Returns: True, if the string has a suffix which matches the suffix described by the given sequence of terminal symbols
 	func hasSuffix(_ suffix: [Terminal]) -> Bool {
-		let suffixString = suffix.map(\Terminal.value).joined()
+		let suffixString = suffix.map{$0.value}.joined()
 		
 		if suffix.contains(where: {$0.isRegularExpression}) {
 			return try! self.hasRegularSuffix("\(suffixString)$")
@@ -187,7 +187,7 @@ public extension String {
 	/// - Parameter suffix: Sequence of terminal symbols
 	/// - Returns: Range of the suffix or nil if no matching suffix was found
 	func rangeOfSuffix(_ suffix: [Terminal]) -> Range<String.Index>? {
-		let suffixString = suffix.map(\Terminal.value).joined()
+		let suffixString = suffix.map{$0.value}.joined()
 		
 		if suffix.contains(where: {$0.isRegularExpression}) {
 			return try! self.rangeOfRegularSuffix(suffixString)

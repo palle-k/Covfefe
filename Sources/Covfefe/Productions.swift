@@ -172,7 +172,7 @@ public struct Production: Codable {
 
 extension Production: Hashable {
 	public var hashValue: Int {
-		return pattern.hashValue ^ production.map(\.hashValue).reduce(0, ^)
+		return pattern.hashValue ^ production.map{$0.hashValue}.reduce(0, ^)
 	}
 	
 	public static func ==(lhs: Production, rhs: Production) -> Bool {
@@ -191,8 +191,8 @@ extension Production: CustomDebugStringConvertible {
 		return """
 		production {
 			pattern: \(self.pattern)
-			produces: \(self.production.map(\.description))
-			chain: \(self.nonTerminalChain?.map(\.description).joined(separator: ", ") ?? "empty")
+			produces: \(self.production.map{$0.description})
+			chain: \(self.nonTerminalChain?.map{$0.description}.joined(separator: ", ") ?? "empty")
 		}
 		"""
 	}

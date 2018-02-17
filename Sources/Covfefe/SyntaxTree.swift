@@ -74,7 +74,7 @@ public extension SyntaxTree {
 			return [leaf]
 			
 		case .node(key: _, children: let children):
-			return children.flatMap(\.leafs)
+			return children.flatMap{$0.leafs}
 		}
 	}
 	
@@ -161,7 +161,7 @@ extension SyntaxTree: CustomDebugStringConvertible {
 			return "leaf (value: \(value))"
 			
 		case .node(key: let key, children: let children):
-			let childrenDescription = children.map(\.debugDescription).joined(separator: "\n").replacingOccurrences(of: "\n", with: "\n\t")
+			let childrenDescription = children.map{$0.debugDescription}.joined(separator: "\n").replacingOccurrences(of: "\n", with: "\n\t")
 			return """
 			node (key: \(key)) {
 				\(childrenDescription)
