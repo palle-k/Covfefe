@@ -248,16 +248,20 @@ public struct EarleyParser: AmbiguousGrammarParser {
 		var knownItems: Set<ParseStateItem> = knownItems
 		
 		repeat {
-			addedItems = addedItems.reduce([]) { (addedItems, item) -> Set<ParseStateItem> in
+			addedItems = addedItems.reduce(into: Set<ParseStateItem>()) { (addedItems, item) in
 				switch item.nextSymbol {
 				case .none:
-					return addedItems.union(complete(item: item, allStates: allStates, knownItems: knownItems))
+					let completed = complete(item: item, allStates: allStates, knownItems: knownItems)
+					addedItems.reserveCapacity(addedItems.count + completed.count)
+					addedItems.formUnion(completed)
 
 				case .some(.terminal):
-					return addedItems // Terminals are processed in scan before
+					break // Terminals are processed in scan before
 
 				case .some(.nonTerminal):
-					return addedItems.union(predict(productions: productions, item: item, currentIndex: allStates.count, knownItems: knownItems))
+					let predicted = predict(productions: productions, item: item, currentIndex: allStates.count, knownItems: knownItems)
+					addedItems.reserveCapacity(addedItems.count + predicted.count)
+					addedItems.formUnion(predicted)
 				}
 			}.subtracting(knownItems)
 
@@ -423,11 +427,11 @@ public struct EarleyParser: AmbiguousGrammarParser {
 				},
 				by: { pair in
 					pair.terminal
-			}
-				).mapValues { pairs in
-					pairs.map { pair in
-						pair.item
-					}
+				}
+			).mapValues { pairs in
+				pairs.map { pair in
+					pair.item
+				}
 			}
 			
 			// Find the tokens which match the string
