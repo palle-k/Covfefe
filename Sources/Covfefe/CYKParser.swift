@@ -119,7 +119,7 @@ public struct CYKParser: AmbiguousGrammarParser {
 			}
 		}
 		
-		let terminalProductions = normalizedGrammar.productions.filter(\.isFinal).filter {!$0.production.isEmpty}
+		let terminalProductions = normalizedGrammar.productions.filter{$0.isFinal}.filter {!$0.production.isEmpty}
 		let startTrees = tokens.map { alternatives -> [SyntaxTree<Production, Range<String.Index>>] in
 			alternatives.flatMap { token -> [SyntaxTree<Production, Range<String.Index>>] in
 				terminalProductions.filter { production in
