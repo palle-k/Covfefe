@@ -32,7 +32,7 @@ class StringUtilitiesTest: XCTestCase {
 	func testPrefix() {
 		let testedString = "hello, world"
 		
-		XCTAssertEqual(testedString.rangeOfPrefix(["world"], from: testedString.startIndex), testedString.range(of: "world"))
+		XCTAssertEqual(testedString.rangeOfPrefix(["world"], from: testedString.startIndex), nil)
 		XCTAssertEqual(testedString.rangeOfPrefix(["world"], from: testedString.index(of: "w")!), testedString.range(of: "world"))
 		XCTAssertNotEqual(testedString.rangeOfPrefix(["world"], from: testedString.index(testedString.startIndex, offsetBy: 8)), testedString.range(of: "world"))
 		

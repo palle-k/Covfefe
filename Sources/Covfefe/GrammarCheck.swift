@@ -31,7 +31,7 @@ public extension Grammar {
 	public var unreachableNonTerminals: Set<NonTerminal> {
 		let productionSet = productions.collect(Set.init)
 		let reachableProductions = Grammar.eliminateUnusedProductions(productions: productions, start: start).collect(Set.init)
-		return productionSet.subtracting(reachableProductions).map(\.pattern).collect(Set.init)
+		return productionSet.subtracting(reachableProductions).map{$0.pattern}.collect(Set.init)
 	}
 	
 	/// Nonterminals which can never produce a sequence of terminals

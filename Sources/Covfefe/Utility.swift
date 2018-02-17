@@ -26,38 +26,6 @@
 import Foundation
 
 extension Sequence {
-	func map<Result>(_ keyPath: KeyPath<Element, Result>) -> [Result] {
-		return self.map(keyPath.function)
-	}
-	
-	func filter(_ predicate: KeyPath<Element, Bool>) -> [Element] {
-		return self.filter(predicate.function)
-	}
-	
-	func flatMap<Result>(_ keyPath: KeyPath<Element, Result?>) -> [Result] {
-		return self.flatMap(keyPath.function)
-	}
-
-	func flatMap<Result>(_ keyPath: KeyPath<Element, [Result]>) -> [Result] {
-		return self.flatMap(keyPath.function)
-	}
-	
-	func sorted<SortKey: Comparable>(by keyPath: KeyPath<Element, SortKey>) -> [Element] {
-		return self.sorted(by: { first, second -> Bool in
-			return first[keyPath: keyPath] < second[keyPath: keyPath]
-		})
-	}
-}
-
-extension KeyPath {
-	var function: (Root) -> Value {
-		return { (element: Root) -> Value in
-			return element[keyPath: self]
-		}
-	}
-}
-
-extension Sequence {
 	func allMatch(_ predicate: (Element) throws -> Bool) rethrows -> Bool {
 		return try !self.contains(where: {try !predicate($0)})
 	}

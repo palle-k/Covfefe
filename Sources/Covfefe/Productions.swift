@@ -37,6 +37,8 @@ public struct Production: Codable {
 	/// Chain of non-terminals which have been eliminated during normalization
 	public let nonTerminalChain: [NonTerminal]?
 	
+	public let hashValue: Int
+	
 	/// Creates a new production
 	///
 	/// - Parameters:
@@ -46,6 +48,8 @@ public struct Production: Codable {
 		self.pattern = pattern
 		self.production = production.characters
 		self.nonTerminalChain = nil
+		
+		self.hashValue = pattern.hashValue ^ self.production.map{$0.hashValue}.reduce(0, ^)
 	}
 	
 	/// Creates a new production
@@ -58,6 +62,8 @@ public struct Production: Codable {
 		self.pattern = pattern
 		self.production = production
 		self.nonTerminalChain = chain
+		
+		self.hashValue = pattern.hashValue ^ production.map{$0.hashValue}.reduce(0, ^)
 	}
 	
 	/// A production is final if it only generates terminal symbols
@@ -171,9 +177,6 @@ public struct Production: Codable {
 }
 
 extension Production: Hashable {
-	public var hashValue: Int {
-		return pattern.hashValue ^ production.map(\.hashValue).reduce(0, ^)
-	}
 	
 	public static func ==(lhs: Production, rhs: Production) -> Bool {
 		return lhs.pattern == rhs.pattern && lhs.production == rhs.production
@@ -191,8 +194,8 @@ extension Production: CustomDebugStringConvertible {
 		return """
 		production {
 			pattern: \(self.pattern)
-			produces: \(self.production.map(\.description))
-			chain: \(self.nonTerminalChain?.map(\.description).joined(separator: ", ") ?? "empty")
+			produces: \(self.production.map{$0.description})
+			chain: \(self.nonTerminalChain?.map{$0.description}.joined(separator: ", ") ?? "empty")
 		}
 		"""
 	}

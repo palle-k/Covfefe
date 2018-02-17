@@ -244,31 +244,33 @@ public struct EarleyParser: AmbiguousGrammarParser {
 		knownItems: Set<ParseStateItem>,
 		newItems: Set<ParseStateItem>
 	) -> Set<ParseStateItem> {
-		let addedItems = newItems.reduce([]) { (addedItems, item) -> Set<ParseStateItem> in
-			switch item.nextSymbol {
-			case .none:
-				return addedItems.union(complete(item: item, allStates: allStates, knownItems: knownItems))
-				
-			case .some(.terminal):
-				return addedItems // Terminals are processed in scan before
-				
-			case .some(.nonTerminal):
-				return addedItems.union(predict(productions: productions, item: item, currentIndex: allStates.count, knownItems: knownItems))
-			}
-		}.subtracting(knownItems)
+		var addedItems: Set<ParseStateItem> = newItems
+		var knownItems: Set<ParseStateItem> = knownItems
 		
-		if addedItems.isEmpty {
-			// No new items have been found so we are done.
-			return knownItems
-		} else {
-			// Tail recursive call to process newly found items.
-			return processState(
-				productions: productions,
-				allStates: allStates,
-				knownItems: knownItems.union(addedItems),
-				newItems: addedItems
-			)
-		}
+		repeat {
+			addedItems = addedItems.reduce(into: Set<ParseStateItem>()) { (addedItems, item) in
+				switch item.nextSymbol {
+				case .none:
+					let completed = complete(item: item, allStates: allStates, knownItems: knownItems)
+					addedItems.reserveCapacity(addedItems.count + completed.count)
+					addedItems.formUnion(completed)
+
+				case .some(.terminal):
+					break // Terminals are processed in scan before
+
+				case .some(.nonTerminal):
+					let predicted = predict(productions: productions, item: item, currentIndex: allStates.count, knownItems: knownItems)
+					addedItems.reserveCapacity(addedItems.count + predicted.count)
+					addedItems.formUnion(predicted)
+				}
+			}.subtracting(knownItems)
+
+			knownItems.reserveCapacity(addedItems.count + knownItems.count)
+			knownItems.formUnion(addedItems)
+
+		} while !addedItems.isEmpty
+
+		return knownItems
 	}
 	
 	private func buildSyntaxTrees(
@@ -425,11 +427,11 @@ public struct EarleyParser: AmbiguousGrammarParser {
 				},
 				by: { pair in
 					pair.terminal
-			}
-				).mapValues { pairs in
-					pairs.map { pair in
-						pair.item
-					}
+				}
+			).mapValues { pairs in
+				pairs.map { pair in
+					pair.item
+				}
 			}
 			
 			// Find the tokens which match the string
@@ -488,7 +490,7 @@ public struct EarleyParser: AmbiguousGrammarParser {
 		// Find all successfully parsed Earley items
 		let parseStates = stateCollection.enumerated().reduce(Array<Set<ParsedItem>>(repeating: [], count: stateCollection.count)) { (parseStates, element) in
 			let (index, state) = element
-			let completed = state.filter(\.isCompleted)
+			let completed = state.filter {$0.isCompleted}
 			return completed.reduce(into: parseStates) { (parseStates, item) in
 				parseStates[item.startTokenIndex].insert(ParsedItem(production: item.production, completedIndex: index))
 			}

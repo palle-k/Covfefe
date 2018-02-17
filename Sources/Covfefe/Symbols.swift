@@ -26,16 +26,23 @@
 import Foundation
 
 /// A non-terminal symbol, which cannot occurr in a word recognized by a parser
-public struct NonTerminal: Codable {
+public struct NonTerminal: Codable, Hashable {
+	
+	public static func ==(lhs: NonTerminal, rhs: NonTerminal) -> Bool {
+		return lhs.name == rhs.name
+	}
 	
 	/// Name of the non-terminal
 	public let name: String
+	
+	public let hashValue: Int
 	
 	/// Creates a new non-terminal symbol with a given name
 	///
 	/// - Parameter name: Name of the non-terminal symbol
 	public init(name: String) {
 		self.name = name
+		self.hashValue = name.hashValue
 	}
 }
 
@@ -53,25 +60,17 @@ extension NonTerminal: ExpressibleByStringLiteral {
 	}
 }
 
-extension NonTerminal: Hashable {
-	public var hashValue: Int {
-		return name.hashValue
-	}
-	
-	public static func ==(lhs: NonTerminal, rhs: NonTerminal) -> Bool {
-		return lhs.name == rhs.name
-	}
-}
-
 /// A terminal symbol which can occur in a string recognized by a parser and which cannot be
 /// replaced by any production
-public struct Terminal: Codable {
+public struct Terminal: Codable, Hashable {
 	
 	/// Value of the terminal
 	public let value: String
 	
 	/// Indicates whether the value of the non-terminal is a regular expression
 	public let isRegularExpression: Bool
+	
+	public let hashValue: Int
 	
 	/// Creates a new terminal value which can occurr in a string
 	///
@@ -85,10 +84,15 @@ public struct Terminal: Codable {
 	public init(value: String, isRegularExpression: Bool = false) throws {
 		self.value = value
 		self.isRegularExpression = isRegularExpression
+		self.hashValue = value.hashValue
 		
 		if isRegularExpression {
 			_ = try NSRegularExpression(pattern: value, options: [])
 		}
+	}
+	
+	public static func ==(lhs: Terminal, rhs: Terminal) -> Bool {
+		return lhs.value == rhs.value
 	}
 }
 
@@ -97,16 +101,6 @@ extension Terminal: ExpressibleByStringLiteral {
 	
 	public init(stringLiteral value: String) {
 		try! self.init(value: value)
-	}
-}
-
-extension Terminal: Hashable {
-	public var hashValue: Int {
-		return value.hashValue
-	}
-	
-	public static func ==(lhs: Terminal, rhs: Terminal) -> Bool {
-		return lhs.value == rhs.value
 	}
 }
 

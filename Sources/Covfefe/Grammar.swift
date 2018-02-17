@@ -79,7 +79,7 @@ extension SyntaxError: CustomStringConvertible {
 	public var description: String {
 		let main = "Error: \(reason) at \(NSRange(range, in: string)): '\(string[range])'"
 		if !context.isEmpty {
-			return "\(main), expected: \(context.map(\.description).joined(separator: " | "))"
+			return "\(main), expected: \(context.map{$0.description}.joined(separator: " | "))"
 		} else {
 			return main
 		}
