@@ -244,31 +244,29 @@ public struct EarleyParser: AmbiguousGrammarParser {
 		knownItems: Set<ParseStateItem>,
 		newItems: Set<ParseStateItem>
 	) -> Set<ParseStateItem> {
-		let addedItems = newItems.reduce([]) { (addedItems, item) -> Set<ParseStateItem> in
-			switch item.nextSymbol {
-			case .none:
-				return addedItems.union(complete(item: item, allStates: allStates, knownItems: knownItems))
-				
-			case .some(.terminal):
-				return addedItems // Terminals are processed in scan before
-				
-			case .some(.nonTerminal):
-				return addedItems.union(predict(productions: productions, item: item, currentIndex: allStates.count, knownItems: knownItems))
-			}
-		}.subtracting(knownItems)
+		var addedItems: Set<ParseStateItem> = newItems
+		var knownItems: Set<ParseStateItem> = knownItems
 		
-		if addedItems.isEmpty {
-			// No new items have been found so we are done.
-			return knownItems
-		} else {
-			// Tail recursive call to process newly found items.
-			return processState(
-				productions: productions,
-				allStates: allStates,
-				knownItems: knownItems.union(addedItems),
-				newItems: addedItems
-			)
-		}
+		repeat {
+			addedItems = addedItems.reduce([]) { (addedItems, item) -> Set<ParseStateItem> in
+				switch item.nextSymbol {
+				case .none:
+					return addedItems.union(complete(item: item, allStates: allStates, knownItems: knownItems))
+
+				case .some(.terminal):
+					return addedItems // Terminals are processed in scan before
+
+				case .some(.nonTerminal):
+					return addedItems.union(predict(productions: productions, item: item, currentIndex: allStates.count, knownItems: knownItems))
+				}
+			}.subtracting(knownItems)
+
+			knownItems.reserveCapacity(addedItems.count + knownItems.count)
+			knownItems.formUnion(addedItems)
+
+		} while !addedItems.isEmpty
+
+		return knownItems
 	}
 	
 	private func buildSyntaxTrees(
