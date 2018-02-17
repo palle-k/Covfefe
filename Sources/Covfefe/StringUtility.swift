@@ -164,7 +164,8 @@ public extension String {
 		if prefix.contains(where: {$0.isRegularExpression}) {
 			return try! self.rangeOfRegularPrefix(prefixString, from: startIndex)
 		} else {
-			return self.range(of: prefixString, range: startIndex ..< self.endIndex)
+			let range = startIndex ..< (self.index(startIndex, offsetBy: prefixString.count, limitedBy: endIndex) ?? endIndex)
+			return self.range(of: prefixString, range: range)
 		}
 	}
 	
