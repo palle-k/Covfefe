@@ -48,8 +48,18 @@ var bnfGrammar: Grammar {
 	let string1 = "string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
 	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
 	
-	let string1char = try! "string-1-char" --> rt("[^']")
-	let string2char = try! "string-2-char" --> rt("[^\"]")
+	// no ', \, \r or \n
+	let string1char = try! "string-1-char" --> rt("[^'\\\\\r\n]") <|> n("string-escaped-char")
+	let string2char = try! "string-2-char" --> rt("[^\"\\\\\r\n]") <|> n("string-escaped-char")
+	
+	let stringEscapedChar = "string-escaped-char" --> n("unicode-scalar") <|> n("carriage-return") <|> n("line-feed") <|> n("tab-char") <|> n("backslash")
+	let unicodeScalar = "unicode-scalar" --> t("\\") <+> t("u") <+> t("{") <+>  n("unicode-scalar-digits") <+> t("}")
+	let unicodeScalarDigits = "unicode-scalar-digits" --> [n("digit")] <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]])
+	let digit = try! "digit" --> rt("[0-9a-fA-F]")
+	let carriageReturn = "carriage-return" --> t("\\") <+> t("r")
+	let lineFeed = "line-feed" --> t("\\") <+> t("n")
+	let tabChar = "tab-char" --> t("\\") <+> t("t")
+	let backslash = "backslash" --> t("\\") <+> t("\\")
 	
 	var productions: [Production] = []
 	productions.append(contentsOf: syntax)
@@ -67,10 +77,22 @@ var bnfGrammar: Grammar {
 	productions.append(contentsOf: literal)
 	productions.append(contentsOf: string1)
 	productions.append(contentsOf: string2)
-	productions.append(string1char)
-	productions.append(string2char)
+	productions.append(contentsOf: string1char)
+	productions.append(contentsOf: string2char)
+	productions.append(contentsOf: stringEscapedChar)
+	productions.append(unicodeScalar)
+	productions.append(contentsOf: unicodeScalarDigits)
+	productions.append(digit)
+	productions.append(carriageReturn)
+	productions.append(lineFeed)
+	productions.append(tabChar)
+	productions.append(backslash)
 	
 	return Grammar(productions: productions, start: "syntax")
+}
+
+enum StringLiteralParsingError: Error {
+	case invalidUnicodeScalar(Int)
 }
 
 public extension Grammar {
@@ -104,16 +126,70 @@ public extension Grammar {
 			}
 		}
 		
-		func string(from literal: SyntaxTree<NonTerminal, Range<String.Index>>) -> String {
-			return literal
-				.allNodes(where: {$0.name == "string-1-char" || $0.name == "string-2-char"})
-				.flatMap{$0.leafs}
-				.reduce("") { partialResult, range -> String in
-					partialResult.appending(bnfString[range])
+		func string(fromCharacterExpression characterExpression: ParseTree) throws -> String {
+			guard let child = characterExpression.children?.first else {
+				fatalError()
+			}
+			switch child {
+			case .leaf(let range):
+				return String(bnfString[range])
+				
+			case .node(key: "string-escaped-char", children: let children):
+				guard let child = children.first else {
+					fatalError()
+				}
+				switch child {
+				case .leaf:
+					fatalError()
+					
+				case .node(key: "unicode-scalar", children: let children):
+					let hexString: String = children.dropFirst(3).dropLast().flatMap {$0.leafs}.map {bnfString[$0]}.joined()
+					// Grammar guarantees that hexString is always a valid hex integer literal
+					let charValue = Int(hexString, radix: 16)!
+					guard let scalar = UnicodeScalar(charValue) else {
+						throw StringLiteralParsingError.invalidUnicodeScalar(charValue)
+					}
+					return String(scalar)
+				
+				case .node(key: "carriage-return", children: _):
+					return "\r"
+					
+				case .node(key: "line-feed", children: _):
+					return "\n"
+					
+				case .node(key: "tab-char", children: _):
+					return "\t"
+					
+				case .node(key: "backslash", children: _):
+					return "\\"
+					
+				default:
+					fatalError()
+				}
+				
+			default:
+				fatalError()
 			}
 		}
 		
-		func makeProductions(from expression: SyntaxTree<NonTerminal, Range<String.Index>>, named name: String) -> [Production] {
+		func string(fromStringExpression stringExpression: ParseTree, knownString: String = "") throws -> String {
+			if let children = stringExpression.children, children.count == 2 {
+				let character = try string(fromCharacterExpression: children[1])
+				return try string(fromStringExpression: children[0], knownString: "\(character)\(knownString)")
+			} else {
+				return knownString
+			}
+		}
+		
+		func string(fromLiteral literal: ParseTree) throws -> String {
+			guard let children = literal.children, children.count == 3 else {
+				fatalError("Invalid parse tree")
+			}
+			let stringNode = children[1]
+			return try string(fromStringExpression: stringNode)
+		}
+		
+		func makeProductions(from expression: SyntaxTree<NonTerminal, Range<String.Index>>, named name: String) throws -> [Production] {
 			guard let type = expression.root?.name else {
 				return []
 			}
@@ -122,17 +198,17 @@ public extension Grammar {
 			}
 			switch type {
 			case "alternation":
-				return makeProductions(from: children[0], named: name) + makeProductions(from: children[2], named: name)
+				return try makeProductions(from: children[0], named: name) + makeProductions(from: children[2], named: name)
 				
 			case "concatenation":
 				if children.count == 2 {
-					let lhsProduction = makeProductions(from: children[0], named: name)
-					let rhsProduction = makeProductions(from: children[1], named: name)
+					let lhsProduction = try makeProductions(from: children[0], named: name)
+					let rhsProduction = try makeProductions(from: children[1], named: name)
 					assert(lhsProduction.count == 1)
 					assert(rhsProduction.count == 1)
 					return [Production(pattern: NonTerminal(name: name), production: lhsProduction[0].production + rhsProduction[0].production)]
 				} else if children.count == 1 {
-					return makeProductions(from: children[0], named: name)
+					return try makeProductions(from: children[0], named: name)
 				} else {
 					fatalError()
 				}
@@ -143,7 +219,7 @@ public extension Grammar {
 				}
 				switch children[0].root!.name {
 				case "literal":
-					let terminalValue = string(from: children[0])
+					let terminalValue = try string(fromLiteral: children[0])
 					if terminalValue.isEmpty {
 						return [Production(pattern: NonTerminal(name: name), production: [])]
 					} else {
@@ -163,12 +239,12 @@ public extension Grammar {
 			}
 		}
 		
-		let productions = ruleDeclarations.flatMap { ruleDeclaration -> [Production] in
+		let productions = try ruleDeclarations.flatMap { ruleDeclaration -> [Production] in
 			guard let children = ruleDeclaration.children, children.count == 3 else {
 				return []
 			}
 			let name = ruleName(from: children[0])
-			return makeProductions(from: children[2], named: name)
+			return try makeProductions(from: children[2], named: name)
 		}
 		
 		if productions.contains(where: { (production: Production) -> Bool in

@@ -33,8 +33,8 @@ class PerformanceTests: XCTestCase {
 		<symbol> ::=  "|" | " " | "	" | "-" | "!" | "#" | "$" | "%" | "&" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | ">" | "=" | "<" | "?" | "@" | "[" | "]" | "^" | "_" | "`" | "{" | "}" | "~" | "'"
 		<character> ::= <letter> | <digit> | <symbol> | <escaped-sequence>
 
-		<escaped-sequence> ::= '\\' <escaped>
-		<escaped> ::= '"' | '\\' | '/' | 'b' | 'f' | 'n' | 'r' | 't' | 'u' <hex-digit> <hex-digit> <hex-digit> <hex-digit>
+		<escaped-sequence> ::= '\\\\' <escaped>
+		<escaped> ::= '"' | '\\\\' | '/' | 'b' | 'f' | 'n' | 'r' | 't' | 'u' <hex-digit> <hex-digit> <hex-digit> <hex-digit>
 
 		<number> ::= <optional-minus-sign> <integer> <optional-float> <optional-exponent>
 		<optional-minus-sign> ::= '-' | ''
