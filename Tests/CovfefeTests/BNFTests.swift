@@ -129,4 +129,16 @@ class BNFTests: XCTestCase {
 		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= (* (* *) 'x'", start: "s"))
 		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= 'x' (* *) *)", start: "s"))
 	}
+	
+	func testBNFExport() throws {
+		let grammarString = """
+		<s> ::= '\\r' '\\n' '\\t' '\\\\' '\\u{20}'
+		"""
+		let referenceGrammar = try Grammar(bnfString: grammarString, start: "s")
+		
+		let encodedString = referenceGrammar.description
+		let decodedGrammar = try Grammar(bnfString: encodedString, start: "s")
+		
+		XCTAssertEqual(referenceGrammar, decodedGrammar)
+	}
 }
