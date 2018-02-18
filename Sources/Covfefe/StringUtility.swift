@@ -222,4 +222,12 @@ public extension String {
 			]
 		)
 	}
+
+	var singleQuoteLiteralEscaped: String {
+		return literalEscaped.replacingOccurrences(of: "'", with: "\\'")
+	}
+	
+	var doubleQuoteLiteralEscaped: String {
+		return literalEscaped.replacingOccurrences(of: "\"", with: "\\\"")
+	}
 }

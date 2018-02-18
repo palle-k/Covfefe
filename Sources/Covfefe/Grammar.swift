@@ -173,11 +173,11 @@ extension Grammar: CustomStringConvertible {
 						return "<\(nonTerminal.name)>"
 
 					case .terminal(let terminal) where terminal.value.contains("\""):
-						let escapedValue = terminal.value.literalEscaped
+						let escapedValue = terminal.value.singleQuoteLiteralEscaped
 						return "'\(escapedValue)'"
 
 					case .terminal(let terminal):
-						let escapedValue = terminal.value.literalEscaped
+						let escapedValue = terminal.value.doubleQuoteLiteralEscaped
 						return "\"\(escapedValue)\""
 					}
 				}.joined(separator: " ")

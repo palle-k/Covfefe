@@ -75,7 +75,7 @@ class BNFTests: XCTestCase {
 	
 	func testEscaped() throws {
 		let grammarString = """
-		<s> ::= "\\r" "\\n" | "\\r" | "\\n" | "\\t" | "\\\\"
+		<s> ::= "\\r" "\\n" | "\\r" | "\\n" | "\\t" | "\\\\" | "\\\"" | '\\''
 		"""
 		let grammar = try Grammar(bnfString: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
@@ -86,12 +86,16 @@ class BNFTests: XCTestCase {
 		XCTAssertTrue(parser.recognizes("\n"))
 		XCTAssertTrue(parser.recognizes("\t"))
 		XCTAssertTrue(parser.recognizes("\\"))
+		XCTAssertTrue(parser.recognizes("\""))
+		XCTAssertTrue(parser.recognizes("'"))
 		
 		XCTAssertFalse(parser.recognizes("\n\r"))
 		XCTAssertFalse(parser.recognizes("\t\r"))
 		XCTAssertFalse(parser.recognizes(" "))
 		XCTAssertFalse(parser.recognizes(""))
 		XCTAssertFalse(parser.recognizes("\\\\"))
+		XCTAssertFalse(parser.recognizes("\"\""))
+		XCTAssertFalse(parser.recognizes("''"))
 	}
 	
 	func testEmpty() {
@@ -131,14 +135,25 @@ class BNFTests: XCTestCase {
 	}
 	
 	func testBNFExport() throws {
-		let grammarString = """
-		<s> ::= '\\r' '\\n' '\\t' '\\\\' '\\u{20}'
-		"""
-		let referenceGrammar = try Grammar(bnfString: grammarString, start: "s")
+		let samples = [
+			"<s> ::= '\\r'",
+			"<s> ::= '\\n'",
+			"<s> ::= '\\t'",
+			"<s> ::= '\\\\'",
+			"<s> ::= '\\u{20}'",
+			"<s> ::= '\\''",
+			"<s> ::= '\\'\"'",
+			"<s> ::= \"\\\"\"",
+			"<s> ::= \"\\\"'\"",
+		]
 		
-		let encodedString = referenceGrammar.description
-		let decodedGrammar = try Grammar(bnfString: encodedString, start: "s")
-		
-		XCTAssertEqual(referenceGrammar, decodedGrammar)
+		for grammarString in samples {
+			let referenceGrammar = try Grammar(bnfString: grammarString, start: "s")
+			
+			let encodedString = referenceGrammar.description
+			let decodedGrammar = try Grammar(bnfString: encodedString, start: "s")
+			
+			XCTAssertEqual(referenceGrammar, decodedGrammar)
+		}
 	}
 }

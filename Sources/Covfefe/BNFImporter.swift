@@ -55,8 +55,8 @@ var bnfGrammar: Grammar {
 	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
 	
 	// no ', \, \r or \n
-	let string1char = try! "string-1-char" --> rt("[^'\\\\\r\n]") <|> n("string-escaped-char")
-	let string2char = try! "string-2-char" --> rt("[^\"\\\\\r\n]") <|> n("string-escaped-char")
+	let string1char = try! "string-1-char" --> rt("[^'\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-single-quote")
+	let string2char = try! "string-2-char" --> rt("[^\"\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-double-quote")
 	
 	let stringEscapedChar = "string-escaped-char" --> n("unicode-scalar") <|> n("carriage-return") <|> n("line-feed") <|> n("tab-char") <|> n("backslash")
 	let unicodeScalar = "unicode-scalar" --> t("\\") <+> t("u") <+> t("{") <+>  n("unicode-scalar-digits") <+> t("}")
@@ -66,6 +66,8 @@ var bnfGrammar: Grammar {
 	let lineFeed = "line-feed" --> t("\\") <+> t("n")
 	let tabChar = "tab-char" --> t("\\") <+> t("t")
 	let backslash = "backslash" --> t("\\") <+> t("\\")
+	let singleQuote = "escaped-single-quote" --> t("\\") <+> t("'")
+	let doubleQuote = "escaped-double-quote" --> t("\\") <+> t("\"")
 	
 	var productions: [Production] = []
 	productions.append(contentsOf: syntax)
@@ -97,6 +99,8 @@ var bnfGrammar: Grammar {
 	productions.append(lineFeed)
 	productions.append(tabChar)
 	productions.append(backslash)
+	productions.append(singleQuote)
+	productions.append(doubleQuote)
 	
 	return Grammar(productions: productions, start: "syntax")
 }
@@ -176,6 +180,12 @@ public extension Grammar {
 				default:
 					fatalError()
 				}
+				
+			case .node(key: "escaped-single-quote", children: _):
+				return "'"
+				
+			case .node(key: "escaped-double-quote", children: _):
+				return "\""
 				
 			default:
 				fatalError()
