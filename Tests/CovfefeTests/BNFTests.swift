@@ -50,4 +50,47 @@ class BNFTests: XCTestCase {
 		XCTAssertTrue(grammar.productions.contains("s" --> t("'")))
 		XCTAssertTrue(grammar.productions.contains("s" --> t("\"")))
 	}
+	
+	func testUnicodeScalars() throws {
+		let grammarString = """
+		<s> ::= "\\u{0020}"
+		"""
+		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let parser = EarleyParser(grammar: grammar)
+		
+		XCTAssertTrue(parser.recognizes(" "))
+		
+		XCTAssertFalse(parser.recognizes(""))
+		XCTAssertFalse(parser.recognizes("  "))
+		
+		// Disallow empty unicode scalars
+		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= '\\u{}'", start: "s"))
+		
+		// Disallow too long unicode scalars
+		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= '\\u{000000001}'", start: "s"))
+		
+		// Disallow invalid unicode scalars
+		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= '\\u{d800}'", start: "s"))
+	}
+	
+	func testEscaped() throws {
+		let grammarString = """
+		<s> ::= "\\r" "\\n" | "\\r" | "\\n" | "\\t" | "\\\\"
+		"""
+		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let parser = EarleyParser(grammar: grammar)
+		
+		XCTAssertTrue(parser.recognizes("\r\n"))
+		XCTAssertTrue(parser.recognizes("\r\n"))
+		XCTAssertTrue(parser.recognizes("\r"))
+		XCTAssertTrue(parser.recognizes("\n"))
+		XCTAssertTrue(parser.recognizes("\t"))
+		XCTAssertTrue(parser.recognizes("\\"))
+		
+		XCTAssertFalse(parser.recognizes("\n\r"))
+		XCTAssertFalse(parser.recognizes("\t\r"))
+		XCTAssertFalse(parser.recognizes(" "))
+		XCTAssertFalse(parser.recognizes(""))
+		XCTAssertFalse(parser.recognizes("\\\\"))
+	}
 }
