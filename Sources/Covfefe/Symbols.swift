@@ -212,7 +212,8 @@ extension Symbol: CustomStringConvertible {
 			return n.name
 			
 		case .terminal(let t):
-			return t.value
+			return t.value.literalEscaped
 		}
 	}
 }
+

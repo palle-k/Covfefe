@@ -173,11 +173,11 @@ extension Grammar: CustomStringConvertible {
 						return "<\(nonTerminal.name)>"
 
 					case .terminal(let terminal) where terminal.value.contains("\""):
-						let escapedValue = terminal.value.replacingOccurrences(of: "\n", with: "\\n").replacingOccurrences(of: "\t", with: "\\t")
+						let escapedValue = terminal.value.singleQuoteLiteralEscaped
 						return "'\(escapedValue)'"
 
 					case .terminal(let terminal):
-						let escapedValue = terminal.value.replacingOccurrences(of: "\n", with: "\\n").replacingOccurrences(of: "\t", with: "\\t")
+						let escapedValue = terminal.value.doubleQuoteLiteralEscaped
 						return "\"\(escapedValue)\""
 					}
 				}.joined(separator: " ")
@@ -208,3 +208,8 @@ public extension Grammar {
 	}
 }
 
+extension Grammar: Equatable {
+	public static func == (lhs: Grammar, rhs: Grammar) -> Bool {
+		return lhs.start == rhs.start && Set(lhs.productions) == Set(rhs.productions)
+	}
+}

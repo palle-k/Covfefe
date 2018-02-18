@@ -28,11 +28,17 @@ import Foundation
 /// A grammar describing the Backus-Naur form
 var bnfGrammar: Grammar {
 	
-	let syntax = "syntax" --> n("rule") <|> n("rule") <+> n("newlines") <|> n("syntax") <+> n("newlines") <+> n("rule") <+> (n("newlines") <|> [[]])
+	let syntax = "syntax" --> n("optional-whitespace") <|> n("newlines") <|> n("rule") <|> n("rule") <+> n("newlines") <|> n("syntax") <+> n("newlines") <+> n("rule") <+> (n("newlines") <|> [[]])
 	let rule = "rule" --> n("optional-whitespace") <+> n("rule-name-container") <+> n("optional-whitespace") <+> n("assignment-operator") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace")
 	
-	let optionalWhitespace = "optional-whitespace" --> [[]] <|> SymbolSet.whitespace <|> SymbolSet.whitespace <+> [n("optional-whitespace")]
+	let optionalWhitespace = "optional-whitespace" --> [[]] <|> n("whitespace") <+> [n("optional-whitespace")]
+	let whitespace = "whitespace" --> SymbolSet.whitespace <|> n("comment")
 	let newlines = "newlines" --> t("\n") <|> t("\n") <+> n("optional-whitespace") <+> n("newlines")
+	
+	let comment = "comment" --> t("(") <+> t("*") <+> n("comment-content") <+> t("*") <+> t(")")
+	let commentContent = "comment-content" --> n("comment-content") <+> n("comment-content-char") <|> [[]]
+	// a comment cannot contain a * followed by a ) or a ( followed by a *
+	let commentContentChar = try! "comment-content-char" --> rt("[^*(]") <|> t("*") <+> rt("[^)]") <|> t("(") <+> rt("[^*]") <|> n("comment")
 	
 	let assignmentOperator = "assignment-operator" --> t(":") <+> t(":") <+> t("=")
 	
@@ -49,8 +55,8 @@ var bnfGrammar: Grammar {
 	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
 	
 	// no ', \, \r or \n
-	let string1char = try! "string-1-char" --> rt("[^'\\\\\r\n]") <|> n("string-escaped-char")
-	let string2char = try! "string-2-char" --> rt("[^\"\\\\\r\n]") <|> n("string-escaped-char")
+	let string1char = try! "string-1-char" --> rt("[^'\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-single-quote")
+	let string2char = try! "string-2-char" --> rt("[^\"\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-double-quote")
 	
 	let stringEscapedChar = "string-escaped-char" --> n("unicode-scalar") <|> n("carriage-return") <|> n("line-feed") <|> n("tab-char") <|> n("backslash")
 	let unicodeScalar = "unicode-scalar" --> t("\\") <+> t("u") <+> t("{") <+>  n("unicode-scalar-digits") <+> t("}")
@@ -60,11 +66,17 @@ var bnfGrammar: Grammar {
 	let lineFeed = "line-feed" --> t("\\") <+> t("n")
 	let tabChar = "tab-char" --> t("\\") <+> t("t")
 	let backslash = "backslash" --> t("\\") <+> t("\\")
+	let singleQuote = "escaped-single-quote" --> t("\\") <+> t("'")
+	let doubleQuote = "escaped-double-quote" --> t("\\") <+> t("\"")
 	
 	var productions: [Production] = []
 	productions.append(contentsOf: syntax)
 	productions.append(rule)
 	productions.append(contentsOf: optionalWhitespace)
+	productions.append(contentsOf: whitespace)
+	productions.append(comment)
+	productions.append(contentsOf: commentContent)
+	productions.append(contentsOf: commentContentChar)
 	productions.append(contentsOf: newlines)
 	productions.append(assignmentOperator)
 	productions.append(ruleNameContainer)
@@ -87,6 +99,8 @@ var bnfGrammar: Grammar {
 	productions.append(lineFeed)
 	productions.append(tabChar)
 	productions.append(backslash)
+	productions.append(singleQuote)
+	productions.append(doubleQuote)
 	
 	return Grammar(productions: productions, start: "syntax")
 }
@@ -166,6 +180,12 @@ public extension Grammar {
 				default:
 					fatalError()
 				}
+				
+			case .node(key: "escaped-single-quote", children: _):
+				return "'"
+				
+			case .node(key: "escaped-double-quote", children: _):
+				return "\""
 				
 			default:
 				fatalError()
