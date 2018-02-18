@@ -28,11 +28,17 @@ import Foundation
 /// A grammar describing the Backus-Naur form
 var bnfGrammar: Grammar {
 	
-	let syntax = "syntax" --> n("rule") <|> n("rule") <+> n("newlines") <|> n("syntax") <+> n("newlines") <+> n("rule") <+> (n("newlines") <|> [[]])
+	let syntax = "syntax" --> n("optional-whitespace") <|> n("newlines") <|> n("rule") <|> n("rule") <+> n("newlines") <|> n("syntax") <+> n("newlines") <+> n("rule") <+> (n("newlines") <|> [[]])
 	let rule = "rule" --> n("optional-whitespace") <+> n("rule-name-container") <+> n("optional-whitespace") <+> n("assignment-operator") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace")
 	
-	let optionalWhitespace = "optional-whitespace" --> [[]] <|> SymbolSet.whitespace <|> SymbolSet.whitespace <+> [n("optional-whitespace")]
+	let optionalWhitespace = "optional-whitespace" --> [[]] <|> n("whitespace") <+> [n("optional-whitespace")]
+	let whitespace = "whitespace" --> SymbolSet.whitespace <|> n("comment")
 	let newlines = "newlines" --> t("\n") <|> t("\n") <+> n("optional-whitespace") <+> n("newlines")
+	
+	let comment = "comment" --> t("(") <+> t("*") <+> n("comment-content") <+> t("*") <+> t(")")
+	let commentContent = "comment-content" --> n("comment-content") <+> n("comment-content-char") <|> [[]]
+	// a comment cannot contain a * followed by a ) or a ( followed by a *
+	let commentContentChar = try! "comment-content-char" --> rt("[^*(]") <|> t("*") <+> rt("[^)]") <|> t("(") <+> rt("[^*]") <|> n("comment")
 	
 	let assignmentOperator = "assignment-operator" --> t(":") <+> t(":") <+> t("=")
 	
@@ -65,6 +71,10 @@ var bnfGrammar: Grammar {
 	productions.append(contentsOf: syntax)
 	productions.append(rule)
 	productions.append(contentsOf: optionalWhitespace)
+	productions.append(contentsOf: whitespace)
+	productions.append(comment)
+	productions.append(contentsOf: commentContent)
+	productions.append(contentsOf: commentContentChar)
 	productions.append(contentsOf: newlines)
 	productions.append(assignmentOperator)
 	productions.append(ruleNameContainer)

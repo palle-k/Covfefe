@@ -93,4 +93,40 @@ class BNFTests: XCTestCase {
 		XCTAssertFalse(parser.recognizes(""))
 		XCTAssertFalse(parser.recognizes("\\\\"))
 	}
+	
+	func testEmpty() {
+		XCTAssertNoThrow(try Grammar(bnfString: "", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "\n", start: "s"))
+		XCTAssertEqual((try? Grammar(bnfString: "", start: "s"))?.productions.count, 0)
+	}
+	
+	func testComments() throws {
+		// Positioning
+		XCTAssertNoThrow(try Grammar(bnfString: "<s> ::= 'x' (* hello world *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "<s> ::= (* hello world *) 'x'", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "<s> (* hello world *) ::= 'x'", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "(* hello world *) <s> ::= 'x'", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "<s> ::= 'x' (* hello world *) 'y'", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "<s> ::= 'x' \n (* hello world *)", start: "s"))
+
+		// Empty comments
+		XCTAssertNoThrow(try Grammar(bnfString: "<s> ::= 'x' (**)", start: "s"))
+		
+		// Nested comments
+		XCTAssertNoThrow(try Grammar(bnfString: "(* (* hello *) world *) <s> ::= 'x'", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "(* (* hello (**) *) world *) <s> ::= 'x'", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "(* * *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "(* ( *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "(* ) *)", start: "s"))
+		
+		// Rules
+		XCTAssertEqual((try? Grammar(bnfString: "(* *)", start: "s"))?.productions.count, 0)
+		
+		// Invalid comments
+		XCTAssertThrowsError(try Grammar(bnfString: "(* hello", start: "s"))
+		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= 'x' *)", start: "s"))
+		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= 'x' (* (* *)", start: "s"))
+		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= (* (* *) 'x'", start: "s"))
+		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= 'x' (* *) *)", start: "s"))
+	}
 }
