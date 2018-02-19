@@ -121,7 +121,7 @@ func crossProduct<S1: Sequence, S2: Sequence>(_ lhs: S1, _ rhs: S2) -> AnySequen
 			rhsIterator: rhs.makeIterator(),
 			rhsIteratorBase: rhs.makeIterator()
 		),
-		next: { state -> (S1.Element, S2.Element)? in
+		next: { (state: inout (lhsIterator: S1.Iterator, lhsElement: S1.Element?, rhsIterator: S2.Iterator, rhsIteratorBase: S2.Iterator)) -> (S1.Element, S2.Element)? in
 			guard let lhsElement = state.lhsElement ?? state.lhsIterator.next() else {
 				return nil
 			}
