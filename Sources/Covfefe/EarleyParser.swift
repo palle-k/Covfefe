@@ -162,7 +162,7 @@ public struct EarleyParser: AmbiguousGrammarParser {
 	/// Best performance can be achieved with left recursive grammars.
 	public init(grammar: Grammar) {
 		self.grammar = grammar
-		self.nullableNonTerminals = grammar.productions.flatMap { production in
+		self.nullableNonTerminals = grammar.productions.compactMap { production in
 			if production.generatesEmpty(in: grammar) {
 				return production.pattern
 			} else {
@@ -419,7 +419,7 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			
 			// Collect all terminals which could occur at the current location according to the grammar
 			let expectedTerminals = Dictionary(
-				grouping: lastState.flatMap { item -> (item: ParseStateItem, terminal: Terminal)? in
+				grouping: lastState.compactMap { item -> (item: ParseStateItem, terminal: Terminal)? in
 					guard case .some(.terminal(let terminal)) = item.nextSymbol else {
 						return nil
 					}
@@ -436,8 +436,8 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			
 			// Find the tokens which match the string
 			let (newItems, tokens): ([[ParseStateItem]], [(terminal: Terminal, range: Range<String.Index>)]) =
-				expectedTerminals.flatMap { (terminal, items) -> (items: [ParseStateItem], token: (terminal: Terminal, range: Range<String.Index>))? in
-					guard let range = string.rangeOfPrefix([terminal], from: currentIndex), range.lowerBound == currentIndex else {
+				expectedTerminals.compactMap { (terminal, items) -> (items: [ParseStateItem], token: (terminal: Terminal, range: Range<String.Index>))? in
+					guard let range = string.rangeOfPrefix(terminal, from: currentIndex), range.lowerBound == currentIndex else {
 						return nil
 					}
 					return (items.map{$0.advanced()}, (terminal, range))
@@ -446,7 +446,7 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			// Check if tokens have been found. Report a syntax error if none have been found
 			guard !newItems.isEmpty else {
 				// Find non terminals which are expected at the current location
-				let context = lastState.flatMap { item -> NonTerminal? in
+				let context = lastState.compactMap { item -> NonTerminal? in
 					switch item.nextSymbol {
 					case .none:
 						return nil

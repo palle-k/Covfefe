@@ -81,11 +81,11 @@ public struct DefaultTokenizer: Tokenizer {
 			return partialResult
 		}
 		let matches = terminals.filter { terminal -> Bool in
-			word.hasPrefix([terminal], from: startIndex)
+			word.hasPrefix(terminal, from: startIndex)
 		}
 		guard
 			let first = matches.first,
-			let firstMatchRange = word.rangeOfPrefix([first], from: startIndex)
+			let firstMatchRange = word.rangeOfPrefix(first, from: startIndex)
 		else {
 			throw SyntaxError(range: startIndex ..< word.endIndex, in: word, reason: .unknownToken)
 		}

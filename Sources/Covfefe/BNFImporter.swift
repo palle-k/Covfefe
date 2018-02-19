@@ -50,9 +50,12 @@ var bnfGrammar: Grammar {
 	let alternation = "alternation" --> n("expression") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("concatenation")
 	let concatenation = "concatenation" --> n("expression-element") <|> n("concatenation") <+> n("optional-whitespace") <+> n("expression-element")
 	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container")
-	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"")
+	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"") <|> n("range-literal")
 	let string1 = "string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
 	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
+	
+	let rangeLiteral = "range-literal" --> n("single-char-literal") <+> n("optional-whitespace") <+> t("-") <+> n("optional-whitespace") <+> n("single-char-literal")
+	let singleCharLiteral = "single-char-literal" --> t("'") <+> n("string-1-char") <+> t("'") <|> t("\"") <+> n("string-2-char") <+> t("\"")
 	
 	// no ', \, \r or \n
 	let string1char = try! "string-1-char" --> rt("[^'\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-single-quote")
@@ -91,6 +94,8 @@ var bnfGrammar: Grammar {
 	productions.append(contentsOf: string2)
 	productions.append(contentsOf: string1char)
 	productions.append(contentsOf: string2char)
+	productions.append(rangeLiteral)
+	productions.append(contentsOf: singleCharLiteral)
 	productions.append(contentsOf: stringEscapedChar)
 	productions.append(unicodeScalar)
 	productions.append(contentsOf: unicodeScalarDigits)
@@ -201,12 +206,15 @@ public extension Grammar {
 			}
 		}
 		
-		func string(fromLiteral literal: ParseTree) throws -> String {
-			guard let children = literal.children, children.count == 3 else {
-				fatalError("Invalid parse tree")
+		func terminal(fromLiteral literal: ParseTree) throws -> Terminal {
+			guard let children = literal.children else {
+				fatalError()
 			}
-			let stringNode = children[1]
-			return try string(fromStringExpression: stringNode)
+			if children.count == 3 {
+				let stringNode = children[1]
+				return try Terminal(stringLiteral: string(fromStringExpression: stringNode))
+			}
+			fatalError()
 		}
 		
 		func makeProductions(from expression: SyntaxTree<NonTerminal, Range<String.Index>>, named name: String) throws -> [Production] {
@@ -239,11 +247,11 @@ public extension Grammar {
 				}
 				switch children[0].root!.name {
 				case "literal":
-					let terminalValue = try string(fromLiteral: children[0])
-					if terminalValue.isEmpty {
+					let t = try terminal(fromLiteral: children[0])
+					if t.value.isEmpty {
 						return [Production(pattern: NonTerminal(name: name), production: [])]
 					} else {
-						return [Production(pattern: NonTerminal(name: name), production: [t(terminalValue)])]
+						return [Production(pattern: NonTerminal(name: name), production: [.terminal(t)])]
 					}
 					
 				case "rule-name-container":
