@@ -220,7 +220,7 @@ extension Either {
 
 #if !swift(>=4.1)
 extension Sequence {
-	func compactMap<Result>(_ transform: (Element) throws -> Result?) rethrows -> [Result] {
+	func compactMap<ElementOfResult>(_ transform: (Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
 		return try self.flatMap(transform)
 	}
 }
