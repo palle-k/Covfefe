@@ -110,8 +110,9 @@ var bnfGrammar: Grammar {
 	return Grammar(productions: productions, start: "syntax")
 }
 
-enum StringLiteralParsingError: Error {
+enum LiteralParsingError: Error {
 	case invalidUnicodeScalar(Int)
+	case invalidRange(lowerBound: Character, upperBound: Character, description: String)
 }
 
 public extension Grammar {
@@ -145,13 +146,13 @@ public extension Grammar {
 			}
 		}
 		
-		func string(fromCharacterExpression characterExpression: ParseTree) throws -> String {
+		func character(fromCharacterExpression characterExpression: ParseTree) throws -> Character {
 			guard let child = characterExpression.children?.first else {
 				fatalError()
 			}
 			switch child {
 			case .leaf(let range):
-				return String(bnfString[range])
+				return bnfString[range.lowerBound]
 				
 			case .node(key: "string-escaped-char", children: let children):
 				guard let child = children.first else {
@@ -166,9 +167,9 @@ public extension Grammar {
 					// Grammar guarantees that hexString is always a valid hex integer literal
 					let charValue = Int(hexString, radix: 16)!
 					guard let scalar = UnicodeScalar(charValue) else {
-						throw StringLiteralParsingError.invalidUnicodeScalar(charValue)
+						throw LiteralParsingError.invalidUnicodeScalar(charValue)
 					}
-					return String(scalar)
+					return Character(scalar)
 				
 				case .node(key: "carriage-return", children: _):
 					return "\r"
@@ -199,8 +200,8 @@ public extension Grammar {
 		
 		func string(fromStringExpression stringExpression: ParseTree, knownString: String = "") throws -> String {
 			if let children = stringExpression.children, children.count == 2 {
-				let character = try string(fromCharacterExpression: children[1])
-				return try string(fromStringExpression: children[0], knownString: "\(character)\(knownString)")
+				let char = try character(fromCharacterExpression: children[1])
+				return try string(fromStringExpression: children[0], knownString: "\(char)\(knownString)")
 			} else {
 				return knownString
 			}
@@ -213,7 +214,24 @@ public extension Grammar {
 			if children.count == 3 {
 				let stringNode = children[1]
 				return try Terminal(string: string(fromStringExpression: stringNode))
+			} else if children.count == 1 {
+				let rangeExpression = children[0]
+				guard rangeExpression.root == "range-literal" else {
+					fatalError()
+				}
+				guard let children = rangeExpression.children, children.count == 5 else {
+					fatalError()
+				}
+				let lowerBound = try character(fromCharacterExpression: children[0].children![1])
+				let upperBound = try character(fromCharacterExpression: children[4].children![1])
+				
+				guard lowerBound <= upperBound else {
+					throw LiteralParsingError.invalidRange(lowerBound: lowerBound, upperBound: upperBound, description: "lowerBound must be less than or equal to upperBound")
+				}
+				
+				return Terminal(range: lowerBound ... upperBound)
 			}
+			
 			fatalError()
 		}
 		

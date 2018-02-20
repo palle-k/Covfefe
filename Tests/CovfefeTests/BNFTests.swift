@@ -134,6 +134,50 @@ class BNFTests: XCTestCase {
 		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= 'x' (* *) *)", start: "s"))
 	}
 	
+	func testCharacterRangeParsing() throws {
+		let validExamples = [
+			"<s> ::= 'a' ... 'b'",
+			"<s> ::= 'a'...'b'",
+			"<s> ::= 'a' ...'b'",
+			"<s> ::= 'a'... 'b'",
+			"<s> ::= \"a\" ... 'b'",
+			"<s> ::= \"a\" ... \"b\"",
+		]
+		
+		let invalidExamples = [
+			"<s> ::= 'b'... 'a'",
+			"<s> ::= 'a...'b'",
+			"<s> ::= 'aa'...'b'",
+			"<s> ::= '0'...'10'",
+		]
+		
+		for validExample in validExamples {
+			XCTAssertNoThrow(try Grammar(bnfString: validExample, start: "s"))
+		}
+		
+		for invalidExample in invalidExamples {
+			print(invalidExample)
+			XCTAssertThrowsError(try Grammar(bnfString: invalidExample, start: "s"))
+		}
+	}
+	
+	func testCharacterRanges() throws {
+		let grammarString = """
+		<s> ::= 'a' ... 'z'
+		"""
+		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let parser = EarleyParser(grammar: grammar)
+		
+		for c in ["a", "b", "x", "y", "z"] {
+			print(c)
+			XCTAssertTrue(parser.recognizes(c))
+		}
+		
+		for c in ["A", "Z", "aa", "bb"] {
+			XCTAssertFalse(parser.recognizes(c))
+		}
+	}
+	
 	func testBNFExport() throws {
 		let samples = [
 			"<s> ::= '\\r'",
