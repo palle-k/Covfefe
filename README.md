@@ -34,7 +34,7 @@ To add this framework manually:
 
 ## Example
 
-Grammars can be specified in a language that is a superset of BNF, which adopts some features of EBNF:
+Grammars can be specified in a language that is a superset of BNF, which adopts some features of EBNF (documented [here](/BNF.md)):
 
 ```swift
 let grammarString = """

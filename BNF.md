@@ -33,14 +33,25 @@ A grammar that produces `Hello World` can thereby be expressed as
 
 Terminals are strings of characters that are delimited either by `'`s or `"`s. 
 
-#### Escaping
+### Escaping
 
 To express characters such as newlines, tabs and unicode symbols, backslashes can be used:
+
 ```
 <S> ::= '\n' | '\t' | '\\' | '\u{1F602}'
 ```
 
 This grammar produces a single newline, a single tab, a single `\` or a single `😂`.
+
+#### Warning
+
+When adding grammars as strings in Swift code, backslashes need to be escaped.
+
+The above grammar then becomes:
+
+```swift
+let grammarString = "<S> ::= '\\n' | '\\t' | '\\\\' | '\\u{1F602}'"
+```
 
 
 ## Alternations
