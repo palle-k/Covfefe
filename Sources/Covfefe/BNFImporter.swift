@@ -49,7 +49,8 @@ var bnfGrammar: Grammar {
 	let expression = "expression" --> n("concatenation") <|> n("alternation")
 	let alternation = "alternation" --> n("expression") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("concatenation")
 	let concatenation = "concatenation" --> n("expression-element") <|> n("concatenation") <+> n("optional-whitespace") <+> n("expression-element")
-	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container")
+	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container") <|> n("expression-group")
+	let expressionGroup = "expression-group" --> t("(") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t(")")
 	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"") <|> n("range-literal")
 	let string1 = "string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
 	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
@@ -89,6 +90,7 @@ var bnfGrammar: Grammar {
 	productions.append(alternation)
 	productions.append(contentsOf: concatenation)
 	productions.append(contentsOf: expressionElement)
+	productions.append(expressionGroup)
 	productions.append(contentsOf: literal)
 	productions.append(contentsOf: string1)
 	productions.append(contentsOf: string2)
@@ -248,11 +250,13 @@ public extension Grammar {
 				
 			case "concatenation":
 				if children.count == 2 {
-					let lhsProduction = try makeProductions(from: children[0], named: name)
-					let rhsProduction = try makeProductions(from: children[1], named: name)
-					assert(lhsProduction.count == 1)
-					assert(rhsProduction.count == 1)
-					return [Production(pattern: NonTerminal(name: name), production: lhsProduction[0].production + rhsProduction[0].production)]
+					let lhsProductions = try makeProductions(from: children[0], named: name)
+					let rhsProductions = try makeProductions(from: children[1], named: name)
+					
+					return crossProduct(lhsProductions, rhsProductions).map { arg -> Production in
+						let (lhs, rhs) = arg
+						return Production(pattern: NonTerminal(name: name), production: lhs.production + rhs.production)
+					}
 				} else if children.count == 1 {
 					return try makeProductions(from: children[0], named: name)
 				} else {
@@ -275,6 +279,13 @@ public extension Grammar {
 				case "rule-name-container":
 					let nonTerminalName = ruleName(from: children[0])
 					return [Production(pattern: NonTerminal(name: name), production: [n(nonTerminalName)])]
+					
+				case "expression-group":
+					guard let group = children[0].children else {
+						fatalError()
+					}
+					assert(group.count == 3)
+					return try makeProductions(from: group[1], named: name)
 					
 				default:
 					fatalError()

@@ -156,7 +156,6 @@ class BNFTests: XCTestCase {
 		}
 		
 		for invalidExample in invalidExamples {
-			print(invalidExample)
 			XCTAssertThrowsError(try Grammar(bnfString: invalidExample, start: "s"))
 		}
 	}
@@ -169,7 +168,6 @@ class BNFTests: XCTestCase {
 		let parser = EarleyParser(grammar: grammar)
 		
 		for c in ["a", "b", "x", "y", "z"] {
-			print(c)
 			XCTAssertTrue(parser.recognizes(c))
 		}
 		
@@ -200,5 +198,109 @@ class BNFTests: XCTestCase {
 			
 			XCTAssertEqual(referenceGrammar, decodedGrammar)
 		}
+	}
+	
+	func testExpressionGroupParsing() {
+		let validExamples = [
+			"<s> ::= ('a')",
+			"<s> ::= ('a' | 'b')",
+			"<s> ::= ('a' 'b')",
+			"<s> ::= ( 'a' 'b')",
+			"<s> ::= ('a' 'b' )",
+			"<s> ::= ('a''b' )",
+			"<s> ::= (   'a''b' )",
+			"<s> ::= ((('a')))",
+		]
+		
+		let invalidExamples = [
+			"<s> ::= ()",
+			"<s> ::= ( )",
+			"<s> ::= (",
+			"<s> ::= )",
+			"<s> ::= (()",
+			"<s> ::= ('a'",
+			"<s> ::= 'a')",
+		]
+		
+		for validExample in validExamples {
+			XCTAssertNoThrow(try Grammar(bnfString: validExample, start: "s"))
+		}
+		
+		for invalidExample in invalidExamples {
+			XCTAssertThrowsError(try Grammar(bnfString: invalidExample, start: "s"))
+		}
+	}
+	
+	func testExpressionGroups() throws {
+		let grammarString = """
+		<s> ::= ('a' | 'b') 'c'
+		"""
+		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let parser = EarleyParser(grammar: grammar)
+		
+		XCTAssertTrue(parser.recognizes("ac"))
+		XCTAssertTrue(parser.recognizes("bc"))
+		
+		XCTAssertFalse(parser.recognizes("aa"))
+		XCTAssertFalse(parser.recognizes("bb"))
+		XCTAssertFalse(parser.recognizes("cc"))
+		XCTAssertFalse(parser.recognizes("a"))
+		XCTAssertFalse(parser.recognizes("b"))
+		XCTAssertFalse(parser.recognizes("c"))
+		XCTAssertFalse(parser.recognizes("acc"))
+		XCTAssertFalse(parser.recognizes("abc"))
+		XCTAssertFalse(parser.recognizes("bbc"))
+		XCTAssertFalse(parser.recognizes("aacc"))
+	}
+	
+	func testExpressionGroups2() throws {
+		let grammarString = """
+		<s> ::= 'a' ('b' | 'c') ('d' | 'e') 'f'
+		"""
+		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let parser = EarleyParser(grammar: grammar)
+		
+		XCTAssertTrue(parser.recognizes("abdf"))
+		XCTAssertTrue(parser.recognizes("abef"))
+		XCTAssertTrue(parser.recognizes("acdf"))
+		XCTAssertTrue(parser.recognizes("acef"))
+		
+		XCTAssertFalse(parser.recognizes("accf"))
+		XCTAssertFalse(parser.recognizes("addf"))
+		XCTAssertFalse(parser.recognizes("adbf"))
+		XCTAssertFalse(parser.recognizes("adbb"))
+	}
+	
+	func testExpressionGroups3() throws {
+		let grammarString = """
+		<s> ::= 'd' ('a' 'b' | 'c')
+		"""
+		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let parser = EarleyParser(grammar: grammar)
+		
+		XCTAssertTrue(parser.recognizes("dab"))
+		XCTAssertTrue(parser.recognizes("dc"))
+		
+		XCTAssertFalse(parser.recognizes("dac"))
+		XCTAssertFalse(parser.recognizes("dbc"))
+		XCTAssertFalse(parser.recognizes("bc"))
+		XCTAssertFalse(parser.recognizes("ab"))
+	}
+	
+	func testExpressionGroups4() throws {
+		let grammarString = """
+		<s> ::= (('a' | 'b') ('c' | 'd')) (('a' | 'b') ('c' | 'd'))
+		"""
+		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let parser = EarleyParser(grammar: grammar)
+		
+		XCTAssertTrue(parser.recognizes("acac"))
+		XCTAssertTrue(parser.recognizes("adbd"))
+		XCTAssertTrue(parser.recognizes("bcad"))
+		XCTAssertTrue(parser.recognizes("bcbd"))
+		
+		XCTAssertFalse(parser.recognizes("abcd"))
+		XCTAssertFalse(parser.recognizes("cbbd"))
+		XCTAssertFalse(parser.recognizes("adaa"))
 	}
 }
