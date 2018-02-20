@@ -4,13 +4,14 @@ Covfefe allows context free grammars to be specified using a language that is a 
 
 ## Contents
 
-1. Productions
-2. Concatenations & Alternations
-3. Sequence Grouping
-4. Optional Sequences
-5. Sequence Repetitions
-6. Character Ranges
-7. Summary
+1. [Productions](#productions)
+2. [Terminals](#terminals)
+3. [Alternations](#alternations)
+3. [Sequence Grouping](#sequence-grouping)
+4. [Optional Sequences](#optional-sequences)
+5. [Sequence Repetitions](#sequence-repetitions)
+6. [Character Ranges](#character-ranges)
+7. [Full Grammar](#full-grammar)
 
 ## Productions
 
