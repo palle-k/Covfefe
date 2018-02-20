@@ -88,7 +88,7 @@ public extension SyntaxTree {
 			return .leaf(element)
 			
 		case .node(key: let key, children: let children) where try predicate(key):
-			return try .node(key: key, children: children.flatMap{try $0.filter(predicate)})
+			return try .node(key: key, children: children.compactMap{try $0.filter(predicate)})
 			
 		case .node(key: _, children: _):
 			return nil
@@ -195,7 +195,7 @@ extension SyntaxTree: CustomStringConvertible {
 			case .node(key: let key, children: let children):
 				let (id, element) = key
 				let childrenDescriptions = children.map(generateDescription).filter{!$0.isEmpty}.joined(separator: "\n")
-				let childrenPointers = children.flatMap{ node -> Int? in
+				let childrenPointers = children.compactMap{ node -> Int? in
 					if let id = node.root?.0 {
 						return id
 					} else if let id = node.leaf?.0 {

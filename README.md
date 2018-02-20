@@ -34,7 +34,7 @@ To add this framework manually:
 
 ## Example
 
-A grammar may be specified in Backus Naur form:
+Grammars can be specified in a language that is a superset of BNF, which adopts some features of EBNF:
 
 ```swift
 let grammarString = """

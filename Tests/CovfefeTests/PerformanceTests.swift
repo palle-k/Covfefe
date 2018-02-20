@@ -25,13 +25,11 @@ class PerformanceTests: XCTestCase {
 		<key> ::= '"' <string-content> '"' | '"' '"'
 		<string> ::= '"' <string-content> '"' | '"' '"'
 		<string-content> ::= <string-content> <character> | <character>
-		<letter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
-		<digit-except-zero> ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
-		<digit> ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
-		<hex-digit> ::= <digit> | 'a' | 'A' | 'b' | 'B' | 'c' | 'C' | 'd' | 'D' | 'e' | 'E' | 'f' | 'F'
-		<whitespace> ::= ' ' | '	' | <EOL>
-		<symbol> ::=  "|" | " " | "	" | "-" | "!" | "#" | "$" | "%" | "&" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | ">" | "=" | "<" | "?" | "@" | "[" | "]" | "^" | "_" | "`" | "{" | "}" | "~" | "'"
-		<character> ::= <letter> | <digit> | <symbol> | <escaped-sequence>
+		<digit-except-zero> ::= '1' ... '9'
+		<digit> ::= '0' ... '9'
+		<hex-digit> ::= <digit> | 'a' ... 'f' | 'A' ... 'F'
+		<whitespace> ::= ' ' | '\\t' | <EOL>
+		<character> ::= <escaped-sequence> | '#' ... '[' (* includes all letters and numbers *) | ']' ... '~' | '!' | <whitespace>
 
 		<escaped-sequence> ::= '\\\\' <escaped>
 		<escaped> ::= '"' | '\\\\' | '/' | 'b' | 'f' | 'n' | 'r' | 't' | 'u' <hex-digit> <hex-digit> <hex-digit> <hex-digit>
@@ -90,7 +88,9 @@ class PerformanceTests: XCTestCase {
 		
 		measure {
 			for _ in 0 ..< 3 {
-				_ = parser.recognizes(testString)
+				if parser.recognizes(testString) == false {
+					XCTFail()
+				}
 			}
 		}
 	}

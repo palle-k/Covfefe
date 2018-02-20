@@ -32,13 +32,13 @@ class StringUtilitiesTest: XCTestCase {
 	func testPrefix() {
 		let testedString = "hello, world"
 		
-		XCTAssertEqual(testedString.rangeOfPrefix(["world"], from: testedString.startIndex), nil)
-		XCTAssertEqual(testedString.rangeOfPrefix(["world"], from: testedString.index(of: "w")!), testedString.range(of: "world"))
-		XCTAssertNotEqual(testedString.rangeOfPrefix(["world"], from: testedString.index(testedString.startIndex, offsetBy: 8)), testedString.range(of: "world"))
+		XCTAssertEqual(testedString.rangeOfPrefix("world", from: testedString.startIndex), nil)
+		XCTAssertEqual(testedString.rangeOfPrefix("world", from: testedString.index(of: "w")!), testedString.range(of: "world"))
+		XCTAssertNotEqual(testedString.rangeOfPrefix("world", from: testedString.index(testedString.startIndex, offsetBy: 8)), testedString.range(of: "world"))
 		
-		XCTAssertFalse(testedString.hasPrefix(["world"], from: testedString.startIndex))
-		XCTAssertTrue(testedString.hasPrefix(["world"], from: testedString.index(of: "w")!))
-		XCTAssertFalse(testedString.hasPrefix(["world"], from: testedString.index(testedString.startIndex, offsetBy: 8)))
+		XCTAssertFalse(testedString.hasPrefix("world", from: testedString.startIndex))
+		XCTAssertTrue(testedString.hasPrefix("world", from: testedString.index(of: "w")!))
+		XCTAssertFalse(testedString.hasPrefix("world", from: testedString.index(testedString.startIndex, offsetBy: 8)))
 	}
 	
 	func testRegularPrefix() {
@@ -71,6 +71,24 @@ class StringUtilitiesTest: XCTestCase {
 		
 		XCTAssertEqual(try testedString.rangeOfRegularPrefix("2", from: startIndex), testedString.range(of: "2"))
 		XCTAssertEqual(try testedString.rangeOfRegularPrefix("(\\d\\+)*\\d", from: startIndex), testedString.range(of: "2+3+4+5"))
+	}
+	
+	func testCharacterRangePrefix() {
+		let testedString = "hello world"
+		
+		XCTAssertTrue(testedString.hasPrefix(Terminal(range: "a" ... "z")))
+		XCTAssertTrue(testedString.hasPrefix(Terminal(range: "h" ... "h")))
+		XCTAssertTrue(testedString.hasPrefix(Terminal(range: "e" ... "e"), from: testedString.index(of: "e")!))
+		
+		XCTAssertFalse(testedString.hasPrefix(Terminal(range: "i" ... "i")))
+		XCTAssertFalse(testedString.hasPrefix(Terminal(range: "A" ... "Z")))
+		XCTAssertFalse(testedString.hasPrefix(Terminal(range: "f" ... "g"), from: testedString.index(of: "e")!))
+		
+		XCTAssertEqual(testedString.rangeOfPrefix(Terminal(range: "a" ... "z"), from: testedString.startIndex), testedString.startIndex ..< testedString.index(after: testedString.startIndex))
+		XCTAssertEqual(testedString.rangeOfPrefix(Terminal(range: "z" ... "z"), from: testedString.startIndex), nil)
+		
+		XCTAssertEqual(testedString.rangeOfPrefix(Terminal(range: "e" ... "e"), from: testedString.index(after: testedString.startIndex)), testedString.index(after: testedString.startIndex) ..< testedString.index(testedString.startIndex, offsetBy: 2))
+		XCTAssertEqual(testedString.rangeOfPrefix(Terminal(range: "z" ... "z"), from: testedString.startIndex), nil)
 	}
 	
 	func testUnique() {

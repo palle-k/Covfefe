@@ -41,7 +41,7 @@ extension Grammar {
 			}
 			
 			// Find all terminals and their indices in the production
-			let enumeratedTerminals = production.production.enumerated().flatMap { offset, element -> (Int, Terminal)? in
+			let enumeratedTerminals = production.production.enumerated().compactMap { offset, element -> (Int, Terminal)? in
 				guard case .terminal(let terminal) = element else {
 					return nil
 				}
@@ -160,7 +160,7 @@ extension Grammar {
 					return partialResult.map {$0 + [symbol]}
 				}
 			}
-			return produced.flatMap { sequence -> Production? in
+			return produced.compactMap { sequence -> Production? in
 				guard !sequence.isEmpty || production.pattern == start else {
 					return nil
 				}

@@ -60,56 +60,6 @@ extension NonTerminal: ExpressibleByStringLiteral {
 	}
 }
 
-/// A terminal symbol which can occur in a string recognized by a parser and which cannot be
-/// replaced by any production
-public struct Terminal: Codable, Hashable {
-	
-	/// Value of the terminal
-	public let value: String
-	
-	/// Indicates whether the value of the non-terminal is a regular expression
-	public let isRegularExpression: Bool
-	
-	public let hashValue: Int
-	
-	/// Creates a new terminal value which can occurr in a string
-	///
-	/// **Note**: The value of the terminal string may not overlap partially with any other non-terminal
-	/// contained in a grammar. For regular terminals, it it may be deriable to add word boundary markers: `\b`.
-	///
-	/// - Parameters:
-	///   - value: Value of the terminal which can occurr in a string
-	///   - isRegularExpression: Indicates whether the value is a regular expression
-	/// - Throws: An error if the value is an invalid regular expression
-	public init(value: String, isRegularExpression: Bool = false) throws {
-		self.value = value
-		self.isRegularExpression = isRegularExpression
-		self.hashValue = value.hashValue
-		
-		if isRegularExpression {
-			_ = try NSRegularExpression(pattern: value, options: [])
-		}
-	}
-	
-	public static func ==(lhs: Terminal, rhs: Terminal) -> Bool {
-		return lhs.value == rhs.value
-	}
-}
-
-extension Terminal: ExpressibleByStringLiteral {
-	public typealias StringLiteralType = String
-	
-	public init(stringLiteral value: String) {
-		try! self.init(value: value)
-	}
-}
-
-extension Terminal: CustomStringConvertible {
-	public var description: String {
-		return value
-	}
-}
-
 /// A symbol which can either be a terminal or a non-terminal character
 ///
 /// - terminal: A terminal character
@@ -157,7 +107,7 @@ public enum Symbol: Codable {
 /// - Parameter value: Value of the terminal symbol
 /// - Returns: A terminal symbol with the given value
 public func t(_ value: String) -> Symbol {
-	return try! Symbol.terminal(Terminal(value: value))
+	return Symbol.terminal(Terminal(string: value))
 }
 
 /// Creates a new non-terminal symbol
@@ -177,7 +127,7 @@ public func n(_ name: String) -> Symbol {
 /// - Returns: A regular terminal symbol
 /// - Throws: An error indicating that the given regular expression is invalid
 public func rt(_ value: String) throws -> Symbol {
-	return try Symbol.terminal(Terminal(value: value, isRegularExpression: true))
+	return try Symbol.terminal(Terminal(expression: value))
 }
 
 extension Symbol: Hashable {
@@ -212,7 +162,7 @@ extension Symbol: CustomStringConvertible {
 			return n.name
 			
 		case .terminal(let t):
-			return t.value.literalEscaped
+			return t.description
 		}
 	}
 }

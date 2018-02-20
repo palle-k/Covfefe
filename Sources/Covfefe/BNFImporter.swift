@@ -50,9 +50,12 @@ var bnfGrammar: Grammar {
 	let alternation = "alternation" --> n("expression") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("concatenation")
 	let concatenation = "concatenation" --> n("expression-element") <|> n("concatenation") <+> n("optional-whitespace") <+> n("expression-element")
 	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container")
-	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"")
+	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"") <|> n("range-literal")
 	let string1 = "string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
 	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
+	
+	let rangeLiteral = "range-literal" --> n("single-char-literal") <+> n("optional-whitespace") <+> t(".") <+> t(".") <+> t(".") <+> n("optional-whitespace") <+> n("single-char-literal")
+	let singleCharLiteral = "single-char-literal" --> t("'") <+> n("string-1-char") <+> t("'") <|> t("\"") <+> n("string-2-char") <+> t("\"")
 	
 	// no ', \, \r or \n
 	let string1char = try! "string-1-char" --> rt("[^'\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-single-quote")
@@ -91,6 +94,8 @@ var bnfGrammar: Grammar {
 	productions.append(contentsOf: string2)
 	productions.append(contentsOf: string1char)
 	productions.append(contentsOf: string2char)
+	productions.append(rangeLiteral)
+	productions.append(contentsOf: singleCharLiteral)
 	productions.append(contentsOf: stringEscapedChar)
 	productions.append(unicodeScalar)
 	productions.append(contentsOf: unicodeScalarDigits)
@@ -105,8 +110,9 @@ var bnfGrammar: Grammar {
 	return Grammar(productions: productions, start: "syntax")
 }
 
-enum StringLiteralParsingError: Error {
+enum LiteralParsingError: Error {
 	case invalidUnicodeScalar(Int)
+	case invalidRange(lowerBound: Character, upperBound: Character, description: String)
 }
 
 public extension Grammar {
@@ -140,13 +146,13 @@ public extension Grammar {
 			}
 		}
 		
-		func string(fromCharacterExpression characterExpression: ParseTree) throws -> String {
+		func character(fromCharacterExpression characterExpression: ParseTree) throws -> Character {
 			guard let child = characterExpression.children?.first else {
 				fatalError()
 			}
 			switch child {
 			case .leaf(let range):
-				return String(bnfString[range])
+				return bnfString[range.lowerBound]
 				
 			case .node(key: "string-escaped-char", children: let children):
 				guard let child = children.first else {
@@ -161,9 +167,9 @@ public extension Grammar {
 					// Grammar guarantees that hexString is always a valid hex integer literal
 					let charValue = Int(hexString, radix: 16)!
 					guard let scalar = UnicodeScalar(charValue) else {
-						throw StringLiteralParsingError.invalidUnicodeScalar(charValue)
+						throw LiteralParsingError.invalidUnicodeScalar(charValue)
 					}
-					return String(scalar)
+					return Character(scalar)
 				
 				case .node(key: "carriage-return", children: _):
 					return "\r"
@@ -194,19 +200,39 @@ public extension Grammar {
 		
 		func string(fromStringExpression stringExpression: ParseTree, knownString: String = "") throws -> String {
 			if let children = stringExpression.children, children.count == 2 {
-				let character = try string(fromCharacterExpression: children[1])
-				return try string(fromStringExpression: children[0], knownString: "\(character)\(knownString)")
+				let char = try character(fromCharacterExpression: children[1])
+				return try string(fromStringExpression: children[0], knownString: "\(char)\(knownString)")
 			} else {
 				return knownString
 			}
 		}
 		
-		func string(fromLiteral literal: ParseTree) throws -> String {
-			guard let children = literal.children, children.count == 3 else {
-				fatalError("Invalid parse tree")
+		func terminal(fromLiteral literal: ParseTree) throws -> Terminal {
+			guard let children = literal.children else {
+				fatalError()
 			}
-			let stringNode = children[1]
-			return try string(fromStringExpression: stringNode)
+			if children.count == 3 {
+				let stringNode = children[1]
+				return try Terminal(string: string(fromStringExpression: stringNode))
+			} else if children.count == 1 {
+				let rangeExpression = children[0]
+				guard rangeExpression.root == "range-literal" else {
+					fatalError()
+				}
+				guard let children = rangeExpression.children, children.count == 5 else {
+					fatalError()
+				}
+				let lowerBound = try character(fromCharacterExpression: children[0].children![1])
+				let upperBound = try character(fromCharacterExpression: children[4].children![1])
+				
+				guard lowerBound <= upperBound else {
+					throw LiteralParsingError.invalidRange(lowerBound: lowerBound, upperBound: upperBound, description: "lowerBound must be less than or equal to upperBound")
+				}
+				
+				return Terminal(range: lowerBound ... upperBound)
+			}
+			
+			fatalError()
 		}
 		
 		func makeProductions(from expression: SyntaxTree<NonTerminal, Range<String.Index>>, named name: String) throws -> [Production] {
@@ -239,11 +265,11 @@ public extension Grammar {
 				}
 				switch children[0].root!.name {
 				case "literal":
-					let terminalValue = try string(fromLiteral: children[0])
-					if terminalValue.isEmpty {
+					let t = try terminal(fromLiteral: children[0])
+					if t.isEmpty {
 						return [Production(pattern: NonTerminal(name: name), production: [])]
 					} else {
-						return [Production(pattern: NonTerminal(name: name), production: [t(terminalValue)])]
+						return [Production(pattern: NonTerminal(name: name), production: [.terminal(t)])]
 					}
 					
 				case "rule-name-container":
