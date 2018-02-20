@@ -429,4 +429,93 @@ class BNFTests: XCTestCase {
 		XCTAssertFalse(parser.recognizes("aba"))
 		XCTAssertFalse(parser.recognizes("bab"))
 	}
+	
+	func testOptionalGrammar() {
+		let validExamples = [
+			"<s> ::= ['a']",
+			"<s> ::= [['a']]",
+			"<s> ::= ['a' 'b']",
+			"<s> ::= ['a' <x>]",
+			"<s> ::= [<x>]",
+			"<s> ::= [{<x>}]",
+			"<s> ::= [{(<x> <y>)}]",
+			]
+		
+		let invalidExamples = [
+			"<s> ::= []",
+			"<s> ::= [ ]",
+			"<s> ::= [<a>",
+			"<s> ::= <a>]",
+			"<s> ::= [[<a>]",
+			"<s> ::= [<a>]]",
+			]
+		
+		for validExample in validExamples {
+			XCTAssertNoThrow(try Grammar(bnfString: validExample, start: "s"))
+		}
+		
+		for invalidExample in invalidExamples {
+			XCTAssertThrowsError(try Grammar(bnfString: invalidExample, start: "s"))
+		}
+	}
+	
+	func testOptional() throws {
+		let grammarString = """
+		<s> ::= 'a' ['b'] 'c'
+		"""
+		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let parser = EarleyParser(grammar: grammar)
+		
+		XCTAssertTrue(parser.recognizes("abc"))
+		XCTAssertTrue(parser.recognizes("ac"))
+		
+		XCTAssertFalse(parser.recognizes("abbc"))
+		XCTAssertFalse(parser.recognizes("ab"))
+		XCTAssertFalse(parser.recognizes("bc"))
+		XCTAssertFalse(parser.recognizes("acc"))
+		XCTAssertFalse(parser.recognizes("aac"))
+	}
+	
+	func testOptional2() throws {
+		let grammarString = """
+		<s> ::= 'a' [{'b'}] 'c'
+		"""
+		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let parser = EarleyParser(grammar: grammar)
+		
+		XCTAssertTrue(parser.recognizes("ac"))
+		XCTAssertTrue(parser.recognizes("abc"))
+		XCTAssertTrue(parser.recognizes("abbbbc"))
+		
+		XCTAssertFalse(parser.recognizes("ab"))
+		XCTAssertFalse(parser.recognizes("bc"))
+		XCTAssertFalse(parser.recognizes("acc"))
+		XCTAssertFalse(parser.recognizes("aac"))
+	}
+	
+	func testOptional3() throws {
+		let grammarString = """
+		<s> ::= ['a' | 'b'] ['c' 'd'] ['e' ['f'] 'g']
+		"""
+		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let parser = EarleyParser(grammar: grammar)
+		
+		XCTAssertTrue(parser.recognizes(""))
+		XCTAssertTrue(parser.recognizes("a"))
+		XCTAssertTrue(parser.recognizes("b"))
+		XCTAssertTrue(parser.recognizes("cd"))
+		XCTAssertTrue(parser.recognizes("eg"))
+		XCTAssertTrue(parser.recognizes("efg"))
+		XCTAssertTrue(parser.recognizes("aeg"))
+		XCTAssertTrue(parser.recognizes("beg"))
+		XCTAssertTrue(parser.recognizes("bcdeg"))
+		
+		XCTAssertFalse(parser.recognizes("ab"))
+		XCTAssertFalse(parser.recognizes("ace"))
+		XCTAssertFalse(parser.recognizes("acefg"))
+		XCTAssertFalse(parser.recognizes("aceg"))
+		XCTAssertFalse(parser.recognizes("bceg"))
+		XCTAssertFalse(parser.recognizes("bcde"))
+		XCTAssertFalse(parser.recognizes("bcdfg"))
+	}
 }

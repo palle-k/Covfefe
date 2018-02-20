@@ -22,8 +22,8 @@ class PerformanceTests: XCTestCase {
 		<array> ::= "[" <array-contents> "]" | "[" <optional-whitespace> "]"
 		<array-contents> ::= <array-contents> "," <optional-whitespace> <any> <optional-whitespace> | <optional-whitespace> <any> <optional-whitespace>
 
-		<key> ::= '"' <string-content> '"' | '"' '"'
-		<string> ::= '"' <string-content> '"' | '"' '"'
+		<key> ::= '"' [{<character>}] '"'
+		<string> ::= '"' [{<character>}] '"'
 		<string-content> ::= <string-content> <character> | <character>
 		<digit-except-zero> ::= '1' ... '9'
 		<digit> ::= '0' ... '9'
@@ -34,15 +34,11 @@ class PerformanceTests: XCTestCase {
 		<escaped-sequence> ::= '\\\\' <escaped>
 		<escaped> ::= '"' | '\\\\' | '/' | 'b' | 'f' | 'n' | 'r' | 't' | 'u' <hex-digit> <hex-digit> <hex-digit> <hex-digit>
 
-		<number> ::= <optional-minus-sign> <integer> <optional-float> <optional-exponent>
-		<optional-minus-sign> ::= '-' | ''
-		<integer> ::= <digit> | <integer-prefix> <digit>
+		<number> ::= ['-'] <integer> ['.' {'0' ... '9'}] [('E' | 'e') <exponent>]
+		<integer> ::= '1'...'9' [{'0'...'9'}]
 		<integer-prefix> ::= <digit-except-zero> | <integer-prefix> <digit>
-		<optional-float> ::= '' | '.' <fraction>
 		<fraction> ::= <digit> | <fraction> <digit>
-		<optional-exponent> ::= '' | 'E' <exponent> | 'e' <exponent>
-		<exponent> ::= <sign> <integer>
-		<sign> ::= '+' | '-' | ''
+		<exponent> ::= ['-' | '+'] <integer>
 
 		<boolean> ::= 't' 'r' 'u' 'e' | 'f' 'a' 'l' 's' 'e'
 		

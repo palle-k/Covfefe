@@ -49,9 +49,10 @@ var bnfGrammar: Grammar {
 	let expression = "expression" --> n("concatenation") <|> n("alternation")
 	let alternation = "alternation" --> n("expression") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("concatenation")
 	let concatenation = "concatenation" --> n("expression-element") <|> n("concatenation") <+> n("optional-whitespace") <+> n("expression-element")
-	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container") <|> n("expression-group") <|> n("expression-repetition")
+	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container") <|> n("expression-group") <|> n("expression-repetition") <|> n("expression-optional")
 	let expressionGroup = "expression-group" --> t("(") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t(")")
 	let expressionRepetition = "expression-repetition" --> t("{") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("}")
+	let expressionOptional = "expression-optional" --> t("[") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("]")
 	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"") <|> n("range-literal")
 	let string1 = "string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
 	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
@@ -93,6 +94,7 @@ var bnfGrammar: Grammar {
 	productions.append(contentsOf: expressionElement)
 	productions.append(expressionGroup)
 	productions.append(expressionRepetition)
+	productions.append(expressionOptional)
 	productions.append(contentsOf: literal)
 	productions.append(contentsOf: string1)
 	productions.append(contentsOf: string2)
@@ -302,6 +304,19 @@ public extension Grammar {
 						Production(pattern: NonTerminal(name: subruleName), production: [n(subruleName)] + rule.production)
 					}
 					return ([Production(pattern: NonTerminal(name: name), production: [n(subruleName)])], additionalRules + subRules + repetitionRules)
+					
+				case "expression-optional":
+					guard let group = children[0].children else {
+						fatalError()
+					}
+					assert(group.count == 3)
+					let subruleName = "\(name)-o"
+					let (productions, additionalProductions) = try makeProductions(from: group[1], named: subruleName)
+					let optionalProductions = productions.map {
+						Production(pattern: $0.pattern, production: [])
+					}
+					let subproduction = Production(pattern: NonTerminal(name: name), production: [n(subruleName)])
+					return ([subproduction], additionalProductions + productions + optionalProductions)
 					
 				default:
 					fatalError()
