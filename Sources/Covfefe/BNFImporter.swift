@@ -49,8 +49,9 @@ var bnfGrammar: Grammar {
 	let expression = "expression" --> n("concatenation") <|> n("alternation")
 	let alternation = "alternation" --> n("expression") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("concatenation")
 	let concatenation = "concatenation" --> n("expression-element") <|> n("concatenation") <+> n("optional-whitespace") <+> n("expression-element")
-	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container") <|> n("expression-group")
+	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container") <|> n("expression-group") <|> n("expression-repetition")
 	let expressionGroup = "expression-group" --> t("(") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t(")")
+	let expressionRepetition = "expression-repetition" --> t("{") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("}")
 	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"") <|> n("range-literal")
 	let string1 = "string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
 	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
@@ -91,6 +92,7 @@ var bnfGrammar: Grammar {
 	productions.append(contentsOf: concatenation)
 	productions.append(contentsOf: expressionElement)
 	productions.append(expressionGroup)
+	productions.append(expressionRepetition)
 	productions.append(contentsOf: literal)
 	productions.append(contentsOf: string1)
 	productions.append(contentsOf: string2)
@@ -237,26 +239,28 @@ public extension Grammar {
 			fatalError()
 		}
 		
-		func makeProductions(from expression: SyntaxTree<NonTerminal, Range<String.Index>>, named name: String) throws -> [Production] {
+		func makeProductions(from expression: SyntaxTree<NonTerminal, Range<String.Index>>, named name: String) throws -> (productions: [Production], additionalRules: [Production]) {
 			guard let type = expression.root?.name else {
-				return []
+				return ([], [])
 			}
 			guard let children = expression.children else {
-				return []
+				return ([], [])
 			}
 			switch type {
 			case "alternation":
-				return try makeProductions(from: children[0], named: name) + makeProductions(from: children[2], named: name)
+				let (lhs, lhsAdd) = try makeProductions(from: children[0], named: "\(name)-a0")
+				let (rhs, rhsAdd) = try makeProductions(from: children[2], named: "\(name)-a1")
+				return ((lhs + rhs).map {Production(pattern: NonTerminal(name: name), production: $0.production)}, lhsAdd + rhsAdd)
 				
 			case "concatenation":
 				if children.count == 2 {
-					let lhsProductions = try makeProductions(from: children[0], named: name)
-					let rhsProductions = try makeProductions(from: children[1], named: name)
+					let (lhsProductions, lhsAdd) = try makeProductions(from: children[0], named: "\(name)-c0")
+					let (rhsProductions, rhsAdd) = try makeProductions(from: children[1], named: "\(name)-c1")
 					
-					return crossProduct(lhsProductions, rhsProductions).map { arg -> Production in
+					return (crossProduct(lhsProductions, rhsProductions).map { arg -> Production in
 						let (lhs, rhs) = arg
 						return Production(pattern: NonTerminal(name: name), production: lhs.production + rhs.production)
-					}
+					}, lhsAdd + rhsAdd)
 				} else if children.count == 1 {
 					return try makeProductions(from: children[0], named: name)
 				} else {
@@ -265,20 +269,20 @@ public extension Grammar {
 				
 			case "expression-element":
 				guard children.count == 1 else {
-					return []
+					return ([], [])
 				}
 				switch children[0].root!.name {
 				case "literal":
 					let t = try terminal(fromLiteral: children[0])
 					if t.isEmpty {
-						return [Production(pattern: NonTerminal(name: name), production: [])]
+						return ([Production(pattern: NonTerminal(name: name), production: [])], [])
 					} else {
-						return [Production(pattern: NonTerminal(name: name), production: [.terminal(t)])]
+						return ([Production(pattern: NonTerminal(name: name), production: [.terminal(t)])], [])
 					}
 					
 				case "rule-name-container":
 					let nonTerminalName = ruleName(from: children[0])
-					return [Production(pattern: NonTerminal(name: name), production: [n(nonTerminalName)])]
+					return ([Production(pattern: NonTerminal(name: name), production: [n(nonTerminalName)])], [])
 					
 				case "expression-group":
 					guard let group = children[0].children else {
@@ -286,6 +290,18 @@ public extension Grammar {
 					}
 					assert(group.count == 3)
 					return try makeProductions(from: group[1], named: name)
+					
+				case "expression-repetition":
+					guard let group = children[0].children else {
+						fatalError()
+					}
+					assert(group.count == 3)
+					let subruleName = "\(name)-r"
+					let (subRules, additionalRules) = try makeProductions(from: group[1], named: subruleName)
+					let repetitionRules = subRules.map { rule in
+						Production(pattern: NonTerminal(name: subruleName), production: [n(subruleName)] + rule.production)
+					}
+					return ([Production(pattern: NonTerminal(name: name), production: [n(subruleName)])], additionalRules + subRules + repetitionRules)
 					
 				default:
 					fatalError()
@@ -301,7 +317,8 @@ public extension Grammar {
 				return []
 			}
 			let name = ruleName(from: children[0])
-			return try makeProductions(from: children[2], named: name)
+			let (productions, additionalRules) = try makeProductions(from: children[2], named: name)
+			return productions + additionalRules
 		}
 		
 		if productions.contains(where: { (production: Production) -> Bool in
