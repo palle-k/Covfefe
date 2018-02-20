@@ -189,6 +189,7 @@ class BNFTests: XCTestCase {
 			"<s> ::= '\\'\"'",
 			"<s> ::= \"\\\"\"",
 			"<s> ::= \"\\\"'\"",
+			"<s> ::= 'a' ... 'z'"
 		]
 		
 		for grammarString in samples {
