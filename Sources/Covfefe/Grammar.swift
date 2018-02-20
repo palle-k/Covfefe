@@ -172,13 +172,47 @@ extension Grammar: CustomStringConvertible {
 					case .nonTerminal(let nonTerminal):
 						return "<\(nonTerminal.name)>"
 
-					case .terminal(let terminal) where terminal.value.contains("\""):
-						let escapedValue = terminal.value.singleQuoteLiteralEscaped
+//					case .terminal(let terminal) where terminal.value.contains("\""):
+//						let escapedValue = terminal.value.singleQuoteLiteralEscaped
+//						return "'\(escapedValue)'"
+//
+//					case .terminal(let terminal):
+//						let escapedValue = terminal.value.doubleQuoteLiteralEscaped
+//						return "\"\(escapedValue)\""
+						
+					case .terminal(.string(let string, _)) where string.contains("\""):
+						let escapedValue = string.singleQuoteLiteralEscaped
 						return "'\(escapedValue)'"
-
-					case .terminal(let terminal):
-						let escapedValue = terminal.value.doubleQuoteLiteralEscaped
+						
+					case .terminal(.string(let string, _)):
+						let escapedValue = string.doubleQuoteLiteralEscaped
 						return "\"\(escapedValue)\""
+						
+					case .terminal(.regularExpression(let expression, _)) where expression.pattern.contains("\""):
+						let escapedValue = expression.pattern.singleQuoteLiteralEscaped
+						return "'\(escapedValue)'"
+						
+					case .terminal(.regularExpression(let expression, _)):
+						let escapedValue = expression.pattern.doubleQuoteLiteralEscaped
+						return "\"\(escapedValue)\""
+						
+					case .terminal(.characterRange(let range, _)):
+						let lowerString: String
+						let upperString: String
+						
+						if range.lowerBound == "'" {
+							lowerString = "\"'\""
+						} else {
+							lowerString = "'\(range.lowerBound)'"
+						}
+						
+						if range.upperBound == "'" {
+							upperString = "\"'\""
+						} else {
+							upperString = "'\(range.upperBound)'"
+						}
+						
+						return "\(lowerString) ... \(upperString)"
 					}
 				}.joined(separator: " ")
 			}.joined(separator: " | ")

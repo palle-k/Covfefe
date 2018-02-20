@@ -81,7 +81,7 @@ extension ParseStateItem: CustomStringConvertible {
 				return "<\(nonTerminal.name)>"
 				
 			case .terminal(let terminal):
-				return "\"\(terminal.value.replacingOccurrences(of: "\n", with: "\\n"))\""
+				return "\"\(terminal.description.replacingOccurrences(of: "\n", with: "\\n"))\""
 			}
 		}.enumerated().reduce("") { (partialResult, string) in
 			if string.offset == productionPosition {
@@ -125,7 +125,7 @@ extension ParsedItem: CustomStringConvertible {
 				return partialResult.appending(" <\(nonTerminal.name)>")
 				
 			case .terminal(let terminal):
-				return partialResult.appending(" '\(terminal.value.replacingOccurrences(of: "\n", with: "\\n"))'")
+				return partialResult.appending(" '\(terminal.description.replacingOccurrences(of: "\n", with: "\\n"))'")
 			}
 		}
 		return "<\(production.pattern.name)> ::=\(producedString) (\(completedIndex))"

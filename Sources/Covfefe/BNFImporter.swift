@@ -212,7 +212,7 @@ public extension Grammar {
 			}
 			if children.count == 3 {
 				let stringNode = children[1]
-				return try Terminal(stringLiteral: string(fromStringExpression: stringNode))
+				return try Terminal(string: string(fromStringExpression: stringNode))
 			}
 			fatalError()
 		}
@@ -248,7 +248,7 @@ public extension Grammar {
 				switch children[0].root!.name {
 				case "literal":
 					let t = try terminal(fromLiteral: children[0])
-					if t.value.isEmpty {
+					if t.isEmpty {
 						return [Production(pattern: NonTerminal(name: name), production: [])]
 					} else {
 						return [Production(pattern: NonTerminal(name: name), production: [.terminal(t)])]

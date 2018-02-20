@@ -7,13 +7,13 @@
 
 import Foundation
 
-public enum ATerminal {
+public enum Terminal {
 	case string(string: String, hash: Int)
 	case characterRange(range: ClosedRange<Character>, hash: Int)
 	case regularExpression(expression: NSRegularExpression, hash: Int)
 }
 
-public extension ATerminal {
+public extension Terminal {
 	init(string: String) {
 		self = .string(string: string, hash: string.hashValue)
 	}
@@ -26,16 +26,29 @@ public extension ATerminal {
 		let regex = try NSRegularExpression(pattern: expression, options: [])
 		self = .regularExpression(expression: regex, hash: expression.hashValue)
 	}
+	
+	var isEmpty: Bool {
+		switch self {
+		case .characterRange:
+			return false
+			
+		case .regularExpression(let expression, _):
+			return expression.pattern.isEmpty
+			
+		case .string(let string, _):
+			return string.isEmpty
+		}
+	}
 }
 
-extension ATerminal: ExpressibleByStringLiteral {
+extension Terminal: ExpressibleByStringLiteral {
 	public init(stringLiteral value: String) {
 		self.init(string: value)
 	}
 }
 
-extension ATerminal: Hashable {
-	public static func == (lhs: ATerminal, rhs: ATerminal) -> Bool {
+extension Terminal: Hashable {
+	public static func == (lhs: Terminal, rhs: Terminal) -> Bool {
 		switch (lhs, rhs) {
 		case (.string(string: let ls, hash: _), .string(string: let rs, hash: _)):
 			return ls == rs
@@ -65,7 +78,7 @@ extension ATerminal: Hashable {
 	}
 }
 
-extension ATerminal: CustomStringConvertible {
+extension Terminal: CustomStringConvertible {
 	public var description: String {
 		switch self {
 		case .string(let string, _):
@@ -80,7 +93,7 @@ extension ATerminal: CustomStringConvertible {
 	}
 }
 
-extension ATerminal: Codable {
+extension Terminal: Codable {
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		switch try container.decode(TerminalCoding.self, forKey: .type) {
