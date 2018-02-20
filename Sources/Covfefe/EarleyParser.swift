@@ -441,7 +441,7 @@ public struct EarleyParser: AmbiguousGrammarParser {
 						return nil
 					}
 					return (items.map{$0.advanced()}, (terminal, range))
-				}.collect(unzip as ([([ParseStateItem], (terminal: Terminal, range: Range<String.Index>))]) -> ([[ParseStateItem]], [(terminal: Terminal, range: Range<String.Index>)]))
+				}.collect(unzip)
 			
 			// Check if tokens have been found. Report a syntax error if none have been found
 			guard !newItems.isEmpty else {

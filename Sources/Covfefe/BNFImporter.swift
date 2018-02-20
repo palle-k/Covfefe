@@ -54,7 +54,7 @@ var bnfGrammar: Grammar {
 	let string1 = "string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
 	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
 	
-	let rangeLiteral = "range-literal" --> n("single-char-literal") <+> n("optional-whitespace") <+> t("-") <+> n("optional-whitespace") <+> n("single-char-literal")
+	let rangeLiteral = "range-literal" --> n("single-char-literal") <+> n("optional-whitespace") <+> t(".") <+> t(".") <+> t(".") <+> n("optional-whitespace") <+> n("single-char-literal")
 	let singleCharLiteral = "single-char-literal" --> t("'") <+> n("string-1-char") <+> t("'") <|> t("\"") <+> n("string-2-char") <+> t("\"")
 	
 	// no ', \, \r or \n
