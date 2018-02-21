@@ -11,12 +11,28 @@ It uses the [Earley](https://en.wikipedia.org/wiki/Earley_parser) or [CYK](https
 
 ## Usage
 
+### Swift Package Manager
+
 This framework can be imported as a Swift Package by adding it as a dependency to the `Package.swift` file:
+
+#### Swift 4.1
+
 ```swift
-.package(url: "https://github.com/palle-k/Covfefe.git", from: "0.3.2")
+.package(url: "https://github.com/palle-k/Covfefe.git", majorVersion: 0, minor: 4)
 ```
 
-Alternatively, it can be added as a dependency via CocoaPods (iOS, tvOS, watchOS and macOS):
+#### Swift 4.0
+
+```swift
+.package(url: "https://github.com/palle-k/Covfefe.git", majorVersion: 0, minor: 3)
+```
+
+### CocoaPods
+
+Alternatively, it can be added as a dependency via CocoaPods (iOS, tvOS, watchOS and macOS).
+
+#### Swift 4.1
+
 ```ruby
 target 'Your-App-Name' do
   use_frameworks!
@@ -24,7 +40,18 @@ target 'Your-App-Name' do
 end
 ```
 
-To add this framework manually:
+#### Swift 4.0
+
+```ruby
+target 'Your-App-Name' do
+use_frameworks!
+pod 'Covfefe', '0.3.7'
+end
+```
+
+Some grammar features are not available when using Swift 4.0 (Grouping, Repetitions, Optional Sequences and Character Ranges)
+
+### To add this framework manually:
 
 1. `git clone https://github.com/palle-k/Covfefe.git`
 2. `cd Covfefe`
