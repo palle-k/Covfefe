@@ -281,10 +281,14 @@ public extension String {
 		)
 	}
 
+	/// Escapes all special characters that need to be escaped to be escaped for the string to be printed as a string literal enclosed by single quotes.
+	/// This includes single quotes, backslashes, line feeds, carriage returns and tab characters.
 	var singleQuoteLiteralEscaped: String {
 		return literalEscaped.replacingOccurrences(of: "'", with: "\\'")
 	}
 	
+	/// Escapes all special characters that need to be escaped to be escaped for the string to be printed as a string literal enclosed by double quotes.
+	/// This includes double quotes, backslashes, line feeds, carriage returns and tab characters.
 	var doubleQuoteLiteralEscaped: String {
 		return literalEscaped.replacingOccurrences(of: "\"", with: "\\\"")
 	}
