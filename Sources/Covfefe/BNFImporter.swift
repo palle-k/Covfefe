@@ -35,10 +35,12 @@ var bnfGrammar: Grammar {
 	let whitespace = "whitespace" --> SymbolSet.whitespace <|> n("comment")
 	let newlines = "newlines" --> t("\n") <|> t("\n") <+> n("optional-whitespace") <+> n("newlines")
 	
-	let comment = "comment" --> t("(") <+> t("*") <+> n("comment-content") <+> t("*") <+> t(")")
+	let comment = "comment" --> t("(") <+> t("*") <+> n("comment-content") <+> t("*") <+> t(")") <|> t("(") <+> t("*") <+> t("*") <+> t("*") <+> t(")")
 	let commentContent = "comment-content" --> n("comment-content") <+> n("comment-content-char") <|> [[]]
 	// a comment cannot contain a * followed by a ) or a ( followed by a *
-	let commentContentChar = try! "comment-content-char" --> rt("[^*(]") <|> t("*") <+> rt("[^)]") <|> t("(") <+> rt("[^*]") <|> n("comment")
+	let commentContentChar = try! "comment-content-char" --> rt("[^*(]") <|> n("comment-asterisk") <+> rt("[^)]") <|> n("comment-open-parenthesis") <+> rt("[^*]") <|> n("comment")
+	let commentAsterisk = "comment-asterisk" --> n("comment-asterisk") <+> t("*") <|> t("*")
+	let commentOpenParenthesis = "comment-open-parenthesis" --> n("comment-open-parenthesis") <+> t("(") <|> t("(")
 	
 	let assignmentOperator = "assignment-operator" --> t(":") <+> t(":") <+> t("=")
 	
@@ -80,9 +82,11 @@ var bnfGrammar: Grammar {
 	productions.append(rule)
 	productions.append(contentsOf: optionalWhitespace)
 	productions.append(contentsOf: whitespace)
-	productions.append(comment)
+	productions.append(contentsOf: comment)
 	productions.append(contentsOf: commentContent)
 	productions.append(contentsOf: commentContentChar)
+	productions.append(contentsOf: commentAsterisk)
+	productions.append(contentsOf: commentOpenParenthesis)
 	productions.append(contentsOf: newlines)
 	productions.append(assignmentOperator)
 	productions.append(ruleNameContainer)
