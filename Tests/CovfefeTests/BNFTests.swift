@@ -127,6 +127,9 @@ class BNFTests: XCTestCase {
 		XCTAssertNoThrow(try Grammar(bnfString: "(*****)", start: "s"))
 		XCTAssertNoThrow(try Grammar(bnfString: "(* (( *)", start: "s"))
 		XCTAssertNoThrow(try Grammar(bnfString: "(* ((( *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "(* () *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "(* (a) *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnfString: "(* (ab) *)", start: "s"))
 		
 		// Rules
 		XCTAssertEqual((try? Grammar(bnfString: "(* *)", start: "s"))?.productions.count, 0)
