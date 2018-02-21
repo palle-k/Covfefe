@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>BNF  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset="utf-8">
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
+  </head>
+  <body>
+
+
+    <a title="BNF  Reference"></a>
+
+    <header class="header">
+      <p class="header-col header-col--primary">
+        <a class="header-link" href="index.html">
+          Covfefe Docs
+        </a>
+         (100% documented)
+      </p>
+    
+      <p class="header-col--secondary">
+        <form role="search" action="search.json">
+          <input type="text" placeholder="Search documentation" data-typeahead>
+        </form>
+      </p>
+    
+        <p class="header-col header-col--secondary">
+          <a class="header-link" href="https://github.com/palle-k/Covfefe">
+            <img class="header-icon" src="img/gh.png"/>
+            View on GitHub
+          </a>
+        </p>
+    
+    </header>
+
+    <p class="breadcrumbs">
+      <a class="breadcrumb" href="index.html">Covfefe Reference</a>
+      <img class="carat" src="img/carat.png" />
+      BNF  Reference
+    </p>
+
+    <div class="content-wrapper">
+      <nav class="navigation">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Guides.html">Guides</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="bnf.html">BNF</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Symbol.html">Symbol</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/SyntaxTree.html">SyntaxTree</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Enums/Terminal.html">Terminal</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/ClosedRange.html">ClosedRange</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Extensions/String.html">String</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Functions.html">Functions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3ssgoiAA10ProductionVAA11NonTerminalV_AA0C6StringVtF">--&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3ssgoiAA10ProductionVAA11NonTerminalV_AA6SymbolOtF">--&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3ssgoiSayAA10ProductionVGAA11NonTerminalV_AA0C6ResultVtF">--&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3lpgoiAA16ProductionResultVAA0C6StringV_ADtF">&lt;+&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3lpgoiAA16ProductionResultVAD_AA0C6StringVtF">&lt;+&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3lpgoiAA16ProductionResultVAD_ADtF">&lt;+&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3lpgoiAA16ProductionStringVAA6SymbolO_ADtF">&lt;+&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3lpgoiAA16ProductionStringVAA6SymbolO_AFtF">&lt;+&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3lpgoiAA16ProductionStringVAD_AA6SymbolOtF">&lt;+&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3lpgoiAA16ProductionStringVAD_ADtF">&lt;+&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3logoiAA16ProductionResultVAA0C6StringV_AA6SymbolOtF">&lt;|&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3logoiAA16ProductionResultVAA0C6StringV_ADtF">&lt;|&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3logoiAA16ProductionResultVAA0C6StringV_AFtF">&lt;|&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3logoiAA16ProductionResultVAA6SymbolO_AA0C6StringVtF">&lt;|&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3logoiAA16ProductionResultVAA6SymbolO_ADtF">&lt;|&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3logoiAA16ProductionResultVAA6SymbolO_AFtF">&lt;|&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3logoiAA16ProductionResultVAD_AA0C6StringVtF">&lt;|&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3logoiAA16ProductionResultVAD_AA6SymbolOtF">&lt;|&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe3logoiAA16ProductionResultVAD_ADtF">&lt;|&gt;(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe2eeoiSbAA10SyntaxTreeOyxq_G_AEts9EquatableRzsAFR_r0_lF">==(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe1nAA6SymbolOSSF">n(_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe2rtAA6SymbolOSSKF">rt(_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Functions.html#/s:7Covfefe1tAA6SymbolOSSF">t(_:)</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/AmbiguousGrammarParser.html">AmbiguousGrammarParser</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Parser.html">Parser</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Protocols/Tokenizer.html">Tokenizer</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/CYKParser.html">CYKParser</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/DefaultTokenizer.html">DefaultTokenizer</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/EarleyParser.html">EarleyParser</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Grammar.html">Grammar</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/NonTerminal.html">NonTerminal</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/NonTerminalString.html">NonTerminalString</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/Production.html">Production</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ProductionResult.html">ProductionResult</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/ProductionString.html">ProductionString</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SymbolSet.html">SymbolSet</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SyntaxError.html">SyntaxError</a>
+              </li>
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Structs/SyntaxError/Reason.html">– Reason</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a class="nav-group-name-link" href="Typealiases.html">Type Aliases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a class="nav-group-task-link" href="Typealiases.html#/s:7Covfefe9ParseTreea">ParseTree</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+
+        <section class="section">
+          <div class="section-content">
+            
+            <h1 id='bnf' class='heading'>BNF</h1>
+
+<p>Covfefe allows context free grammars to be specified using a language that is a superset of BNF.</p>
+<h2 id='contents' class='heading'>Contents</h2>
+
+<ol>
+<li><a href="#productions">Productions</a></li>
+<li><a href="#terminals">Terminals</a></li>
+<li><a href="#alternations">Alternations</a></li>
+<li><a href="#sequence-grouping">Sequence Grouping</a></li>
+<li><a href="#optional-sequences">Optional Sequences</a></li>
+<li><a href="#sequence-repetitions">Sequence Repetitions</a></li>
+<li><a href="#character-ranges">Character Ranges</a></li>
+<li><a href="#full-grammar">Full Grammar</a></li>
+</ol>
+<h2 id='productions' class='heading'>Productions</h2>
+
+<p>A production in a context free grammar has the form <code>X -&gt; b</code>, which indicates that <code>X</code> can be replaced by <code>b</code>.
+<code>X</code> is a non-terminal, <code>b</code> is a string of terminals and non-terminals.</p>
+
+<p>In BNF, a non-terminal is written as <code>&lt;A&gt;</code>, a terminal is written as <code>&#39;a&#39;</code> or <code>&quot;a&quot;</code>.
+An assignment is written as <code>lhs ::= rhs</code>.</p>
+
+<p>A grammar that produces <code>Hello World</code> can thereby be expressed as</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'hello' &lt;whitespace&gt; 'world'
+&lt;whitespace&gt; ::= ' '
+&lt;whitespace&gt; ::= '\t'
+</code></pre>
+<h2 id='terminals' class='heading'>Terminals</h2>
+
+<p>Terminals are strings of characters that are delimited either by <code>&#39;</code>s or <code>&quot;</code>s. </p>
+<h3 id='escaping' class='heading'>Escaping</h3>
+
+<p>To express characters such as newlines, tabs and unicode symbols, backslashes can be used:</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= '\n' | '\t' | '\\' | '\u{1F602}'
+</code></pre>
+
+<p>This grammar produces a single newline, a single tab, a single <code>\</code> or a single <code>😂</code>.</p>
+<h4 id='warning' class='heading'>Warning</h4>
+
+<p>When adding grammars as strings in Swift code, backslashes need to be escaped.</p>
+
+<p>The above grammar then becomes:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">grammarString</span> <span class="o">=</span> <span class="s">"&lt;S&gt; ::= '</span><span class="se">\\</span><span class="s">n' | '</span><span class="se">\\</span><span class="s">t' | '</span><span class="se">\\\\</span><span class="s">' | '</span><span class="se">\\</span><span class="s">u{1F602}'"</span>
+</code></pre>
+<h2 id='alternations' class='heading'>Alternations</h2>
+
+<p>In the above example, whitespace can be replaced either by <code>&#39; &#39;</code> or by <code>&#39;\t&#39;</code>.
+This can be written as</p>
+<pre class="highlight plaintext"><code>&lt;whitespace&gt; ::= ' ' | '\t'
+</code></pre>
+
+<p>Concatenation has a higher precedence than alternations, so the following grammar produces <code>ab</code> and <code>cd</code></p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'a' 'b' | 'c' 'd'
+</code></pre>
+<h2 id='sequence-grouping' class='heading'>Sequence Grouping</h2>
+
+<p>Parentheses (<code>(</code> and <code>)</code>) can be used to group symbols together.</p>
+
+<p>The following grammar produces <code>abd</code> and <code>acd</code>:</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'a' ('b' | 'c') 'd'
+</code></pre>
+<h2 id='optional-sequences' class='heading'>Optional Sequences</h2>
+
+<p>To mark a sequence as optional, brackets (<code>[</code> and <code>]</code>) can be used.</p>
+
+<p>The following grammar produces <code>abc</code> and <code>ac</code>:</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'a' ['b'] 'c'
+</code></pre>
+<h2 id='sequence-repetitions' class='heading'>Sequence Repetitions</h2>
+
+<p>To repeat a sequence, braces (<code>{</code> and <code>}</code>) can be used.</p>
+
+<p>The following grammar produces <code>aba</code>, <code>abba</code>, <code>abbba</code>, etc. but not <code>aa</code>:</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'a' {'b'} 'a'
+</code></pre>
+
+<p>To also generate <code>aa</code>, repetitions can be matched with optional sequences:</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'a' [{'b'}] 'a'
+</code></pre>
+
+<p>It is preferred to make the entire repetition optional instead of repeating an optional sequence.</p>
+
+<p>The repetition is generated using a left-recursive auxiliary rule.</p>
+<h2 id='character-ranges' class='heading'>Character Ranges</h2>
+
+<p>To make it easier to specify grammars that recognize a large alphabet, character ranges can be used.
+The following grammar recognizes all upper and lower case roman letters:</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'A' ... 'Z' | 'a' ... 'z'
+</code></pre>
+
+<p>The lower bound of a character range must be less than or equal the upper bound (e.g. <code>&#39;b&#39; ... &#39;a&#39;</code> is an invalid range).
+The bounds of a range must be exactly one character. The characters can consist of multiple unicode scalars.</p>
+<h2 id='full-grammar' class='heading'>Full Grammar</h2>
+
+<p>The grammar that is recognized (excluding non-ascii characters) is the following:</p>
+
+<style type="text/css">
+p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; color: #66b366; display: inline;}
+p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; color: #cc1a1a; display: inline;}
+p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; color: #000000; display: inline;}
+p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; color: #cc33b3; display: inline;}
+p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; color: #cc1a1a; display: inline;}
+p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; color: #cc1a1a; display: inline;}
+p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; color: #666666; display: inline;}
+span.s1 {color: #cc4d4d; display: inline;}
+span.s2 {color: #000000; display: inline;}
+span.s3 {color: #808080; display: inline;}
+span.s4 {color: #59b3cc; display: inline;}
+span.s5 {color: #3380cc; display: inline;}
+span.s6 {color: #666666; display: inline;}
+span.s7 {color: #cc4d4d; display: inline;}
+span.s8 {display: inline;}
+span.s9 {color: #cc1a1a; display: inline;}
+span.s10 {color: #666666; display: inline;}
+span.s11 {color: #cc4d4d; display: inline;}
+span.s12 {display: inline;}
+span.s13 {color: #000000; display: inline;}
+span.s14 {color: #808080; display: inline;}
+span.s15 {color: #666666; display: inline;}
+span.s16 {color: #cc4d4d; display: inline;}
+span.s17 {display: inline;}
+span.s18 {color: #59b3cc; display: inline;}
+span.s19 {color: #3380cc; display: inline;}
+span.s20 {color: #59b3cc; display: inline;}
+span.s21 {color: #3380cc; display: inline;}
+span.s22 {color: #cc1a1a; display: inline;}
+span.s23 {color: #cc33b3; display: inline;}
+span.s24 {color: #cc33b3; display: inline;}
+</style>
+
+<pre>
+<p class="p1">(* Production rules are separated by newlines and optional whitespace *)</p>
+<p class="p2"><span class="s1">&lt;</span>syntax<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>newlines<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>rule<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>rule<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>newlines<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>syntax<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>newlines<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>rule<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>newlines<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>syntax<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>newlines<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>rule<span class="s1">&gt;</span></p>
+<p class="p3"></p>
+<p class="p1">(* A rule consists of a non-terminal pattern name, an assignment operator and a production expression *)</p>
+<p class="p2"><span class="s1">&lt;</span>rule<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>rule-name-container<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>assignment-operator<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>expression<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span></p>
+<p class="p3"></p>
+<p class="p1">(* Rule names are strings of alphanumeric characters *)</p>
+<p class="p2"><span class="s1">&lt;</span>rule-name-container<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">&lt;</span><span class="s4">"</span><span class="s2"> </span><span class="s6">{</span><span class="s7">&lt;</span><span class="s8">rule-name-char</span><span class="s7">&gt;</span><span class="s6">}</span><span class="s2"> </span><span class="s4">"</span><span class="s5">&gt;</span><span class="s4">"</span></p>
+<p class="p4"><span class="s1">&lt;</span><span class="s9">rule-name-char</span><span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span>'a'<span class="s10"> ... </span>'z'<span class="s2"> | </span>'A'<span class="s10"> ... </span>'Z'<span class="s2"> | </span>'0'<span class="s10"> ... </span>'9'<span class="s2"> | </span><span class="s4">'</span><span class="s5">_</span><span class="s4">'</span><span class="s2"> | </span><span class="s4">'</span><span class="s5">-</span><span class="s4">'</span></p>
+<p class="p3"></p>
+<p class="p2"><span class="s1">&lt;</span>assignment-operator<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">:</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">:</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">=</span><span class="s4">"</span></p>
+<p class="p3"></p>
+<p class="p1">(* An expression can either be a concatenation or an alternation *)</p>
+<p class="p5"><span class="s11">&lt;</span><span class="s12">expression</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s11">&lt;</span><span class="s12">concatenation</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s6">[</span><span class="s10">{</span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s10"> </span><span class="s4">"</span><span class="s5">|</span><span class="s4">"</span><span class="s10"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s10"> </span><span class="s1">&lt;</span>concatenation<span class="s1">&gt;</span><span class="s10">}</span><span class="s6">]</span></p>
+<p class="p3"></p>
+<p class="p1">(* A concatenation is a string of terminals and non-terminals *)</p>
+<p class="p5"><span class="s11">&lt;</span><span class="s12">concatenation</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s6">[</span><span class="s10">{</span><span class="s1">&lt;</span>expression-element<span class="s1">&gt;</span><span class="s10"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s10">}</span><span class="s6">]</span><span class="s13"> </span><span class="s11">&lt;</span><span class="s12">expression-element</span><span class="s11">&gt;</span></p>
+<p class="p3"></p>
+<p class="p1">(* An atom of a expression can either be a terminal literal, a non-terminal or a group *)</p>
+<p class="p2"><span class="s1">&lt;</span>expression-element<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>literal<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>rule-name-container<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>expression-group<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>expression-repetition<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>expression-optional<span class="s1">&gt;</span></p>
+<p class="p3"></p>
+<p class="p1">(* Expression containers *)</p>
+<p class="p2"><span class="s1">&lt;</span>expression-group<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">(</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>expression<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">)</span><span class="s4">"</span></p>
+<p class="p2"><span class="s1">&lt;</span>expression-repetition<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">{</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>expression<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">}</span><span class="s4">"</span></p>
+<p class="p2"><span class="s1">&lt;</span>expression-optional<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">[</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>expression<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">]</span><span class="s4">"</span></p>
+<p class="p3"></p>
+<p class="p1">(* Terminal literals *)</p>
+<p class="p2"><span class="s1">&lt;</span>literal<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">'</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>string-1<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">'</span><span class="s4">"</span><span class="s2"> | </span><span class="s4">'</span><span class="s5">"</span><span class="s4">'</span><span class="s2"> </span><span class="s1">&lt;</span>string-2<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">'</span><span class="s5">"</span><span class="s4">'</span><span class="s2"> | </span><span class="s1">&lt;</span>range-literal<span class="s1">&gt;</span></p>
+<p class="p2"><span class="s1">&lt;</span>range-literal<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>single-char-literal<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">.</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">.</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">.</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>single-char-literal<span class="s1">&gt;</span></p>
+<p class="p3"></p>
+<p class="p1">(* Strings and characters *)</p>
+<p class="p5"><span class="s11">&lt;</span><span class="s12">string-1</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s6">[</span><span class="s10">{</span><span class="s1">&lt;</span>string-1-char<span class="s1">&gt;</span><span class="s10">}</span><span class="s6">]</span></p>
+<p class="p2"><span class="s1">&lt;</span>string-1-char<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>any-char<span class="s1">&gt;</span><span class="s2"> | </span><span class="s4">'</span><span class="s5">"</span><span class="s4">'</span><span class="s2"> | </span><span class="s1">&lt;</span>string-escaped-char<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>escaped-single-quote<span class="s1">&gt;</span></p>
+<p class="p5"><span class="s11">&lt;</span><span class="s12">string-2</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s6">[</span><span class="s10">{</span><span class="s1">&lt;</span>string-2-char<span class="s1">&gt;</span><span class="s10">}</span><span class="s6">]</span></p>
+<p class="p2"><span class="s1">&lt;</span>string-2-char<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>any-char<span class="s1">&gt;</span><span class="s2"> | </span><span class="s4">"</span><span class="s5">'</span><span class="s4">"</span><span class="s2"> | </span><span class="s1">&lt;</span>string-escaped-char<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>escaped-double-quote<span class="s1">&gt;</span></p>
+<p class="p2"><span class="s1">&lt;</span>single-char-literal<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">'</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>string-1-char<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">'</span><span class="s4">"</span><span class="s2"> | </span><span class="s4">'</span><span class="s5">"</span><span class="s4">'</span><span class="s2"> </span><span class="s1">&lt;</span>string-2-char<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">'</span><span class="s5">"</span><span class="s4">'</span></p>
+<p class="p3"></p>
+<p class="p4"><span class="s1">&lt;</span><span class="s9">any-char</span><span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">'</span><span class="s5">!</span><span class="s4">'</span><span class="s2"> | </span>'#'<span class="s10"> ... </span>'&amp;'<span class="s2"> | </span>'('<span class="s10"> ... </span>'['<span class="s2"> | </span>']'<span class="s10"> ... </span>'~'<span class="s2"> | </span><span class="s4">'</span><span class="s5"> </span><span class="s4">'</span><span class="s2"> | </span><span class="s4">'</span><span class="s5">\t</span><span class="s4">'</span></p>
+<p class="p3"></p>
+<p class="p1">(* Escape sequences *)</p>
+<p class="p2"><span class="s1">&lt;</span>string-escaped-char<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>unicode-scalar<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>carriage-return<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>line-feed<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>tab-char<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>backslash<span class="s1">&gt;</span></p>
+<p class="p3"></p>
+<p class="p2"><span class="s1">&lt;</span>backslash<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span></p>
+<p class="p2"><span class="s1">&lt;</span>line-feed<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">n</span><span class="s4">"</span></p>
+<p class="p2"><span class="s1">&lt;</span>carriage-return<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">r</span><span class="s4">"</span></p>
+<p class="p2"><span class="s1">&lt;</span>tab-char<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">t</span><span class="s4">"</span></p>
+<p class="p3"></p>
+<p class="p2"><span class="s1">&lt;</span>escaped-double-quote<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">'</span><span class="s5">"</span><span class="s4">'</span></p>
+<p class="p2"><span class="s1">&lt;</span>escaped-single-quote<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">'</span><span class="s4">"</span></p>
+<p class="p3"></p>
+<p class="p2"><span class="s1">&lt;</span>unicode-scalar<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">u</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">{</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>unicode-scalar-digits<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">}</span><span class="s4">"</span></p>
+<p class="p6"><span class="s11">&lt;</span><span class="s12">unicode-scalar-digits</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s11">&lt;</span><span class="s12">digit</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span></p>
+<p class="p4"><span class="s1">&lt;</span><span class="s9">digit</span><span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span>'0'<span class="s10"> ... </span>'9'<span class="s2"> | </span>'A'<span class="s10"> ... </span>'F'<span class="s2"> | </span>'a'<span class="s10"> ... </span>'f'</p>
+<p class="p3"></p>
+<p class="p1">(* Whitespace *)</p>
+<p class="p6"><span class="s11">&lt;</span><span class="s12">newlines</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s10">{</span><span class="s4">"</span><span class="s5">\n</span><span class="s4">"</span><span class="s10"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s10">}</span></p>
+<p class="p3"></p>
+<p class="p2"><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s6">[</span><span class="s15">{</span><span class="s16">&lt;</span><span class="s17">whitespace</span><span class="s16">&gt;</span><span class="s15">}</span><span class="s6">]</span></p>
+<p class="p2"><span class="s1">&lt;</span>whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5"> </span><span class="s4">"</span><span class="s2"> | </span><span class="s4">"</span><span class="s5">\t</span><span class="s4">"</span><span class="s2"> | </span><span class="s4">"</span><span class="s5">\n</span><span class="s4">"</span><span class="s2"> | </span><span class="s1">&lt;</span>comment<span class="s1">&gt;</span></p>
+<p class="p3"></p>
+<p class="p1">(* Comments *)</p>
+<p class="p5"><span class="s11">&lt;</span><span class="s12">comment</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s18">"</span><span class="s19">(</span><span class="s18">"</span><span class="s13"> </span><span class="s18">"</span><span class="s19">*</span><span class="s18">"</span><span class="s13"> </span><span class="s6">(</span><span class="s10">{</span><span class="s1">&lt;</span>comment-content-char<span class="s1">&gt;</span><span class="s10">}</span><span class="s6"> | </span><span class="s20">'</span><span class="s21">*</span><span class="s20">'</span><span class="s6">)</span><span class="s13"> </span><span class="s18">"</span><span class="s19">*</span><span class="s18">"</span><span class="s13"> </span><span class="s18">"</span><span class="s19">)</span><span class="s18">"</span></p>
+<p class="p7"><span class="s11">&lt;</span><span class="s22">comment-content-char</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s23">'!'</span><span class="s12"> ... </span><span class="s23">"'"</span><span class="s13"> | </span><span class="s23">'+'</span><span class="s12"> ... </span><span class="s23">'~'</span><span class="s13"> | </span><span class="s18">'</span><span class="s19">)</span><span class="s18">'</span><span class="s13"> | </span><span class="s18">"</span><span class="s19"> </span><span class="s18">"</span><span class="s13"> | </span><span class="s18">"</span><span class="s19">\t</span><span class="s18">"</span><span class="s13"> | </span><span class="s18">"</span><span class="s19">\n</span><span class="s18">"</span><span class="s13"> | </span><span class="s18">'</span><span class="s19">"</span><span class="s18">'</span><span class="s13"> | </span><span class="s18">"</span><span class="s19">'</span><span class="s18">"</span><span class="s13"> | </span>{<span class="s4">'</span><span class="s5">(</span><span class="s4">'</span>}<span class="s13"> </span>(<span class="s24">'!'</span> ... <span class="s24">')'</span> | <span class="s24">'+'</span> ... <span class="s24">'~'</span> | <span class="s4">"</span><span class="s5"> </span><span class="s4">"</span> | <span class="s4">"</span><span class="s5">\t</span><span class="s4">"</span> | <span class="s4">"</span><span class="s5">\n</span><span class="s4">"</span>)<span class="s13"> | </span>{<span class="s4">'</span><span class="s5">*</span><span class="s4">'</span>}<span class="s13"> </span>(<span class="s24">'!'</span> ... <span class="s24">'('</span> | <span class="s24">'+'</span> ... <span class="s24">'~'</span>)<span class="s13"> | </span><span class="s11">&lt;</span><span class="s22">comment</span><span class="s11">&gt;</span></p>
+</pre>
+
+          </div>
+        </section>
+
+
+      </article>
+    </div>
+    <section class="footer">
+      <p>&copy; 2018 <a class="link" href="https://github.com/palle-k" target="_blank" rel="external">palle-k</a>. All rights reserved. (Last updated: 2018-02-21)</p>
+      <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.9.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+    </section>
+  </body>
+</div>
+</html>
