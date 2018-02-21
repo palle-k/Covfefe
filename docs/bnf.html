@@ -321,67 +321,107 @@ The following grammar recognizes all upper and lower case roman letters:</p>
 The bounds of a range must be exactly one character. The characters can consist of multiple unicode scalars.</p>
 <h2 id='full-grammar' class='heading'>Full Grammar</h2>
 
-<p>The grammar that is recognized is the following:</p>
-<pre class="highlight plaintext"><code>(* Production rules are separated by newlines and optional whitespace *)
-&lt;syntax&gt; ::= &lt;optional-whitespace&gt; | &lt;newlines&gt; | &lt;rule&gt; | &lt;rule&gt; &lt;newlines&gt; | &lt;syntax&gt; &lt;newlines&gt; &lt;rule&gt; &lt;newlines&gt; | &lt;syntax&gt; &lt;newlines&gt; &lt;rule&gt;
+<p>The grammar that is recognized (excluding non-ascii characters) is the following:</p>
 
-(* A rule consists of a non-terminal pattern name, an assignment operator and a production expression *)
-&lt;rule&gt; ::= &lt;optional-whitespace&gt; &lt;rule-name-container&gt; &lt;optional-whitespace&gt; &lt;assignment-operator&gt; &lt;optional-whitespace&gt; &lt;expression&gt; &lt;optional-whitespace&gt;
+<style type="text/css">
+p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; color: #66b366; display: inline;}
+p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; color: #cc1a1a; display: inline;}
+p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; color: #000000; display: inline;}
+p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; color: #cc33b3; display: inline;}
+p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; color: #cc1a1a; display: inline;}
+p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; color: #cc1a1a; display: inline;}
+p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; color: #666666; display: inline;}
+span.s1 {color: #cc4d4d; display: inline;}
+span.s2 {color: #000000; display: inline;}
+span.s3 {color: #808080; display: inline;}
+span.s4 {color: #59b3cc; display: inline;}
+span.s5 {color: #3380cc; display: inline;}
+span.s6 {color: #666666; display: inline;}
+span.s7 {color: #cc4d4d; display: inline;}
+span.s8 {display: inline;}
+span.s9 {color: #cc1a1a; display: inline;}
+span.s10 {color: #666666; display: inline;}
+span.s11 {color: #cc4d4d; display: inline;}
+span.s12 {display: inline;}
+span.s13 {color: #000000; display: inline;}
+span.s14 {color: #808080; display: inline;}
+span.s15 {color: #666666; display: inline;}
+span.s16 {color: #cc4d4d; display: inline;}
+span.s17 {display: inline;}
+span.s18 {color: #59b3cc; display: inline;}
+span.s19 {color: #3380cc; display: inline;}
+span.s20 {color: #59b3cc; display: inline;}
+span.s21 {color: #3380cc; display: inline;}
+span.s22 {color: #cc1a1a; display: inline;}
+span.s23 {color: #cc33b3; display: inline;}
+span.s24 {color: #cc33b3; display: inline;}
+</style>
 
-(* Rule names are strings of alphanumeric characters *)
-&lt;rule-name-container&gt; ::= "&lt;" &lt;rule-name&gt; "&gt;"
-&lt;rule-name&gt; ::= &lt;rule-name&gt; &lt;rule-name-char&gt; | ""
-&lt;rule-name-char&gt; ::= 'a' ... 'z' | 'A' ... 'Z' | '0' ... '9' | '_' | '-'
-
-&lt;assignment-operator&gt; ::= ":" ":" "="
-
-(* An expression can either be a concatenation or an alternation *)
-&lt;expression&gt; ::= &lt;concatenation&gt; | &lt;alternation&gt;
-
-(* An alternation is a list of concatenations separated by the | character *)
-&lt;alternation&gt; ::= &lt;expression&gt; &lt;optional-whitespace&gt; "|" &lt;optional-whitespace&gt; &lt;concatenation&gt;
-
-(* A concatenation is a string of terminals and non-terminals *)
-&lt;concatenation&gt; ::= &lt;expression-element&gt; | &lt;concatenation&gt; &lt;optional-whitespace&gt; &lt;expression-element&gt;
-
-(* An atom of a expression can either be a terminal literal, a non-terminal or a group *)
-&lt;expression-element&gt; ::= &lt;literal&gt; | &lt;rule-name-container&gt; | &lt;expression-group&gt; | &lt;expression-repetition&gt; | &lt;expression-optional&gt;
-
-&lt;literal&gt; ::= "'" &lt;string-1&gt; "'" | '"' &lt;string-2&gt; '"' | &lt;range-literal&gt;
-&lt;range-literal&gt; ::= &lt;single-char-literal&gt; &lt;optional-whitespace&gt; "." "." "." &lt;optional-whitespace&gt; &lt;single-char-literal&gt;
-
-&lt;expression-group&gt; ::= "(" &lt;optional-whitespace&gt; &lt;expression&gt; &lt;optional-whitespace&gt; ")"
-&lt;expression-repetition&gt; ::= "{" &lt;optional-whitespace&gt; &lt;expression&gt; &lt;optional-whitespace&gt; "}"
-&lt;expression-optional&gt; ::= "[" &lt;optional-whitespace&gt; &lt;expression&gt; &lt;optional-whitespace&gt; "]"
-
-&lt;string-1&gt; ::= &lt;string-1&gt; &lt;string-1-char&gt; | ""
-&lt;string-1-char&gt; ::= "[^'\\\\\r\n]" | &lt;string-escaped-char&gt; | &lt;escaped-single-quote&gt;
-&lt;string-2&gt; ::= &lt;string-2&gt; &lt;string-2-char&gt; | ""
-&lt;string-2-char&gt; ::= '[^"\\\\\r\n]' | &lt;string-escaped-char&gt; | &lt;escaped-double-quote&gt;
-&lt;single-char-literal&gt; ::= "'" &lt;string-1-char&gt; "'" | '"' &lt;string-2-char&gt; '"'
-
-&lt;string-escaped-char&gt; ::= &lt;unicode-scalar&gt; | &lt;carriage-return&gt; | &lt;line-feed&gt; | &lt;tab-char&gt; | &lt;backslash&gt;
-
-&lt;backslash&gt; ::= "\\" "\\"
-&lt;line-feed&gt; ::= "\\" "n"
-&lt;carriage-return&gt; ::= "\\" "r"
-&lt;tab-char&gt; ::= "\\" "t"
-
-&lt;escaped-double-quote&gt; ::= "\\" '"'
-&lt;escaped-single-quote&gt; ::= "\\" "'"
-
-&lt;unicode-scalar&gt; ::= "\\" "u" "{" &lt;unicode-scalar-digits&gt; "}"
-&lt;unicode-scalar-digits&gt; ::= &lt;digit&gt; [&lt;digit&gt;] [&lt;digit&gt;] [&lt;digit&gt;] [&lt;digit&gt;] [&lt;digit&gt;] [&lt;digit&gt;] [&lt;digit&gt;]
-&lt;digit&gt; ::= '0' ... '9' | 'A' ... 'F' | 'a' ... 'f'
-
-&lt;newlines&gt; ::= "\n" | "\n" &lt;optional-whitespace&gt; &lt;newlines&gt;
-
-&lt;optional-whitespace&gt; ::= "" | &lt;whitespace&gt; &lt;optional-whitespace&gt;
-&lt;whitespace&gt; ::= " " | "\t" | "\n" | &lt;comment&gt;
-&lt;comment&gt; ::= "(" "*" &lt;comment-content&gt; "*" ")"
-&lt;comment-content&gt; ::= &lt;comment-content&gt; &lt;comment-content-char&gt; | ""
-&lt;comment-content-char&gt; ::= "[^*(]" | "*" "[^)]" | "(" "[^*]" | &lt;comment&gt;
-</code></pre>
+<pre>
+<p class="p1">(* Production rules are separated by newlines and optional whitespace *)</p>
+<p class="p2"><span class="s1">&lt;</span>syntax<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>newlines<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>rule<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>rule<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>newlines<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>syntax<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>newlines<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>rule<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>newlines<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>syntax<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>newlines<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>rule<span class="s1">&gt;</span></p>
+<p class="p3"></p>
+<p class="p1">(* A rule consists of a non-terminal pattern name, an assignment operator and a production expression *)</p>
+<p class="p2"><span class="s1">&lt;</span>rule<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>rule-name-container<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>assignment-operator<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>expression<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span></p>
+<p class="p3"></p>
+<p class="p1">(* Rule names are strings of alphanumeric characters *)</p>
+<p class="p2"><span class="s1">&lt;</span>rule-name-container<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">&lt;</span><span class="s4">"</span><span class="s2"> </span><span class="s6">{</span><span class="s7">&lt;</span><span class="s8">rule-name-char</span><span class="s7">&gt;</span><span class="s6">}</span><span class="s2"> </span><span class="s4">"</span><span class="s5">&gt;</span><span class="s4">"</span></p>
+<p class="p4"><span class="s1">&lt;</span><span class="s9">rule-name-char</span><span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span>'a'<span class="s10"> ... </span>'z'<span class="s2"> | </span>'A'<span class="s10"> ... </span>'Z'<span class="s2"> | </span>'0'<span class="s10"> ... </span>'9'<span class="s2"> | </span><span class="s4">'</span><span class="s5">_</span><span class="s4">'</span><span class="s2"> | </span><span class="s4">'</span><span class="s5">-</span><span class="s4">'</span></p>
+<p class="p3"></p>
+<p class="p2"><span class="s1">&lt;</span>assignment-operator<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">:</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">:</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">=</span><span class="s4">"</span></p>
+<p class="p3"></p>
+<p class="p1">(* An expression can either be a concatenation or an alternation *)</p>
+<p class="p5"><span class="s11">&lt;</span><span class="s12">expression</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s11">&lt;</span><span class="s12">concatenation</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s6">[</span><span class="s10">{</span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s10"> </span><span class="s4">"</span><span class="s5">|</span><span class="s4">"</span><span class="s10"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s10"> </span><span class="s1">&lt;</span>concatenation<span class="s1">&gt;</span><span class="s10">}</span><span class="s6">]</span></p>
+<p class="p3"></p>
+<p class="p1">(* A concatenation is a string of terminals and non-terminals *)</p>
+<p class="p5"><span class="s11">&lt;</span><span class="s12">concatenation</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s6">[</span><span class="s10">{</span><span class="s1">&lt;</span>expression-element<span class="s1">&gt;</span><span class="s10"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s10">}</span><span class="s6">]</span><span class="s13"> </span><span class="s11">&lt;</span><span class="s12">expression-element</span><span class="s11">&gt;</span></p>
+<p class="p3"></p>
+<p class="p1">(* An atom of a expression can either be a terminal literal, a non-terminal or a group *)</p>
+<p class="p2"><span class="s1">&lt;</span>expression-element<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>literal<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>rule-name-container<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>expression-group<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>expression-repetition<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>expression-optional<span class="s1">&gt;</span></p>
+<p class="p3"></p>
+<p class="p1">(* Expression containers *)</p>
+<p class="p2"><span class="s1">&lt;</span>expression-group<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">(</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>expression<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">)</span><span class="s4">"</span></p>
+<p class="p2"><span class="s1">&lt;</span>expression-repetition<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">{</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>expression<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">}</span><span class="s4">"</span></p>
+<p class="p2"><span class="s1">&lt;</span>expression-optional<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">[</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>expression<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">]</span><span class="s4">"</span></p>
+<p class="p3"></p>
+<p class="p1">(* Terminal literals *)</p>
+<p class="p2"><span class="s1">&lt;</span>literal<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">'</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>string-1<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">'</span><span class="s4">"</span><span class="s2"> | </span><span class="s4">'</span><span class="s5">"</span><span class="s4">'</span><span class="s2"> </span><span class="s1">&lt;</span>string-2<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">'</span><span class="s5">"</span><span class="s4">'</span><span class="s2"> | </span><span class="s1">&lt;</span>range-literal<span class="s1">&gt;</span></p>
+<p class="p2"><span class="s1">&lt;</span>range-literal<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>single-char-literal<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">.</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">.</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">.</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s1">&lt;</span>single-char-literal<span class="s1">&gt;</span></p>
+<p class="p3"></p>
+<p class="p1">(* Strings and characters *)</p>
+<p class="p5"><span class="s11">&lt;</span><span class="s12">string-1</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s6">[</span><span class="s10">{</span><span class="s1">&lt;</span>string-1-char<span class="s1">&gt;</span><span class="s10">}</span><span class="s6">]</span></p>
+<p class="p2"><span class="s1">&lt;</span>string-1-char<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>any-char<span class="s1">&gt;</span><span class="s2"> | </span><span class="s4">'</span><span class="s5">"</span><span class="s4">'</span><span class="s2"> | </span><span class="s1">&lt;</span>string-escaped-char<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>escaped-single-quote<span class="s1">&gt;</span></p>
+<p class="p5"><span class="s11">&lt;</span><span class="s12">string-2</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s6">[</span><span class="s10">{</span><span class="s1">&lt;</span>string-2-char<span class="s1">&gt;</span><span class="s10">}</span><span class="s6">]</span></p>
+<p class="p2"><span class="s1">&lt;</span>string-2-char<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>any-char<span class="s1">&gt;</span><span class="s2"> | </span><span class="s4">"</span><span class="s5">'</span><span class="s4">"</span><span class="s2"> | </span><span class="s1">&lt;</span>string-escaped-char<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>escaped-double-quote<span class="s1">&gt;</span></p>
+<p class="p2"><span class="s1">&lt;</span>single-char-literal<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">'</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>string-1-char<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">'</span><span class="s4">"</span><span class="s2"> | </span><span class="s4">'</span><span class="s5">"</span><span class="s4">'</span><span class="s2"> </span><span class="s1">&lt;</span>string-2-char<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">'</span><span class="s5">"</span><span class="s4">'</span></p>
+<p class="p3"></p>
+<p class="p4"><span class="s1">&lt;</span><span class="s9">any-char</span><span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">'</span><span class="s5">!</span><span class="s4">'</span><span class="s2"> | </span>'#'<span class="s10"> ... </span>'&amp;'<span class="s2"> | </span>'('<span class="s10"> ... </span>'['<span class="s2"> | </span>']'<span class="s10"> ... </span>'~'<span class="s2"> | </span><span class="s4">'</span><span class="s5"> </span><span class="s4">'</span><span class="s2"> | </span><span class="s4">'</span><span class="s5">\t</span><span class="s4">'</span></p>
+<p class="p3"></p>
+<p class="p1">(* Escape sequences *)</p>
+<p class="p2"><span class="s1">&lt;</span>string-escaped-char<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s1">&lt;</span>unicode-scalar<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>carriage-return<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>line-feed<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>tab-char<span class="s1">&gt;</span><span class="s2"> | </span><span class="s1">&lt;</span>backslash<span class="s1">&gt;</span></p>
+<p class="p3"></p>
+<p class="p2"><span class="s1">&lt;</span>backslash<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span></p>
+<p class="p2"><span class="s1">&lt;</span>line-feed<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">n</span><span class="s4">"</span></p>
+<p class="p2"><span class="s1">&lt;</span>carriage-return<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">r</span><span class="s4">"</span></p>
+<p class="p2"><span class="s1">&lt;</span>tab-char<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">t</span><span class="s4">"</span></p>
+<p class="p3"></p>
+<p class="p2"><span class="s1">&lt;</span>escaped-double-quote<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">'</span><span class="s5">"</span><span class="s4">'</span></p>
+<p class="p2"><span class="s1">&lt;</span>escaped-single-quote<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">'</span><span class="s4">"</span></p>
+<p class="p3"></p>
+<p class="p2"><span class="s1">&lt;</span>unicode-scalar<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5">\\</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">u</span><span class="s4">"</span><span class="s2"> </span><span class="s4">"</span><span class="s5">{</span><span class="s4">"</span><span class="s2"> </span><span class="s1">&lt;</span>unicode-scalar-digits<span class="s1">&gt;</span><span class="s2"> </span><span class="s4">"</span><span class="s5">}</span><span class="s4">"</span></p>
+<p class="p6"><span class="s11">&lt;</span><span class="s12">unicode-scalar-digits</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s11">&lt;</span><span class="s12">digit</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span><span class="s13"> </span><span class="s10">[</span><span class="s1">&lt;</span>digit<span class="s1">&gt;</span><span class="s10">]</span></p>
+<p class="p4"><span class="s1">&lt;</span><span class="s9">digit</span><span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span>'0'<span class="s10"> ... </span>'9'<span class="s2"> | </span>'A'<span class="s10"> ... </span>'F'<span class="s2"> | </span>'a'<span class="s10"> ... </span>'f'</p>
+<p class="p3"></p>
+<p class="p1">(* Whitespace *)</p>
+<p class="p6"><span class="s11">&lt;</span><span class="s12">newlines</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s10">{</span><span class="s4">"</span><span class="s5">\n</span><span class="s4">"</span><span class="s10"> </span><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s10">}</span></p>
+<p class="p3"></p>
+<p class="p2"><span class="s1">&lt;</span>optional-whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s6">[</span><span class="s15">{</span><span class="s16">&lt;</span><span class="s17">whitespace</span><span class="s16">&gt;</span><span class="s15">}</span><span class="s6">]</span></p>
+<p class="p2"><span class="s1">&lt;</span>whitespace<span class="s1">&gt;</span><span class="s2"> </span><span class="s3">::=</span><span class="s2"> </span><span class="s4">"</span><span class="s5"> </span><span class="s4">"</span><span class="s2"> | </span><span class="s4">"</span><span class="s5">\t</span><span class="s4">"</span><span class="s2"> | </span><span class="s4">"</span><span class="s5">\n</span><span class="s4">"</span><span class="s2"> | </span><span class="s1">&lt;</span>comment<span class="s1">&gt;</span></p>
+<p class="p3"></p>
+<p class="p1">(* Comments *)</p>
+<p class="p5"><span class="s11">&lt;</span><span class="s12">comment</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s18">"</span><span class="s19">(</span><span class="s18">"</span><span class="s13"> </span><span class="s18">"</span><span class="s19">*</span><span class="s18">"</span><span class="s13"> </span><span class="s6">(</span><span class="s10">{</span><span class="s1">&lt;</span>comment-content-char<span class="s1">&gt;</span><span class="s10">}</span><span class="s6"> | </span><span class="s20">'</span><span class="s21">*</span><span class="s20">'</span><span class="s6">)</span><span class="s13"> </span><span class="s18">"</span><span class="s19">*</span><span class="s18">"</span><span class="s13"> </span><span class="s18">"</span><span class="s19">)</span><span class="s18">"</span></p>
+<p class="p7"><span class="s11">&lt;</span><span class="s22">comment-content-char</span><span class="s11">&gt;</span><span class="s13"> </span><span class="s14">::=</span><span class="s13"> </span><span class="s23">'!'</span><span class="s12"> ... </span><span class="s23">"'"</span><span class="s13"> | </span><span class="s23">'+'</span><span class="s12"> ... </span><span class="s23">'~'</span><span class="s13"> | </span><span class="s18">'</span><span class="s19">)</span><span class="s18">'</span><span class="s13"> | </span><span class="s18">"</span><span class="s19"> </span><span class="s18">"</span><span class="s13"> | </span><span class="s18">"</span><span class="s19">\t</span><span class="s18">"</span><span class="s13"> | </span><span class="s18">"</span><span class="s19">\n</span><span class="s18">"</span><span class="s13"> | </span><span class="s18">'</span><span class="s19">"</span><span class="s18">'</span><span class="s13"> | </span><span class="s18">"</span><span class="s19">'</span><span class="s18">"</span><span class="s13"> | </span>{<span class="s4">'</span><span class="s5">(</span><span class="s4">'</span>}<span class="s13"> </span>(<span class="s24">'!'</span> ... <span class="s24">')'</span> | <span class="s24">'+'</span> ... <span class="s24">'~'</span> | <span class="s4">"</span><span class="s5"> </span><span class="s4">"</span> | <span class="s4">"</span><span class="s5">\t</span><span class="s4">"</span> | <span class="s4">"</span><span class="s5">\n</span><span class="s4">"</span>)<span class="s13"> | </span>{<span class="s4">'</span><span class="s5">*</span><span class="s4">'</span>}<span class="s13"> </span>(<span class="s24">'!'</span> ... <span class="s24">'('</span> | <span class="s24">'+'</span> ... <span class="s24">'~'</span>)<span class="s13"> | </span><span class="s11">&lt;</span><span class="s22">comment</span><span class="s11">&gt;</span></p>
+</pre>
 
           </div>
         </section>
