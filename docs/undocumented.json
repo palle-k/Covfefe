@@ -1,19 +1,6 @@
 {
   "warnings": [
-    {
-      "file": "/Users/Palle/Library/Mobile Documents/com~apple~CloudDocs/Developer/Covfefe/Sources/Covfefe/StringUtility.swift",
-      "line": 226,
-      "symbol": "String.singleQuoteLiteralEscaped",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/Palle/Library/Mobile Documents/com~apple~CloudDocs/Developer/Covfefe/Sources/Covfefe/StringUtility.swift",
-      "line": 230,
-      "symbol": "String.doubleQuoteLiteralEscaped",
-      "symbol_kind": "source.lang.swift.decl.var.instance",
-      "warning": "undocumented"
-    }
+
   ],
   "source_directory": "/Users/Palle/Library/Mobile Documents/com~apple~CloudDocs/Developer/Covfefe"
 }

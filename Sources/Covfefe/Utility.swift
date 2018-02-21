@@ -117,34 +117,28 @@ func crossProduct<S1: Sequence, S2: Sequence>(_ lhs: S1, _ rhs: S2) -> AnySequen
 	return sequence(
 		state: (
 			lhsIterator: lhs.makeIterator(),
-			lhsElement: nil,
+			lhsElement: Optional<S1.Element>.none,
 			rhsIterator: rhs.makeIterator(),
 			rhsIteratorBase: rhs.makeIterator()
-		)
-	) { (state: (
-			inout (
-				lhsIterator: S1.Iterator,
-				lhsElement: S1.Element?,
-				rhsIterator: S2.Iterator,
-				rhsIteratorBase: S2.Iterator
-			)
-		)) -> (S1.Element, S2.Element)? in
-		guard let lhsElement = state.lhsElement ?? state.lhsIterator.next() else {
-			return nil
-		}
-		state.lhsElement = lhsElement
-		if let rhsElement = state.rhsIterator.next() {
-			return (lhsElement, rhsElement)
-		} else {
-			state.rhsIterator = state.rhsIteratorBase
-			
-			guard let lhsNewElement = state.lhsIterator.next(), let rhsElement = state.rhsIterator.next() else {
+		),
+		next: { (state: inout (lhsIterator: S1.Iterator, lhsElement: S1.Element?, rhsIterator: S2.Iterator, rhsIteratorBase: S2.Iterator)) -> (S1.Element, S2.Element)? in
+			guard let lhsElement = state.lhsElement ?? state.lhsIterator.next() else {
 				return nil
 			}
-			state.lhsElement = lhsNewElement
-			return (lhsNewElement, rhsElement)
+			state.lhsElement = lhsElement
+			if let rhsElement = state.rhsIterator.next() {
+				return (lhsElement, rhsElement)
+			} else {
+				state.rhsIterator = state.rhsIteratorBase
+				
+				guard let lhsNewElement = state.lhsIterator.next(), let rhsElement = state.rhsIterator.next() else {
+					return nil
+				}
+				state.lhsElement = lhsNewElement
+				return (lhsNewElement, rhsElement)
+			}
 		}
-	}.collect(AnySequence.init)
+	).collect(AnySequence.init)
 }
 
 func crossMap<S1: Sequence, S2: Sequence, ElementOfResult>(_ lhs: S1, _ rhs: S2, transform: (S1.Element, S2.Element) throws -> ElementOfResult) rethrows -> [ElementOfResult] {

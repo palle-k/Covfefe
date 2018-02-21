@@ -33,7 +33,15 @@ public extension String {
 	/// - Returns: Ranges of matches in the string for the given regular expression
 	/// - Throws: An error indicating that the provided regular expression is invalid.
 	public func matches(for pattern: String) throws -> [Range<String.Index>] {
-		return try matches(for: pattern, in: self.startIndex ..< self.endIndex)
+		return try matches(for: pattern, in: startIndex ..< endIndex)
+	}
+	
+	/// Returns the ranges of all matches of the provided regular expression
+	///
+	/// - Parameter expression: Regular expression for which matches should be searched
+	/// - Returns: Ranges of matches in the string for the given regular expression
+	public func matches(for expression: NSRegularExpression) -> [Range<String.Index>] {
+		return matches(for: expression, in: startIndex ..< endIndex)
 	}
 
 	/// Returns the ranges of all matches of a regular expression which is provided as the pattern argument
@@ -45,9 +53,19 @@ public extension String {
 	/// - Throws: An error indicating that the provided regular expression is invalid.
 	public func matches(for pattern: String, in range: Range<String.Index>) throws -> [Range<String.Index>] {
 		let expression = try NSRegularExpression(pattern: pattern, options: [])
+		return matches(for: expression, in: range)
+	}
+	
+	/// Returns the ranges of all matches of the provided regular expression
+	///
+	/// - Parameters:
+	///   - expression: Regular expression for which matches should be searched
+	///   - range: Range of the string which should be checked
+	/// - Returns: Ranges of matches in the string for the given regular expression
+	public func matches(for expression: NSRegularExpression, in range: Range<String.Index>) -> [Range<String.Index>] {
 		let range = NSRange(range, in: self)
 		let matches = expression.matches(in: self, options: [], range: range)
-		return matches.flatMap { match -> Range<String.Index>? in
+		return matches.compactMap { match -> Range<String.Index>? in
 			return Range(match.range, in: self)
 		}
 	}
@@ -61,6 +79,14 @@ public extension String {
 		return try hasRegularPrefix(pattern, from: self.startIndex)
 	}
 	
+	/// Returns a boolean value indicating that the string has a prefix which can be matched by the given regular expression
+	///
+	/// - Parameter pattern: Regular expression
+	/// - Returns: True, if the regular expression matches a substring beginning at the start index of the string
+	public func hasRegularPrefix(_ expression: NSRegularExpression) -> Bool {
+		return hasRegularPrefix(expression, from: self.startIndex)
+	}
+	
 	/// Returns a boolean value indicating that the string has a prefix beginning at the given start index
 	/// which can be matched by the given regular expression
 	///
@@ -70,6 +96,17 @@ public extension String {
 	/// - Throws: An error indicating that the provided regular expression is invalid
 	public func hasRegularPrefix(_ pattern: String, from startIndex: String.Index) throws -> Bool {
 		return try rangeOfRegularPrefix(pattern, from: startIndex) != nil
+	}
+	
+	/// Returns a boolean value indicating that the string has a prefix beginning at the given start index
+	/// which can be matched by the given regular expression
+	///
+	/// - Parameter pattern: Regular expression
+	/// - Parameter startIndex: Start index for the search
+	/// - Returns: True, if the regular expression matches a substring beginning at the start index of the string
+	/// - Throws: An error indicating that the provided regular expression is invalid
+	public func hasRegularPrefix(_ expression: NSRegularExpression, from startIndex: String.Index) -> Bool {
+		return rangeOfRegularPrefix(expression, from: startIndex) != nil
 	}
 	
 	/// Returns the range of a match for the given regular expression beginning at the start of the string
@@ -84,11 +121,30 @@ public extension String {
 	/// Returns the range of a match for the given regular expression beginning at the start of the string
 	///
 	/// - Parameter pattern: Regular expression
+	/// - Returns: Range of the prefix matched by the regular expression or nil, if no match was found
+	/// - Throws: An error indicating that the provided regular expression is invalid
+	public func rangeOfRegularPrefix(_ expression: NSRegularExpression) -> Range<String.Index>? {
+		return rangeOfRegularPrefix(expression, from: self.startIndex)
+	}
+	
+	/// Returns the range of a match for the given regular expression beginning at the start of the string
+	///
+	/// - Parameter pattern: Regular expression
 	/// - Parameter startIndex: Start index for the search
 	/// - Returns: Range of the prefix matched by the regular expression or nil, if no match was found
 	/// - Throws: An error indicating that the provided regular expression is invalid
 	public func rangeOfRegularPrefix(_ pattern: String, from lowerBound: String.Index) throws -> Range<String.Index>? {
 		let expression = try NSRegularExpression(pattern: pattern, options: [])
+		return rangeOfRegularPrefix(expression, from: lowerBound)
+	}
+	
+	/// Returns the range of a match for the given regular expression beginning at the start of the string
+	///
+	/// - Parameter pattern: Regular expression
+	/// - Parameter startIndex: Start index for the search
+	/// - Returns: Range of the prefix matched by the regular expression or nil, if no match was found
+	/// - Throws: An error indicating that the provided regular expression is invalid
+	public func rangeOfRegularPrefix(_ expression: NSRegularExpression, from lowerBound: String.Index) -> Range<String.Index>? {
 		let range = NSRange(lowerBound ..< self.endIndex, in: self)
 		guard let match = expression.firstMatch(in: self, options: .anchored, range: range) else {
 			return nil
@@ -107,6 +163,17 @@ public extension String {
 		})
 	}
 	
+	/// Returns a boolean value indicating that the string ends with a substring matched by the given regular expression
+	///
+	/// - Parameter pattern: Regular expression
+	/// - Returns: True, if a match was found
+	/// - Throws: An error indicating that the regular expression is invalid
+	func hasRegularSuffix(_ expression: NSRegularExpression) -> Bool {
+		return matches(for: expression).contains(where: { range -> Bool in
+			range.upperBound == self.endIndex
+		})
+	}
+	
 	/// Returns the range of a substring matched by the given regular expression ending at the end index of the string
 	///
 	/// - Parameter pattern: Regular expression
@@ -118,37 +185,46 @@ public extension String {
 		})
 	}
 	
-	/// Returns a boolean value indicating that the string has a prefix described by the given sequence of terminal symbols.
+	/// Returns the range of a substring matched by the given regular expression ending at the end index of the string
+	///
+	/// - Parameter pattern: Regular expression
+	/// - Returns: Range of the match or nil, if no match was found
+	/// - Throws: An error indicating that the regular expression is invalid
+	func rangeOfRegularSuffix(_ expression: NSRegularExpression) throws -> Range<String.Index>? {
+		return matches(for: expression).first(where: { range -> Bool in
+			range.upperBound == self.endIndex
+		})
+	}
+	
+	/// Returns a boolean value indicating that the string has a prefix described by the given terminal symbol.
 	///
 	/// - Parameter prefix: Sequence of terminal symbols
 	/// - Returns: True, if the string has a prefix described by the given non-terminal sequence
-	func hasPrefix(_ prefix: [Terminal]) -> Bool {
+	func hasPrefix(_ prefix: Terminal) -> Bool {
 		return hasPrefix(prefix, from: self.startIndex)
 	}
 	
 	/// Returns a boolean value indicating that the string has a prefix from the given start index described by the given
-	/// sequence of non-terminal symbols
+	/// terminal symbol
 	///
 	/// - Parameters:
 	///   - prefix: Sequence of terminal symbols
 	///   - startIndex: Index from which the search should start
 	/// - Returns: True, if the string has a prefix from the given start index described by the given non-terminal sequence
-	func hasPrefix(_ prefix: [Terminal], from startIndex: String.Index) -> Bool {
-		let prefixString = prefix.map{$0.value}.joined()
-		
-		if prefix.contains(where: {$0.isRegularExpression}) {
-			return try! self.hasRegularPrefix("\(prefixString)", from: startIndex)
-		} else {
-			return self[startIndex...].hasPrefix(prefixString)
+	func hasPrefix(_ prefix: Terminal, from startIndex: String.Index) -> Bool {
+		switch prefix {
+		case .characterRange(let range, _):
+			guard let first = self[startIndex...].first else {
+				return false
+			}
+			return range.contains(first)
+			
+		case .regularExpression(let expression, _):
+			return hasRegularPrefix(expression, from: startIndex)
+			
+		case .string(string: let string, hash: _):
+			return self[startIndex...].hasPrefix(string)
 		}
-	}
-	
-	/// Returns the range of the prefix described by the given sequence of terminal symbols
-	///
-	/// - Parameter prefix: Sequence of terminal symbols
-	/// - Returns: The range of the prefix or nil, if no matching prefix has been found
-	func rangeOfPrefix(_ prefix: [Terminal]) -> Range<String.Index>? {
-		return rangeOfPrefix(prefix, from: self.startIndex)
 	}
 	
 	/// Returns the range of the prefix described by the given sequence of terminal symbols
@@ -158,45 +234,27 @@ public extension String {
 	///   - prefix: Sequence of terminal symbols
 	///   - startIndex: Index from which the search should start
 	/// - Returns: The range of the prefix or nil, if no matching prefix has been found
-	func rangeOfPrefix(_ prefix: [Terminal], from startIndex: String.Index) -> Range<String.Index>? {
-		let prefixString = prefix.map{$0.value}.joined()
-		
-		if prefix.contains(where: {$0.isRegularExpression}) {
-			return try! self.rangeOfRegularPrefix(prefixString, from: startIndex)
-		} else {
+	func rangeOfPrefix(_ prefix: Terminal, from startIndex: String.Index) -> Range<String.Index>? {
+		switch prefix {
+		case .characterRange(let range, _):
+			guard let first = self[startIndex...].first else {
+				return nil
+			}
+			if range.contains(first) {
+				return startIndex ..< self.index(after: startIndex)
+			} else {
+				return nil
+			}
+			
+		case .regularExpression(let expression, _):
+			return rangeOfRegularPrefix(expression, from: startIndex)
+			
+		case .string(string: let prefixString, hash: _):
 			let range = startIndex ..< (self.index(startIndex, offsetBy: prefixString.count, limitedBy: endIndex) ?? endIndex)
 			return self.range(of: prefixString, range: range)
 		}
 	}
-	
-	/// Returns a boolean value indicating that the string has a suffix described by the given sequence of terminal symbols
-	///
-	/// - Parameter suffix: Sequence of terminal symbols
-	/// - Returns: True, if the string has a suffix which matches the suffix described by the given sequence of terminal symbols
-	func hasSuffix(_ suffix: [Terminal]) -> Bool {
-		let suffixString = suffix.map{$0.value}.joined()
 		
-		if suffix.contains(where: {$0.isRegularExpression}) {
-			return try! self.hasRegularSuffix("\(suffixString)$")
-		} else {
-			return self.hasSuffix(suffixString)
-		}
-	}
-	
-	/// Returns the range of the suffix described by the given sequence of terminal symbols
-	///
-	/// - Parameter suffix: Sequence of terminal symbols
-	/// - Returns: Range of the suffix or nil if no matching suffix was found
-	func rangeOfSuffix(_ suffix: [Terminal]) -> Range<String.Index>? {
-		let suffixString = suffix.map{$0.value}.joined()
-		
-		if suffix.contains(where: {$0.isRegularExpression}) {
-			return try! self.rangeOfRegularSuffix(suffixString)
-		} else {
-			return self.range(of: suffixString, options: .backwards)
-		}
-	}
-	
 	/// Performs replacements using the given replacement rules.
 	/// The replacements are performed in order.
 	/// Each replacement is a tuple of strings, where the first string is the pattern that is replaced
@@ -223,10 +281,14 @@ public extension String {
 		)
 	}
 
+	/// Escapes all special characters that need to be escaped to be escaped for the string to be printed as a string literal enclosed by single quotes.
+	/// This includes single quotes, backslashes, line feeds, carriage returns and tab characters.
 	var singleQuoteLiteralEscaped: String {
 		return literalEscaped.replacingOccurrences(of: "'", with: "\\'")
 	}
 	
+	/// Escapes all special characters that need to be escaped to be escaped for the string to be printed as a string literal enclosed by double quotes.
+	/// This includes double quotes, backslashes, line feeds, carriage returns and tab characters.
 	var doubleQuoteLiteralEscaped: String {
 		return literalEscaped.replacingOccurrences(of: "\"", with: "\\\"")
 	}

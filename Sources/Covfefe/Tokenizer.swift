@@ -64,6 +64,22 @@ public struct DefaultTokenizer: Tokenizer {
 		self.terminals = grammar.productions.flatMap{$0.generatedTerminals}
 	}
 	
+	/// Tokenizes the given word and returns a sequence of possible tokens for each unit of the string
+	///
+	/// For a grammar
+	///
+	///		A -> a | A B
+	///		B -> a | B b
+	///
+	/// and a string "ab"
+	///
+	/// The tokenizer generates the tokenization
+	///
+	///		[[a], [b]]
+	///
+	/// - Parameter word: Word which should be tokenized
+	/// - Returns: Tokenization of the word
+	/// - Throws: A syntax error if the word could not be tokenized according to rules of the recognized language
 	public func tokenize(_ word: String) throws -> [[(terminal: Terminal, range: Range<String.Index>)]] {
 		return try tokenize(word: word, from: word.startIndex, partialResult: [])
 	}
@@ -81,11 +97,11 @@ public struct DefaultTokenizer: Tokenizer {
 			return partialResult
 		}
 		let matches = terminals.filter { terminal -> Bool in
-			word.hasPrefix([terminal], from: startIndex)
+			word.hasPrefix(terminal, from: startIndex)
 		}
 		guard
 			let first = matches.first,
-			let firstMatchRange = word.rangeOfPrefix([first], from: startIndex)
+			let firstMatchRange = word.rangeOfPrefix(first, from: startIndex)
 		else {
 			throw SyntaxError(range: startIndex ..< word.endIndex, in: word, reason: .unknownToken)
 		}

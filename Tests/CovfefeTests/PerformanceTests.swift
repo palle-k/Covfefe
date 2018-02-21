@@ -22,29 +22,23 @@ class PerformanceTests: XCTestCase {
 		<array> ::= "[" <array-contents> "]" | "[" <optional-whitespace> "]"
 		<array-contents> ::= <array-contents> "," <optional-whitespace> <any> <optional-whitespace> | <optional-whitespace> <any> <optional-whitespace>
 
-		<key> ::= '"' <string-content> '"' | '"' '"'
-		<string> ::= '"' <string-content> '"' | '"' '"'
+		<key> ::= '"' [{<character>}] '"'
+		<string> ::= '"' [{<character>}] '"'
 		<string-content> ::= <string-content> <character> | <character>
-		<letter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
-		<digit-except-zero> ::= '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
-		<digit> ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
-		<hex-digit> ::= <digit> | 'a' | 'A' | 'b' | 'B' | 'c' | 'C' | 'd' | 'D' | 'e' | 'E' | 'f' | 'F'
-		<whitespace> ::= ' ' | '	' | <EOL>
-		<symbol> ::=  "|" | " " | "	" | "-" | "!" | "#" | "$" | "%" | "&" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | ">" | "=" | "<" | "?" | "@" | "[" | "]" | "^" | "_" | "`" | "{" | "}" | "~" | "'"
-		<character> ::= <letter> | <digit> | <symbol> | <escaped-sequence>
+		<digit-except-zero> ::= '1' ... '9'
+		<digit> ::= '0' ... '9'
+		<hex-digit> ::= <digit> | 'a' ... 'f' | 'A' ... 'F'
+		<whitespace> ::= ' ' | '\\t' | <EOL>
+		<character> ::= <escaped-sequence> | '#' ... '[' (* includes all letters and numbers *) | ']' ... '~' | '!' | <whitespace>
 
 		<escaped-sequence> ::= '\\\\' <escaped>
 		<escaped> ::= '"' | '\\\\' | '/' | 'b' | 'f' | 'n' | 'r' | 't' | 'u' <hex-digit> <hex-digit> <hex-digit> <hex-digit>
 
-		<number> ::= <optional-minus-sign> <integer> <optional-float> <optional-exponent>
-		<optional-minus-sign> ::= '-' | ''
-		<integer> ::= <digit> | <integer-prefix> <digit>
+		<number> ::= ['-'] <integer> ['.' {'0' ... '9'}] [('E' | 'e') <exponent>]
+		<integer> ::= '1'...'9' [{'0'...'9'}]
 		<integer-prefix> ::= <digit-except-zero> | <integer-prefix> <digit>
-		<optional-float> ::= '' | '.' <fraction>
 		<fraction> ::= <digit> | <fraction> <digit>
-		<optional-exponent> ::= '' | 'E' <exponent> | 'e' <exponent>
-		<exponent> ::= <sign> <integer>
-		<sign> ::= '+' | '-' | ''
+		<exponent> ::= ['-' | '+'] <integer>
 
 		<boolean> ::= 't' 'r' 'u' 'e' | 'f' 'a' 'l' 's' 'e'
 		
@@ -90,7 +84,9 @@ class PerformanceTests: XCTestCase {
 		
 		measure {
 			for _ in 0 ..< 3 {
-				_ = parser.recognizes(testString)
+				if parser.recognizes(testString) == false {
+					XCTFail()
+				}
 			}
 		}
 	}
