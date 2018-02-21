@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Protocols  Reference</title>
+    <title>BNF  Reference</title>
     <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="css/highlight.css" />
     <meta charset="utf-8">
@@ -15,7 +15,7 @@
   <body>
 
 
-    <a title="Protocols  Reference"></a>
+    <a title="BNF  Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
@@ -43,7 +43,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="index.html">Covfefe Reference</a>
       <img class="carat" src="img/carat.png" />
-      Protocols  Reference
+      BNF  Reference
     </p>
 
     <div class="content-wrapper">
@@ -225,109 +225,167 @@
 
         <section class="section">
           <div class="section-content">
-            <h1>Protocols</h1>
-            <p>The following protocols are available globally.</p>
+            
+            <h1 id='bnf' class='heading'>BNF</h1>
+
+<p>Covfefe allows context free grammars to be specified using a language that is a superset of BNF.</p>
+<h2 id='contents' class='heading'>Contents</h2>
+
+<ol>
+<li><a href="#productions">Productions</a></li>
+<li><a href="#terminals">Terminals</a></li>
+<li><a href="#alternations">Alternations</a></li>
+<li><a href="#sequence-grouping">Sequence Grouping</a></li>
+<li><a href="#optional-sequences">Optional Sequences</a></li>
+<li><a href="#sequence-repetitions">Sequence Repetitions</a></li>
+<li><a href="#character-ranges">Character Ranges</a></li>
+<li><a href="#full-grammar">Full Grammar</a></li>
+</ol>
+<h2 id='productions' class='heading'>Productions</h2>
+
+<p>A production in a context free grammar has the form <code>X -&gt; b</code>, which indicates that <code>X</code> can be replaced by <code>b</code>.
+<code>X</code> is a non-terminal, <code>b</code> is a string of terminals and non-terminals.</p>
+
+<p>In BNF, a non-terminal is written as <code>&lt;A&gt;</code>, a terminal is written as <code>&#39;a&#39;</code> or <code>&quot;a&quot;</code>.
+An assignment is written as <code>lhs ::= rhs</code>.</p>
+
+<p>A grammar that produces <code>Hello World</code> can thereby be expressed as</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'hello' &lt;whitespace&gt; 'world'
+&lt;whitespace&gt; ::= ' '
+&lt;whitespace&gt; ::= '\t'
+</code></pre>
+<h2 id='terminals' class='heading'>Terminals</h2>
+
+<p>Terminals are strings of characters that are delimited either by <code>&#39;</code>s or <code>&quot;</code>s. </p>
+<h3 id='escaping' class='heading'>Escaping</h3>
+
+<p>To express characters such as newlines, tabs and unicode symbols, backslashes can be used:</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= '\n' | '\t' | '\\' | '\u{1F602}'
+</code></pre>
+
+<p>This grammar produces a single newline, a single tab, a single <code>\</code> or a single <code>😂</code>.</p>
+<h4 id='warning' class='heading'>Warning</h4>
+
+<p>When adding grammars as strings in Swift code, backslashes need to be escaped.</p>
+
+<p>The above grammar then becomes:</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">grammarString</span> <span class="o">=</span> <span class="s">"&lt;S&gt; ::= '</span><span class="se">\\</span><span class="s">n' | '</span><span class="se">\\</span><span class="s">t' | '</span><span class="se">\\\\</span><span class="s">' | '</span><span class="se">\\</span><span class="s">u{1F602}'"</span>
+</code></pre>
+<h2 id='alternations' class='heading'>Alternations</h2>
+
+<p>In the above example, whitespace can be replaced either by <code>&#39; &#39;</code> or by <code>&#39;\t&#39;</code>.
+This can be written as</p>
+<pre class="highlight plaintext"><code>&lt;whitespace&gt; ::= ' ' | '\t'
+</code></pre>
+
+<p>Concatenation has a higher precedence than alternations, so the following grammar produces <code>ab</code> and <code>cd</code></p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'a' 'b' | 'c' 'd'
+</code></pre>
+<h2 id='sequence-grouping' class='heading'>Sequence Grouping</h2>
+
+<p>Parentheses (<code>(</code> and <code>)</code>) can be used to group symbols together.</p>
+
+<p>The following grammar produces <code>abd</code> and <code>acd</code>:</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'a' ('b' | 'c') 'd'
+</code></pre>
+<h2 id='optional-sequences' class='heading'>Optional Sequences</h2>
+
+<p>To mark a sequence as optional, brackets (<code>[</code> and <code>]</code>) can be used.</p>
+
+<p>The following grammar produces <code>abc</code> and <code>ac</code>:</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'a' ['b'] 'c'
+</code></pre>
+<h2 id='sequence-repetitions' class='heading'>Sequence Repetitions</h2>
+
+<p>To repeat a sequence, braces (<code>{</code> and <code>}</code>) can be used.</p>
+
+<p>The following grammar produces <code>aba</code>, <code>abba</code>, <code>abbba</code>, etc. but not <code>aa</code>:</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'a' {'b'} 'a'
+</code></pre>
+
+<p>To also generate <code>aa</code>, repetitions can be matched with optional sequences:</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'a' [{'b'}] 'a'
+</code></pre>
+
+<p>It is preferred to make the entire repetition optional instead of repeating an optional sequence.</p>
+
+<p>The repetition is generated using a left-recursive auxiliary rule.</p>
+<h2 id='character-ranges' class='heading'>Character Ranges</h2>
+
+<p>To make it easier to specify grammars that recognize a large alphabet, character ranges can be used.
+The following grammar recognizes all upper and lower case roman letters:</p>
+<pre class="highlight plaintext"><code>&lt;S&gt; ::= 'A' ... 'Z' | 'a' ... 'z'
+</code></pre>
+
+<p>The lower bound of a character range must be less than or equal the upper bound (e.g. <code>&#39;b&#39; ... &#39;a&#39;</code> is an invalid range).
+The bounds of a range must be exactly one character. The characters can consist of multiple unicode scalars.</p>
+<h2 id='full-grammar' class='heading'>Full Grammar</h2>
+
+<p>The grammar that is recognized is the following:</p>
+<pre class="highlight plaintext"><code>(* Production rules are separated by newlines and optional whitespace *)
+&lt;syntax&gt; ::= &lt;optional-whitespace&gt; | &lt;newlines&gt; | &lt;rule&gt; | &lt;rule&gt; &lt;newlines&gt; | &lt;syntax&gt; &lt;newlines&gt; &lt;rule&gt; &lt;newlines&gt; | &lt;syntax&gt; &lt;newlines&gt; &lt;rule&gt;
+
+(* A rule consists of a non-terminal pattern name, an assignment operator and a production expression *)
+&lt;rule&gt; ::= &lt;optional-whitespace&gt; &lt;rule-name-container&gt; &lt;optional-whitespace&gt; &lt;assignment-operator&gt; &lt;optional-whitespace&gt; &lt;expression&gt; &lt;optional-whitespace&gt;
+
+(* Rule names are strings of alphanumeric characters *)
+&lt;rule-name-container&gt; ::= "&lt;" &lt;rule-name&gt; "&gt;"
+&lt;rule-name&gt; ::= &lt;rule-name&gt; &lt;rule-name-char&gt; | ""
+&lt;rule-name-char&gt; ::= 'a' ... 'z' | 'A' ... 'Z' | '0' ... '9' | '_' | '-'
+
+&lt;assignment-operator&gt; ::= ":" ":" "="
+
+(* An expression can either be a concatenation or an alternation *)
+&lt;expression&gt; ::= &lt;concatenation&gt; | &lt;alternation&gt;
+
+(* An alternation is a list of concatenations separated by the | character *)
+&lt;alternation&gt; ::= &lt;expression&gt; &lt;optional-whitespace&gt; "|" &lt;optional-whitespace&gt; &lt;concatenation&gt;
+
+(* A concatenation is a string of terminals and non-terminals *)
+&lt;concatenation&gt; ::= &lt;expression-element&gt; | &lt;concatenation&gt; &lt;optional-whitespace&gt; &lt;expression-element&gt;
+
+(* An atom of a expression can either be a terminal literal, a non-terminal or a group *)
+&lt;expression-element&gt; ::= &lt;literal&gt; | &lt;rule-name-container&gt; | &lt;expression-group&gt; | &lt;expression-repetition&gt; | &lt;expression-optional&gt;
+
+&lt;literal&gt; ::= "'" &lt;string-1&gt; "'" | '"' &lt;string-2&gt; '"' | &lt;range-literal&gt;
+&lt;range-literal&gt; ::= &lt;single-char-literal&gt; &lt;optional-whitespace&gt; "." "." "." &lt;optional-whitespace&gt; &lt;single-char-literal&gt;
+
+&lt;expression-group&gt; ::= "(" &lt;optional-whitespace&gt; &lt;expression&gt; &lt;optional-whitespace&gt; ")"
+&lt;expression-repetition&gt; ::= "{" &lt;optional-whitespace&gt; &lt;expression&gt; &lt;optional-whitespace&gt; "}"
+&lt;expression-optional&gt; ::= "[" &lt;optional-whitespace&gt; &lt;expression&gt; &lt;optional-whitespace&gt; "]"
+
+&lt;string-1&gt; ::= &lt;string-1&gt; &lt;string-1-char&gt; | ""
+&lt;string-1-char&gt; ::= "[^'\\\\\r\n]" | &lt;string-escaped-char&gt; | &lt;escaped-single-quote&gt;
+&lt;string-2&gt; ::= &lt;string-2&gt; &lt;string-2-char&gt; | ""
+&lt;string-2-char&gt; ::= '[^"\\\\\r\n]' | &lt;string-escaped-char&gt; | &lt;escaped-double-quote&gt;
+&lt;single-char-literal&gt; ::= "'" &lt;string-1-char&gt; "'" | '"' &lt;string-2-char&gt; '"'
+
+&lt;string-escaped-char&gt; ::= &lt;unicode-scalar&gt; | &lt;carriage-return&gt; | &lt;line-feed&gt; | &lt;tab-char&gt; | &lt;backslash&gt;
+
+&lt;backslash&gt; ::= "\\" "\\"
+&lt;line-feed&gt; ::= "\\" "n"
+&lt;carriage-return&gt; ::= "\\" "r"
+&lt;tab-char&gt; ::= "\\" "t"
+
+&lt;escaped-double-quote&gt; ::= "\\" '"'
+&lt;escaped-single-quote&gt; ::= "\\" "'"
+
+&lt;unicode-scalar&gt; ::= "\\" "u" "{" &lt;unicode-scalar-digits&gt; "}"
+&lt;unicode-scalar-digits&gt; ::= &lt;digit&gt; [&lt;digit&gt;] [&lt;digit&gt;] [&lt;digit&gt;] [&lt;digit&gt;] [&lt;digit&gt;] [&lt;digit&gt;] [&lt;digit&gt;]
+&lt;digit&gt; ::= '0' ... '9' | 'A' ... 'F' | 'a' ... 'f'
+
+&lt;newlines&gt; ::= "\n" | "\n" &lt;optional-whitespace&gt; &lt;newlines&gt;
+
+&lt;optional-whitespace&gt; ::= "" | &lt;whitespace&gt; &lt;optional-whitespace&gt;
+&lt;whitespace&gt; ::= " " | "\t" | "\n" | &lt;comment&gt;
+&lt;comment&gt; ::= "(" "*" &lt;comment-content&gt; "*" ")"
+&lt;comment-content&gt; ::= &lt;comment-content&gt; &lt;comment-content-char&gt; | ""
+&lt;comment-content-char&gt; ::= "[^*(]" | "*" "[^)]" | "(" "[^*]" | &lt;comment&gt;
+</code></pre>
 
           </div>
         </section>
 
-        <section class="section">
-          <div class="section-content">
-            <div class="task-group">
-              <ul class="item-container">
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:7Covfefe6ParserP"></a>
-                    <a name="//apple_ref/swift/Protocol/Parser" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe6ParserP">Parser</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A parser which can check if a word is in a language
-and generate a syntax tree explaining how a word was derived from a grammar</p>
-
-                        <a href="Protocols/Parser.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Parser</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:7Covfefe22AmbiguousGrammarParserP"></a>
-                    <a name="//apple_ref/swift/Protocol/AmbiguousGrammarParser" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe22AmbiguousGrammarParserP">AmbiguousGrammarParser</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A parser that can parse ambiguous grammars and retrieve every possible syntax tree</p>
-
-                        <a href="Protocols/AmbiguousGrammarParser.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">AmbiguousGrammarParser</span><span class="p">:</span> <span class="kt"><a href="Protocols/Parser.html">Parser</a></span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul class="item-container">
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:7Covfefe9TokenizerP"></a>
-                    <a name="//apple_ref/swift/Protocol/Tokenizer" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe9TokenizerP">Tokenizer</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>A string tokenizer which tokenizes a string based on final productions of a context free grammar.</p>
-
-                        <a href="Protocols/Tokenizer.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Tokenizer</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
 
       </article>
     </div>
