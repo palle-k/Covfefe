@@ -29,11 +29,11 @@ class EBNFTests: XCTestCase {
 			]
 		
 		for validExample in validExamples {
-			XCTAssertNoThrow(try Grammar(ebnfString: validExample, start: "s"))
+			XCTAssertNoThrow(try Grammar(ebnf: validExample, start: "s"))
 		}
 		
 		for invalidExample in invalidExamples {
-			XCTAssertThrowsError(try Grammar(ebnfString: invalidExample, start: "s"))
+			XCTAssertThrowsError(try Grammar(ebnf: invalidExample, start: "s"))
 		}
 	}
 	
@@ -43,7 +43,7 @@ class EBNFTests: XCTestCase {
 		hello = "hello", world | "foo", "bar", "baz" | "xyz";
 		world = "world";
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "hello")
+		let grammar = try Grammar(ebnf: grammarString, start: "hello")
 		XCTAssertTrue(grammar.productions.contains("hello" --> t("hello") <+> n("world")))
 		XCTAssertTrue(grammar.productions.contains("hello" --> t("foo") <+> t("bar") <+> t("baz")))
 		XCTAssertTrue(grammar.productions.contains("hello" --> t("xyz")))
@@ -54,7 +54,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = "'" | '"';
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		XCTAssertTrue(grammar.productions.contains("s" --> t("'")))
 		XCTAssertTrue(grammar.productions.contains("s" --> t("\"")))
 	}
@@ -63,7 +63,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = "\\u{0020}";
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes(" "))
@@ -72,20 +72,20 @@ class EBNFTests: XCTestCase {
 		XCTAssertFalse(parser.recognizes("  "))
 		
 		// Disallow empty unicode scalars
-		XCTAssertThrowsError(try Grammar(ebnfString: "<s> ::= '\\u{}'", start: "s"))
+		XCTAssertThrowsError(try Grammar(ebnf: "<s> ::= '\\u{}'", start: "s"))
 		
 		// Disallow too long unicode scalars
-		XCTAssertThrowsError(try Grammar(ebnfString: "<s> ::= '\\u{000000001}'", start: "s"))
+		XCTAssertThrowsError(try Grammar(ebnf: "<s> ::= '\\u{000000001}'", start: "s"))
 		
 		// Disallow invalid unicode scalars
-		XCTAssertThrowsError(try Grammar(ebnfString: "<s> ::= '\\u{d800}'", start: "s"))
+		XCTAssertThrowsError(try Grammar(ebnf: "<s> ::= '\\u{d800}'", start: "s"))
 	}
 	
 	func testEscaped() throws {
 		let grammarString = """
 		s = "\\r", "\\n" | "\\r" | "\\n" | "\\t" | "\\\\" | "\\\"" | '\\'';
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("\r\n"))
@@ -107,47 +107,47 @@ class EBNFTests: XCTestCase {
 	}
 	
 	func testEmpty() {
-		XCTAssertNoThrow(try Grammar(ebnfString: "", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "\n", start: "s"))
-		XCTAssertEqual((try? Grammar(ebnfString: "", start: "s"))?.productions.count, 0)
+		XCTAssertNoThrow(try Grammar(ebnf: "", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "\n", start: "s"))
+		XCTAssertEqual((try? Grammar(ebnf: "", start: "s"))?.productions.count, 0)
 	}
 	
 	func testComments() throws {
 		// Positioning
-		XCTAssertNoThrow(try Grammar(ebnfString: "s = 'x'; (* hello world *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "s = (* hello world *) 'x';", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "s (* hello world *) = 'x';", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(* hello world *) s = 'x';", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "s = 'x', (* hello world *) 'y';", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "s = 'x'; \n (* hello world *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "s = 'x'; (* hello world *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "s = (* hello world *) 'x';", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "s (* hello world *) = 'x';", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(* hello world *) s = 'x';", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "s = 'x', (* hello world *) 'y';", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "s = 'x'; \n (* hello world *)", start: "s"))
 		
 		// Empty comments
-		XCTAssertNoThrow(try Grammar(ebnfString: "s = 'x'; (**)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "s = 'x'; (**)", start: "s"))
 		
 		// Nested comments
-		XCTAssertNoThrow(try Grammar(ebnfString: "(* (* hello *) world *) s = 'x';", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(* (* hello (**) *) world *) s = 'x';", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(* * *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(* ( *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(* ) *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(***)", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(****)", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(*****)", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(* (( *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(* ((( *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(* () *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(* (a) *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(ebnfString: "(* (ab) *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(* (* hello *) world *) s = 'x';", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(* (* hello (**) *) world *) s = 'x';", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(* * *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(* ( *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(* ) *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(***)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(****)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(*****)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(* (( *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(* ((( *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(* () *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(* (a) *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(ebnf: "(* (ab) *)", start: "s"))
 		
 		// Rules
-		XCTAssertEqual((try? Grammar(ebnfString: "(* *)", start: "s"))?.productions.count, 0)
+		XCTAssertEqual((try? Grammar(ebnf: "(* *)", start: "s"))?.productions.count, 0)
 		
 		// Invalid comments
-		XCTAssertThrowsError(try Grammar(ebnfString: "(* hello", start: "s"))
-		XCTAssertThrowsError(try Grammar(ebnfString: "s = 'x'; *)", start: "s"))
-		XCTAssertThrowsError(try Grammar(ebnfString: "s = 'x'; (* (* *)", start: "s"))
-		XCTAssertThrowsError(try Grammar(ebnfString: "s = (* (* *) 'x';", start: "s"))
-		XCTAssertThrowsError(try Grammar(ebnfString: "s = 'x'; (* *) *)", start: "s"))
+		XCTAssertThrowsError(try Grammar(ebnf: "(* hello", start: "s"))
+		XCTAssertThrowsError(try Grammar(ebnf: "s = 'x'; *)", start: "s"))
+		XCTAssertThrowsError(try Grammar(ebnf: "s = 'x'; (* (* *)", start: "s"))
+		XCTAssertThrowsError(try Grammar(ebnf: "s = (* (* *) 'x';", start: "s"))
+		XCTAssertThrowsError(try Grammar(ebnf: "s = 'x'; (* *) *)", start: "s"))
 	}
 	
 	func testCharacterRangeParsing() throws {
@@ -168,11 +168,11 @@ class EBNFTests: XCTestCase {
 			]
 		
 		for validExample in validExamples {
-			XCTAssertNoThrow(try Grammar(ebnfString: validExample, start: "s"))
+			XCTAssertNoThrow(try Grammar(ebnf: validExample, start: "s"))
 		}
 		
 		for invalidExample in invalidExamples {
-			XCTAssertThrowsError(try Grammar(ebnfString: invalidExample, start: "s"))
+			XCTAssertThrowsError(try Grammar(ebnf: invalidExample, start: "s"))
 		}
 	}
 	
@@ -180,7 +180,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = 'a' ... 'z';
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		for c in ["a", "b", "x", "y", "z"] {
@@ -215,11 +215,11 @@ class EBNFTests: XCTestCase {
 			]
 		
 		for validExample in validExamples {
-			XCTAssertNoThrow(try Grammar(ebnfString: validExample, start: "s"))
+			XCTAssertNoThrow(try Grammar(ebnf: validExample, start: "s"))
 		}
 		
 		for invalidExample in invalidExamples {
-			XCTAssertThrowsError(try Grammar(ebnfString: invalidExample, start: "s"))
+			XCTAssertThrowsError(try Grammar(ebnf: invalidExample, start: "s"))
 		}
 	}
 	
@@ -227,7 +227,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = ('a' | 'b'), 'c';
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("ac"))
@@ -249,7 +249,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = 'a', ('b' | 'c'), ('d' | 'e'), 'f';
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("abdf"))
@@ -267,7 +267,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = 'd', ('a', 'b' | 'c');
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("dab"))
@@ -283,7 +283,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = (('a' | 'b'), ('c' | 'd')), (('a' | 'b'), ('c' | 'd'));
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("acac"))
@@ -319,11 +319,11 @@ class EBNFTests: XCTestCase {
 			]
 		
 		for validExample in validExamples {
-			XCTAssertNoThrow(try Grammar(ebnfString: validExample, start: "s"))
+			XCTAssertNoThrow(try Grammar(ebnf: validExample, start: "s"))
 		}
 		
 		for invalidExample in invalidExamples {
-			XCTAssertThrowsError(try Grammar(ebnfString: invalidExample, start: "s"))
+			XCTAssertThrowsError(try Grammar(ebnf: invalidExample, start: "s"))
 		}
 	}
 	
@@ -331,7 +331,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = {'a'};
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("a"))
@@ -348,7 +348,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = {'a', 'b'};
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("ab"))
@@ -366,7 +366,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = {'a' | 'b'};
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("a"))
@@ -385,7 +385,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = {'a', {'b' | 'c'}, 'd' | 'e'};
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("abd"))
@@ -408,7 +408,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = {'a'}, {'b'};
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("ab"))
@@ -443,11 +443,11 @@ class EBNFTests: XCTestCase {
 			]
 		
 		for validExample in validExamples {
-			XCTAssertNoThrow(try Grammar(ebnfString: validExample, start: "s"))
+			XCTAssertNoThrow(try Grammar(ebnf: validExample, start: "s"))
 		}
 		
 		for invalidExample in invalidExamples {
-			XCTAssertThrowsError(try Grammar(ebnfString: invalidExample, start: "s"))
+			XCTAssertThrowsError(try Grammar(ebnf: invalidExample, start: "s"))
 		}
 	}
 	
@@ -455,7 +455,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = 'a', ['b'], 'c';
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("abc"))
@@ -472,7 +472,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = 'a', [{'b'}], 'c';
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("ac"))
@@ -489,7 +489,7 @@ class EBNFTests: XCTestCase {
 		let grammarString = """
 		s = ['a' | 'b'], ['c', 'd'], ['e', ['f'], 'g'];
 		"""
-		let grammar = try Grammar(ebnfString: grammarString, start: "s")
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes(""))

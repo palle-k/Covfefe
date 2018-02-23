@@ -156,13 +156,13 @@ public struct Grammar {
 
 
 extension Grammar: CustomStringConvertible {
-	public var description: String {
+	public var bnf: String {
 		let groupedProductions = Dictionary(grouping: self.productions) { production in
 			production.pattern
 		}
 		return groupedProductions.sorted(by: {$0.key.name < $1.key.name}).map { entry -> String in
 			let (pattern, productions) = entry
-
+			
 			let productionString = productions.map { production in
 				if production.production.isEmpty {
 					return "\"\""
@@ -171,14 +171,6 @@ extension Grammar: CustomStringConvertible {
 					switch symbol {
 					case .nonTerminal(let nonTerminal):
 						return "<\(nonTerminal.name)>"
-
-//					case .terminal(let terminal) where terminal.value.contains("\""):
-//						let escapedValue = terminal.value.singleQuoteLiteralEscaped
-//						return "'\(escapedValue)'"
-//
-//					case .terminal(let terminal):
-//						let escapedValue = terminal.value.doubleQuoteLiteralEscaped
-//						return "\"\(escapedValue)\""
 						
 					case .terminal(.string(let string, _)) where string.contains("\""):
 						let escapedValue = string.singleQuoteLiteralEscaped
@@ -216,10 +208,72 @@ extension Grammar: CustomStringConvertible {
 					}
 				}.joined(separator: " ")
 			}.joined(separator: " | ")
-
+			
 			return "<\(pattern.name)> ::= \(productionString)"
 		}.joined(separator: "\n")
 	}
+	
+	public var ebnf: String {
+		let groupedProductions = Dictionary(grouping: self.productions) { production in
+			production.pattern
+		}
+		return groupedProductions.sorted(by: {$0.key.name < $1.key.name}).map { entry -> String in
+			let (pattern, productions) = entry
+			
+			let productionString = productions.map { production in
+				if production.production.isEmpty {
+					return "\"\""
+				}
+				return production.production.map { symbol -> String in
+					switch symbol {
+					case .nonTerminal(let nonTerminal):
+						return nonTerminal.name
+						
+					case .terminal(.string(let string, _)) where string.contains("\""):
+						let escapedValue = string.singleQuoteLiteralEscaped
+						return "'\(escapedValue)'"
+						
+					case .terminal(.string(let string, _)):
+						let escapedValue = string.doubleQuoteLiteralEscaped
+						return "\"\(escapedValue)\""
+						
+					case .terminal(.regularExpression(let expression, _)) where expression.pattern.contains("\""):
+						let escapedValue = expression.pattern.singleQuoteLiteralEscaped
+						return "'\(escapedValue)'"
+						
+					case .terminal(.regularExpression(let expression, _)):
+						let escapedValue = expression.pattern.doubleQuoteLiteralEscaped
+						return "\"\(escapedValue)\""
+						
+					case .terminal(.characterRange(let range, _)):
+						let lowerString: String
+						let upperString: String
+						
+						if range.lowerBound == "'" {
+							lowerString = "\"'\""
+						} else {
+							lowerString = "'\(range.lowerBound)'"
+						}
+						
+						if range.upperBound == "'" {
+							upperString = "\"'\""
+						} else {
+							upperString = "'\(range.upperBound)'"
+						}
+						
+						return "\(lowerString) ... \(upperString)"
+					}
+				}.joined(separator: ", ")
+			}.joined(separator: " | ")
+			
+			return "\(pattern.name) = \(productionString);"
+		}.joined(separator: "\n")
+	}
+	
+	public var description: String {
+		return bnf
+	}
+		
 }
 
 public extension Grammar {

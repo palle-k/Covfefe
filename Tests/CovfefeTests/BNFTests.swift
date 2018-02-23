@@ -33,7 +33,7 @@ class BNFTests: XCTestCase {
 		<hello> ::= "hello" <world> | "foo" "bar" "baz" | "xyz"
 		<world> ::= "world"
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "hello")
+		let grammar = try Grammar(bnf: grammarString, start: "hello")
 		XCTAssertEqual(grammar.description, grammarString)
 		XCTAssertTrue(grammar.productions.contains("hello" --> t("hello") <+> n("world")))
 		XCTAssertTrue(grammar.productions.contains("hello" --> t("foo") <+> t("bar") <+> t("baz")))
@@ -45,7 +45,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= "'" | '"'
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		XCTAssertEqual(grammar.description, grammarString)
 		XCTAssertTrue(grammar.productions.contains("s" --> t("'")))
 		XCTAssertTrue(grammar.productions.contains("s" --> t("\"")))
@@ -55,7 +55,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= "\\u{0020}"
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes(" "))
@@ -64,20 +64,20 @@ class BNFTests: XCTestCase {
 		XCTAssertFalse(parser.recognizes("  "))
 		
 		// Disallow empty unicode scalars
-		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= '\\u{}'", start: "s"))
+		XCTAssertThrowsError(try Grammar(bnf: "<s> ::= '\\u{}'", start: "s"))
 		
 		// Disallow too long unicode scalars
-		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= '\\u{000000001}'", start: "s"))
+		XCTAssertThrowsError(try Grammar(bnf: "<s> ::= '\\u{000000001}'", start: "s"))
 		
 		// Disallow invalid unicode scalars
-		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= '\\u{d800}'", start: "s"))
+		XCTAssertThrowsError(try Grammar(bnf: "<s> ::= '\\u{d800}'", start: "s"))
 	}
 	
 	func testEscaped() throws {
 		let grammarString = """
 		<s> ::= "\\r" "\\n" | "\\r" | "\\n" | "\\t" | "\\\\" | "\\\"" | '\\''
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("\r\n"))
@@ -99,47 +99,47 @@ class BNFTests: XCTestCase {
 	}
 	
 	func testEmpty() {
-		XCTAssertNoThrow(try Grammar(bnfString: "", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "\n", start: "s"))
-		XCTAssertEqual((try? Grammar(bnfString: "", start: "s"))?.productions.count, 0)
+		XCTAssertNoThrow(try Grammar(bnf: "", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "\n", start: "s"))
+		XCTAssertEqual((try? Grammar(bnf: "", start: "s"))?.productions.count, 0)
 	}
 	
 	func testComments() throws {
 		// Positioning
-		XCTAssertNoThrow(try Grammar(bnfString: "<s> ::= 'x' (* hello world *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "<s> ::= (* hello world *) 'x'", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "<s> (* hello world *) ::= 'x'", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(* hello world *) <s> ::= 'x'", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "<s> ::= 'x' (* hello world *) 'y'", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "<s> ::= 'x' \n (* hello world *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "<s> ::= 'x' (* hello world *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "<s> ::= (* hello world *) 'x'", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "<s> (* hello world *) ::= 'x'", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(* hello world *) <s> ::= 'x'", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "<s> ::= 'x' (* hello world *) 'y'", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "<s> ::= 'x' \n (* hello world *)", start: "s"))
 
 		// Empty comments
-		XCTAssertNoThrow(try Grammar(bnfString: "<s> ::= 'x' (**)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "<s> ::= 'x' (**)", start: "s"))
 		
 		// Nested comments
-		XCTAssertNoThrow(try Grammar(bnfString: "(* (* hello *) world *) <s> ::= 'x'", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(* (* hello (**) *) world *) <s> ::= 'x'", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(* * *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(* ( *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(* ) *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(***)", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(****)", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(*****)", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(* (( *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(* ((( *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(* () *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(* (a) *)", start: "s"))
-		XCTAssertNoThrow(try Grammar(bnfString: "(* (ab) *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(* (* hello *) world *) <s> ::= 'x'", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(* (* hello (**) *) world *) <s> ::= 'x'", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(* * *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(* ( *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(* ) *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(***)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(****)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(*****)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(* (( *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(* ((( *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(* () *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(* (a) *)", start: "s"))
+		XCTAssertNoThrow(try Grammar(bnf: "(* (ab) *)", start: "s"))
 		
 		// Rules
-		XCTAssertEqual((try? Grammar(bnfString: "(* *)", start: "s"))?.productions.count, 0)
+		XCTAssertEqual((try? Grammar(bnf: "(* *)", start: "s"))?.productions.count, 0)
 		
 		// Invalid comments
-		XCTAssertThrowsError(try Grammar(bnfString: "(* hello", start: "s"))
-		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= 'x' *)", start: "s"))
-		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= 'x' (* (* *)", start: "s"))
-		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= (* (* *) 'x'", start: "s"))
-		XCTAssertThrowsError(try Grammar(bnfString: "<s> ::= 'x' (* *) *)", start: "s"))
+		XCTAssertThrowsError(try Grammar(bnf: "(* hello", start: "s"))
+		XCTAssertThrowsError(try Grammar(bnf: "<s> ::= 'x' *)", start: "s"))
+		XCTAssertThrowsError(try Grammar(bnf: "<s> ::= 'x' (* (* *)", start: "s"))
+		XCTAssertThrowsError(try Grammar(bnf: "<s> ::= (* (* *) 'x'", start: "s"))
+		XCTAssertThrowsError(try Grammar(bnf: "<s> ::= 'x' (* *) *)", start: "s"))
 	}
 	
 	func testCharacterRangeParsing() throws {
@@ -160,11 +160,11 @@ class BNFTests: XCTestCase {
 		]
 		
 		for validExample in validExamples {
-			XCTAssertNoThrow(try Grammar(bnfString: validExample, start: "s"))
+			XCTAssertNoThrow(try Grammar(bnf: validExample, start: "s"))
 		}
 		
 		for invalidExample in invalidExamples {
-			XCTAssertThrowsError(try Grammar(bnfString: invalidExample, start: "s"))
+			XCTAssertThrowsError(try Grammar(bnf: invalidExample, start: "s"))
 		}
 	}
 	
@@ -172,7 +172,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= 'a' ... 'z'
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		for c in ["a", "b", "x", "y", "z"] {
@@ -199,10 +199,10 @@ class BNFTests: XCTestCase {
 		]
 		
 		for grammarString in samples {
-			let referenceGrammar = try Grammar(bnfString: grammarString, start: "s")
+			let referenceGrammar = try Grammar(bnf: grammarString, start: "s")
 			
 			let encodedString = referenceGrammar.description
-			let decodedGrammar = try Grammar(bnfString: encodedString, start: "s")
+			let decodedGrammar = try Grammar(bnf: encodedString, start: "s")
 			
 			XCTAssertEqual(referenceGrammar, decodedGrammar)
 		}
@@ -231,11 +231,11 @@ class BNFTests: XCTestCase {
 		]
 		
 		for validExample in validExamples {
-			XCTAssertNoThrow(try Grammar(bnfString: validExample, start: "s"))
+			XCTAssertNoThrow(try Grammar(bnf: validExample, start: "s"))
 		}
 		
 		for invalidExample in invalidExamples {
-			XCTAssertThrowsError(try Grammar(bnfString: invalidExample, start: "s"))
+			XCTAssertThrowsError(try Grammar(bnf: invalidExample, start: "s"))
 		}
 	}
 	
@@ -243,7 +243,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= ('a' | 'b') 'c'
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("ac"))
@@ -265,7 +265,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= 'a' ('b' | 'c') ('d' | 'e') 'f'
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("abdf"))
@@ -283,7 +283,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= 'd' ('a' 'b' | 'c')
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("dab"))
@@ -299,7 +299,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= (('a' | 'b') ('c' | 'd')) (('a' | 'b') ('c' | 'd'))
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("acac"))
@@ -335,11 +335,11 @@ class BNFTests: XCTestCase {
 			]
 		
 		for validExample in validExamples {
-			XCTAssertNoThrow(try Grammar(bnfString: validExample, start: "s"))
+			XCTAssertNoThrow(try Grammar(bnf: validExample, start: "s"))
 		}
 		
 		for invalidExample in invalidExamples {
-			XCTAssertThrowsError(try Grammar(bnfString: invalidExample, start: "s"))
+			XCTAssertThrowsError(try Grammar(bnf: invalidExample, start: "s"))
 		}
 	}
 	
@@ -347,7 +347,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= {'a'}
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("a"))
@@ -364,7 +364,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= {'a' 'b'}
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("ab"))
@@ -382,7 +382,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= {'a' | 'b'}
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("a"))
@@ -401,7 +401,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= {'a' {'b' | 'c'} 'd' | 'e'}
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("abd"))
@@ -424,7 +424,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= {'a'} {'b'}
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("ab"))
@@ -459,11 +459,11 @@ class BNFTests: XCTestCase {
 			]
 		
 		for validExample in validExamples {
-			XCTAssertNoThrow(try Grammar(bnfString: validExample, start: "s"))
+			XCTAssertNoThrow(try Grammar(bnf: validExample, start: "s"))
 		}
 		
 		for invalidExample in invalidExamples {
-			XCTAssertThrowsError(try Grammar(bnfString: invalidExample, start: "s"))
+			XCTAssertThrowsError(try Grammar(bnf: invalidExample, start: "s"))
 		}
 	}
 	
@@ -471,7 +471,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= 'a' ['b'] 'c'
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("abc"))
@@ -488,7 +488,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= 'a' [{'b'}] 'c'
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("ac"))
@@ -505,7 +505,7 @@ class BNFTests: XCTestCase {
 		let grammarString = """
 		<s> ::= ['a' | 'b'] ['c' 'd'] ['e' ['f'] 'g']
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "s")
+		let grammar = try Grammar(bnf: grammarString, start: "s")
 		let parser = EarleyParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes(""))

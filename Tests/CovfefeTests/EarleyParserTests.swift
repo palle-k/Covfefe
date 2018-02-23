@@ -36,7 +36,7 @@ class EarleyParserTests: XCTestCase {
 		<number> ::= <digit> <number> | <digit>
 		<digit> ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "sum")
+		let grammar = try Grammar(bnf: grammarString, start: "sum")
 		let parser = EarleyParser(grammar: grammar)
 		let expression = "1+(2*3-4)"
 		_ = try parser.syntaxTree(for: (expression)).mapLeafs{String(expression[$0])}
@@ -55,7 +55,7 @@ class EarleyParserTests: XCTestCase {
 		<variable>         ::= <letter> | <letter> <variable>
 		<letter>           ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "expression")
+		let grammar = try Grammar(bnf: grammarString, start: "expression")
 		let parser = EarleyParser(grammar: grammar)
 		let expression = "(a+b)*(-c)"
 		_ = try parser.syntaxTree(for: (expression)).mapLeafs{String(expression[$0])}
@@ -72,7 +72,7 @@ class EarleyParserTests: XCTestCase {
 		<optional-whitespace> ::= <optional-whitespace> <whitespace> | ''
 		<whitespace> ::= ' ' | '	'
 		"""
-		let grammar = try Grammar(bnfString: grammarString, start: "start")
+		let grammar = try Grammar(bnf: grammarString, start: "start")
 		let parser = EarleyParser(grammar: grammar)
 		
 		let expression = """
@@ -113,7 +113,7 @@ class EarleyParserTests: XCTestCase {
 		<optional-whitespace> ::= <optional-whitespace> <whitespace> | ''
 		"""
 
-		let grammar = try Grammar(bnfString: grammarString, start: "any")
+		let grammar = try Grammar(bnf: grammarString, start: "any")
 		let parser = EarleyParser(grammar: grammar)
 		let expression = """
 		{

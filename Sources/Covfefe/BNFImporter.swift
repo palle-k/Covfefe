@@ -135,7 +135,7 @@ public extension Grammar {
 	/// - Parameters:
 	///   - bnfString: String describing the grammar in BNF
 	///   - start: Start non-terminal
-	public init(bnfString: String, start: String) throws {
+	public init(bnf bnfString: String, start: String) throws {
 		let grammar = bnfGrammar
 		let tokenizer = DefaultTokenizer(grammar: grammar)
 		let parser = EarleyParser(grammar: grammar)
