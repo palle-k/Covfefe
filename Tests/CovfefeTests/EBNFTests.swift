@@ -514,7 +514,7 @@ class EBNFTests: XCTestCase {
 	func testMultiplicityGrammar() throws {
 		let validExamples = [
 			"s = 3 * x;",
-			"s = 1337 * x;",
+			"s = 42 * x;",
 			"s = 0 * x;",
 			"s = 0 * 'x';",
 			"s = 0 *x;",
@@ -530,6 +530,7 @@ class EBNFTests: XCTestCase {
 			"s = -1 * x;",
 			"s = 3, * y;",
 			"s = y * 3;",
+			"s = 3.14 * y;",
 		]
 		
 		for validExample in validExamples {
@@ -540,5 +541,39 @@ class EBNFTests: XCTestCase {
 		for invalidExample in invalidExamples {
 			XCTAssertThrowsError(try Grammar(ebnf: invalidExample, start: "s"))
 		}
+	}
+	
+	func testMultiplicity() throws {
+		let grammarString = """
+		s = 4 * ('a' | 'b');
+		"""
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
+		let parser = EarleyParser(grammar: grammar)
+		
+		XCTAssertTrue(parser.recognizes("aaaa"))
+		XCTAssertTrue(parser.recognizes("bbbb"))
+		XCTAssertTrue(parser.recognizes("abaa"))
+		XCTAssertTrue(parser.recognizes("baab"))
+		
+		XCTAssertFalse(parser.recognizes(""))
+		XCTAssertFalse(parser.recognizes("aaa"))
+		XCTAssertFalse(parser.recognizes("bbb"))
+		XCTAssertFalse(parser.recognizes("acaa"))
+		XCTAssertFalse(parser.recognizes("aaaab"))
+	}
+	
+	func testMultiplicity2() throws {
+		let grammarString = """
+		s = 3 * 2 * 'a';
+		"""
+		let grammar = try Grammar(ebnf: grammarString, start: "s")
+		let parser = EarleyParser(grammar: grammar)
+		
+		XCTAssertTrue(parser.recognizes("aaaaaa"))
+		
+		XCTAssertFalse(parser.recognizes(""))
+		XCTAssertFalse(parser.recognizes("aaaaa"))
+		XCTAssertFalse(parser.recognizes("aaaaaaa"))
+		XCTAssertFalse(parser.recognizes("abaaaa"))
 	}
 }

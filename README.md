@@ -76,7 +76,7 @@ let grammarString = """
 <variable>         ::= {<letter>}
 <letter>           ::= 'A' ... 'Z' | 'a' ... 'z'
 """
-let grammar = try Grammar(bnfString: grammarString, start: "expression")
+let grammar = try Grammar(bnf: grammarString, start: "expression")
 ```
 
 This grammar describes simple mathematical expressions consisting of unary and binary operations and parentheses.
