@@ -510,4 +510,35 @@ class EBNFTests: XCTestCase {
 		XCTAssertFalse(parser.recognizes("bcde"))
 		XCTAssertFalse(parser.recognizes("bcdfg"))
 	}
+	
+	func testMultiplicityGrammar() throws {
+		let validExamples = [
+			"s = 3 * x;",
+			"s = 1337 * x;",
+			"s = 0 * x;",
+			"s = 0 * 'x';",
+			"s = 0 *x;",
+			"s = 0* x;",
+			"s = 0*x;",
+			"s = 0 * (x | y);",
+			"s = 0 * (x, y);",
+		]
+		
+		let invalidExamples = [
+			"s = 3 * ;",
+			"s = * x;",
+			"s = -1 * x;",
+			"s = 3, * y;",
+			"s = y * 3;",
+		]
+		
+		for validExample in validExamples {
+			print(validExample)
+			XCTAssertNoThrow(try Grammar(ebnf: validExample, start: "s"))
+		}
+		
+		for invalidExample in invalidExamples {
+			XCTAssertThrowsError(try Grammar(ebnf: invalidExample, start: "s"))
+		}
+	}
 }

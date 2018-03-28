@@ -52,10 +52,13 @@ var ebnfGrammar: Grammar {
 	let expression = "expression" --> n("concatenation") <|> n("alternation")
 	let alternation = "alternation" --> n("expression") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("concatenation")
 	let concatenation = "concatenation" --> n("expression-element") <|> n("concatenation") <+> n("optional-whitespace") <+> t(",") <+> n("optional-whitespace") <+> n("expression-element")
-	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container") <|> n("expression-group") <|> n("expression-repetition") <|> n("expression-optional")
+	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container") <|> n("expression-group") <|> n("expression-repetition") <|> n("expression-optional") <|> n("expression-multiply")
+	
 	let expressionGroup = "expression-group" --> t("(") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t(")")
 	let expressionRepetition = "expression-repetition" --> t("{") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("}")
 	let expressionOptional = "expression-optional" --> t("[") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("]")
+	let expressionMultiply = "expression-multiply" --> n("number") <+> n("optional-whitespace") <+> t("*") <+> n("optional-whitespace") <+> n("epxression-element")
+	
 	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"") <|> n("range-literal")
 	let string1 = "string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
 	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
@@ -67,10 +70,14 @@ var ebnfGrammar: Grammar {
 	let string1char = try! "string-1-char" --> rt("[^'\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-single-quote")
 	let string2char = try! "string-2-char" --> rt("[^\"\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-double-quote")
 	
+	let digit = try! "digit" --> rt("[0-9]")
+ 	let number = "number" --> n("digit") <|> n("number") <+> n("digit")
+	
 	let stringEscapedChar = "string-escaped-char" --> n("unicode-scalar") <|> n("carriage-return") <|> n("line-feed") <|> n("tab-char") <|> n("backslash")
 	let unicodeScalar = "unicode-scalar" --> t("\\") <+> t("u") <+> t("{") <+>  n("unicode-scalar-digits") <+> t("}")
-	let unicodeScalarDigits = "unicode-scalar-digits" --> [n("digit")] <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]])
-	let digit = try! "digit" --> rt("[0-9a-fA-F]")
+	let unicodeScalarDigits = "unicode-scalar-digits" --> [n("hex-digit")] <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]])
+	let hexDigit = try! "hex-digit" --> rt("[0-9a-fA-F]")
+	
 	let carriageReturn = "carriage-return" --> t("\\") <+> t("r")
 	let lineFeed = "line-feed" --> t("\\") <+> t("n")
 	let tabChar = "tab-char" --> t("\\") <+> t("t")
@@ -101,17 +108,20 @@ var ebnfGrammar: Grammar {
 	productions.append(expressionGroup)
 	productions.append(expressionRepetition)
 	productions.append(expressionOptional)
+	productions.append(expressionMultiply)
 	productions.append(contentsOf: literal)
 	productions.append(contentsOf: string1)
 	productions.append(contentsOf: string2)
 	productions.append(contentsOf: string1char)
 	productions.append(contentsOf: string2char)
+	productions.append(digit)
+	productions.append(contentsOf: number)
 	productions.append(rangeLiteral)
 	productions.append(contentsOf: singleCharLiteral)
 	productions.append(contentsOf: stringEscapedChar)
 	productions.append(unicodeScalar)
 	productions.append(contentsOf: unicodeScalarDigits)
-	productions.append(digit)
+	productions.append(hexDigit)
 	productions.append(carriageReturn)
 	productions.append(lineFeed)
 	productions.append(tabChar)
@@ -315,6 +325,31 @@ public extension Grammar {
 					}
 					let subproduction = Production(pattern: NonTerminal(name: name), production: [n(subruleName)])
 					return ([subproduction], additionalProductions + productions + optionalProductions)
+					
+				case "expression-multiply":
+					guard let group = children[0].children else {
+						fatalError()
+					}
+					let multiplicityExpression = group[0].leafs
+					let multiplicityRange = multiplicityExpression.first!.lowerBound ..< multiplicityExpression.last!.upperBound
+					let multiplicity = Int(ebnfString[multiplicityRange])!
+					
+					let subruleName = "\(name)-m"
+					let (subrules, additionalExpressions) = try makeProductions(from: group[2], named: subruleName)
+					
+					let repeatedSubrules = repeatElement(subrules, count: multiplicity).reduce([]) { (acc, subrules) -> [Production] in
+						if acc.isEmpty {
+							return subrules.map { rule in
+								return Production(pattern: NonTerminal(name: name), production: rule.production)
+							}
+						} else {
+							return crossProduct(acc, subrules).map { arg in
+								let (lhs, rhs) = arg
+								return Production(pattern: NonTerminal(name: name), production: lhs.production + rhs.production)
+							}
+						}
+					}
+					return (repeatedSubrules, additionalExpressions)
 					
 				default:
 					fatalError()
