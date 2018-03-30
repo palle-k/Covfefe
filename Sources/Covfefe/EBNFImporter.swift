@@ -134,13 +134,13 @@ var ebnfGrammar: Grammar {
 
 public extension Grammar {
 	
-	/// Creates a new grammar from a specification in Backus-Naur Form (BNF)
+	/// Creates a new grammar from a specification in Extended Backus-Naur Form (EBNF)
 	///
-	/// 	<pattern1> ::= <alternative1> | <alternative2>
-	///		<pattern2> ::= 'con' 'catenation'
+	/// 	pattern1 = alternative1 | alternative2;
+	///		pattern2 = 'con', 'catenation';
 	///
 	/// - Parameters:
-	///   - bnfString: String describing the grammar in BNF
+	///   - bnfString: String describing the grammar in EBNF
 	///   - start: Start non-terminal
 	public init(ebnf ebnfString: String, start: String) throws {
 		let grammar = ebnfGrammar
