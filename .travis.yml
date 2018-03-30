@@ -4,7 +4,6 @@ language: generic
 sudo: required
 dist: trusty
 osx_image:
-  - xcode9.2
   - xcode9.3beta
 script:
   - swift test -c release -Xswiftc -enable-testing
