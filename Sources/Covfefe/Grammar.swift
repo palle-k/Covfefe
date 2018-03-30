@@ -156,6 +156,19 @@ public struct Grammar {
 
 
 extension Grammar: CustomStringConvertible {
+	
+	/// Returns a Backus-Naur form representation of the grammar.
+	///
+	/// Production rules are encoded in the following form:
+	/// `pattern ::= production-result`, where the pattern is always a single non-terminal and the production-result
+	/// is a list of alternative results separated by `|` (or just one single result). The production result is a concatenation
+	/// of terminal and non-terminal symbols. Terminals are delimited by single or double quotation marks; non-terminals
+	/// are delimited by angle brackets (`<`, `>`). Concatenations consist of one or multiple symbols separated by zero or more
+	/// whitespace characters.
+	///
+	/// Example:
+	///
+	///		<non-terminal-pattern> ::= <produced-non-terminal-pattern> | 'terminal' <concatenated-non-terminal>
 	public var bnf: String {
 		let groupedProductions = Dictionary(grouping: self.productions) { production in
 			production.pattern
@@ -213,6 +226,18 @@ extension Grammar: CustomStringConvertible {
 		}.joined(separator: "\n")
 	}
 	
+	
+	/// Returns a Extended Backus-Naur form representation of the grammar.
+	///
+	/// Production rules are encoded in the following form:
+	/// `pattern = production-result;`, where the pattern is always a single non-terminal and the production-result
+	/// is a list of alternative results separated by `|` (or just one single result). The production result is a concatenation
+	/// of terminal and non-terminal symbols. Terminals are delimited by single or double quotation marks; non-terminals
+	/// are not delimited by a special character. Concatenations consist of one or multiple symbols separated by a comma.
+	///
+	/// Example:
+	///
+	///		non-terminal pattern = produced non-terminal | 'terminal', concatenated non-terminal;
 	public var ebnf: String {
 		let groupedProductions = Dictionary(grouping: self.productions) { production in
 			production.pattern
