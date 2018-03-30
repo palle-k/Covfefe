@@ -133,37 +133,39 @@ The grammar that is recognized is the following:
 <rule> ::= <optional-whitespace> <rule-name-container> <optional-whitespace> <assignment-operator> <optional-whitespace> <expression> <optional-whitespace>
 
 (* Rule names are strings of alphanumeric characters *)
-<rule-name-container> ::= "<" <rule-name> ">"
-<rule-name> ::= <rule-name> <rule-name-char> | ""
+<rule-name-container> ::= "<" {<rule-name-char>} ">"
 <rule-name-char> ::= 'a' ... 'z' | 'A' ... 'Z' | '0' ... '9' | '_' | '-'
 
 <assignment-operator> ::= ":" ":" "="
 
 (* An expression can either be a concatenation or an alternation *)
-<expression> ::= <concatenation> | <alternation>
-
-(* An alternation is a list of concatenations separated by the | character *)
-<alternation> ::= <expression> <optional-whitespace> "|" <optional-whitespace> <concatenation>
+<expression> ::= <concatenation> [{<optional-whitespace> "|" <optional-whitespace> <concatenation>}]
 
 (* A concatenation is a string of terminals and non-terminals *)
-<concatenation> ::= <expression-element> | <concatenation> <optional-whitespace> <expression-element>
+<concatenation> ::= [{<expression-element> <optional-whitespace>}] <expression-element>
 
 (* An atom of a expression can either be a terminal literal, a non-terminal or a group *)
 <expression-element> ::= <literal> | <rule-name-container> | <expression-group> | <expression-repetition> | <expression-optional>
 
-<literal> ::= "'" <string-1> "'" | '"' <string-2> '"' | <range-literal>
-<range-literal> ::= <single-char-literal> <optional-whitespace> "." "." "." <optional-whitespace> <single-char-literal>
-
+(* Expression containers *)
 <expression-group> ::= "(" <optional-whitespace> <expression> <optional-whitespace> ")"
 <expression-repetition> ::= "{" <optional-whitespace> <expression> <optional-whitespace> "}"
 <expression-optional> ::= "[" <optional-whitespace> <expression> <optional-whitespace> "]"
 
-<string-1> ::= <string-1> <string-1-char> | ""
-<string-1-char> ::= "[^'\\\\\r\n]" | <string-escaped-char> | <escaped-single-quote>
-<string-2> ::= <string-2> <string-2-char> | ""
-<string-2-char> ::= '[^"\\\\\r\n]' | <string-escaped-char> | <escaped-double-quote>
+(* Terminal literals *)
+<literal> ::= "'" <string-1> "'" | '"' <string-2> '"' | <range-literal>
+<range-literal> ::= <single-char-literal> <optional-whitespace> "." "." "." <optional-whitespace> <single-char-literal>
+
+(* Strings and characters *)
+<string-1> ::= [{<string-1-char>}]
+<string-1-char> ::= <any-char> | '"' | <string-escaped-char> | <escaped-single-quote>
+<string-2> ::= [{<string-2-char>}]
+<string-2-char> ::= <any-char> | "'" | <string-escaped-char> | <escaped-double-quote>
 <single-char-literal> ::= "'" <string-1-char> "'" | '"' <string-2-char> '"'
 
+<any-char> ::= '!' | '#' ... '&' | '(' ... '[' | ']' ... '~' | ' ' | '\t'
+
+(* Escape sequences *)
 <string-escaped-char> ::= <unicode-scalar> | <carriage-return> | <line-feed> | <tab-char> | <backslash>
 
 <backslash> ::= "\\" "\\"
@@ -178,11 +180,13 @@ The grammar that is recognized is the following:
 <unicode-scalar-digits> ::= <digit> [<digit>] [<digit>] [<digit>] [<digit>] [<digit>] [<digit>] [<digit>]
 <digit> ::= '0' ... '9' | 'A' ... 'F' | 'a' ... 'f'
 
-<newlines> ::= "\n" | "\n" <optional-whitespace> <newlines>
+(* Whitespace *)
+<newlines> ::= {"\n" <optional-whitespace>}
 
-<optional-whitespace> ::= "" | <whitespace> <optional-whitespace>
+<optional-whitespace> ::= [{<whitespace>}]
 <whitespace> ::= " " | "\t" | "\n" | <comment>
-<comment> ::= "(" "*" <comment-content> "*" ")"
-<comment-content> ::= <comment-content> <comment-content-char> | ""
-<comment-content-char> ::= "[^*(]" | "*" "[^)]" | "(" "[^*]" | <comment>
+
+(* Comments *)
+<comment> ::= "(" "*" ({<comment-content-char>} | '*') "*" ")"
+<comment-content-char> ::= '!' ... "'" | '+' ... '~' | ')' | " " | "\t" | "\n" | '"' | "'" | {'('} ('!' ... ')' | '+' ... '~' | " " | "\t" | "\n") | {'*'} ('!' ... '(' | '+' ... '~') | <comment>
 ```

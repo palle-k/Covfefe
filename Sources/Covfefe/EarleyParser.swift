@@ -436,7 +436,7 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			
 			// Find the tokens which match the string
 			let (newItems, tokens): ([[ParseStateItem]], [(terminal: Terminal, range: Range<String.Index>)]) =
-				expectedTerminals.compactMap { (terminal, items) -> (items: [ParseStateItem], token: (terminal: Terminal, range: Range<String.Index>))? in
+				expectedTerminals.compactMap { (terminal, items) -> ([ParseStateItem], (terminal: Terminal, range: Range<String.Index>))? in
 					guard let range = string.rangeOfPrefix(terminal, from: currentIndex), range.lowerBound == currentIndex else {
 						return nil
 					}

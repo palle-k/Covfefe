@@ -46,7 +46,7 @@ class PerformanceTests: XCTestCase {
 		
 		<optional-whitespace> ::= <optional-whitespace> <whitespace> | ''
 		"""
-		return try! Grammar(bnfString: grammarString, start: "any")
+		return try! Grammar(bnf: grammarString, start: "any")
 	}()
 	
 	func testEarleyPerformance() {

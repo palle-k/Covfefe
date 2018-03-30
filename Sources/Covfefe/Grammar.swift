@@ -156,13 +156,26 @@ public struct Grammar {
 
 
 extension Grammar: CustomStringConvertible {
-	public var description: String {
+	
+	/// Returns a Backus-Naur form representation of the grammar.
+	///
+	/// Production rules are encoded in the following form:
+	/// `pattern ::= production-result`, where the pattern is always a single non-terminal and the production-result
+	/// is a list of alternative results separated by `|` (or just one single result). The production result is a concatenation
+	/// of terminal and non-terminal symbols. Terminals are delimited by single or double quotation marks; non-terminals
+	/// are delimited by angle brackets (`<`, `>`). Concatenations consist of one or multiple symbols separated by zero or more
+	/// whitespace characters.
+	///
+	/// Example:
+	///
+	///		<non-terminal-pattern> ::= <produced-non-terminal-pattern> | 'terminal' <concatenated-non-terminal>
+	public var bnf: String {
 		let groupedProductions = Dictionary(grouping: self.productions) { production in
 			production.pattern
 		}
 		return groupedProductions.sorted(by: {$0.key.name < $1.key.name}).map { entry -> String in
 			let (pattern, productions) = entry
-
+			
 			let productionString = productions.map { production in
 				if production.production.isEmpty {
 					return "\"\""
@@ -171,14 +184,6 @@ extension Grammar: CustomStringConvertible {
 					switch symbol {
 					case .nonTerminal(let nonTerminal):
 						return "<\(nonTerminal.name)>"
-
-//					case .terminal(let terminal) where terminal.value.contains("\""):
-//						let escapedValue = terminal.value.singleQuoteLiteralEscaped
-//						return "'\(escapedValue)'"
-//
-//					case .terminal(let terminal):
-//						let escapedValue = terminal.value.doubleQuoteLiteralEscaped
-//						return "\"\(escapedValue)\""
 						
 					case .terminal(.string(let string, _)) where string.contains("\""):
 						let escapedValue = string.singleQuoteLiteralEscaped
@@ -216,10 +221,84 @@ extension Grammar: CustomStringConvertible {
 					}
 				}.joined(separator: " ")
 			}.joined(separator: " | ")
-
+			
 			return "<\(pattern.name)> ::= \(productionString)"
 		}.joined(separator: "\n")
 	}
+	
+	
+	/// Returns a Extended Backus-Naur form representation of the grammar.
+	///
+	/// Production rules are encoded in the following form:
+	/// `pattern = production-result;`, where the pattern is always a single non-terminal and the production-result
+	/// is a list of alternative results separated by `|` (or just one single result). The production result is a concatenation
+	/// of terminal and non-terminal symbols. Terminals are delimited by single or double quotation marks; non-terminals
+	/// are not delimited by a special character. Concatenations consist of one or multiple symbols separated by a comma.
+	///
+	/// Example:
+	///
+	///		non-terminal pattern = produced non-terminal | 'terminal', concatenated non-terminal;
+	public var ebnf: String {
+		let groupedProductions = Dictionary(grouping: self.productions) { production in
+			production.pattern
+		}
+		return groupedProductions.sorted(by: {$0.key.name < $1.key.name}).map { entry -> String in
+			let (pattern, productions) = entry
+			
+			let productionString = productions.map { production in
+				if production.production.isEmpty {
+					return "\"\""
+				}
+				return production.production.map { symbol -> String in
+					switch symbol {
+					case .nonTerminal(let nonTerminal):
+						return nonTerminal.name
+						
+					case .terminal(.string(let string, _)) where string.contains("\""):
+						let escapedValue = string.singleQuoteLiteralEscaped
+						return "'\(escapedValue)'"
+						
+					case .terminal(.string(let string, _)):
+						let escapedValue = string.doubleQuoteLiteralEscaped
+						return "\"\(escapedValue)\""
+						
+					case .terminal(.regularExpression(let expression, _)) where expression.pattern.contains("\""):
+						let escapedValue = expression.pattern.singleQuoteLiteralEscaped
+						return "'\(escapedValue)'"
+						
+					case .terminal(.regularExpression(let expression, _)):
+						let escapedValue = expression.pattern.doubleQuoteLiteralEscaped
+						return "\"\(escapedValue)\""
+						
+					case .terminal(.characterRange(let range, _)):
+						let lowerString: String
+						let upperString: String
+						
+						if range.lowerBound == "'" {
+							lowerString = "\"'\""
+						} else {
+							lowerString = "'\(range.lowerBound)'"
+						}
+						
+						if range.upperBound == "'" {
+							upperString = "\"'\""
+						} else {
+							upperString = "'\(range.upperBound)'"
+						}
+						
+						return "\(lowerString) ... \(upperString)"
+					}
+				}.joined(separator: ", ")
+			}.joined(separator: " | ")
+			
+			return "\(pattern.name) = \(productionString);"
+		}.joined(separator: "\n")
+	}
+	
+	public var description: String {
+		return bnf
+	}
+		
 }
 
 public extension Grammar {

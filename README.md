@@ -49,7 +49,7 @@ pod 'Covfefe', '0.3.7'
 end
 ```
 
-Some grammar features are not available when using Swift 4.0 (Grouping, Repetitions, Optional Sequences and Character Ranges)
+Some grammar features are not available when using Swift 4.0 (Grouping, Repetitions, Optional Sequences and Character Ranges, EBNF import)
 
 ### To add this framework manually:
 
@@ -61,7 +61,7 @@ Some grammar features are not available when using Swift 4.0 (Grouping, Repetiti
 
 ## Example
 
-Grammars can be specified in a language that is a superset of BNF, which adopts some features of EBNF (documented [here](/BNF.md)):
+Grammars can be specified in a language that is a superset of BNF, which adopts some features of EBNF (documented [here](/BNF.md)), or in EBNF:
 
 ```swift
 let grammarString = """
@@ -76,7 +76,7 @@ let grammarString = """
 <variable>         ::= {<letter>}
 <letter>           ::= 'A' ... 'Z' | 'a' ... 'z'
 """
-let grammar = try Grammar(bnfString: grammarString, start: "expression")
+let grammar = try Grammar(bnf: grammarString, start: "expression")
 ```
 
 This grammar describes simple mathematical expressions consisting of unary and binary operations and parentheses.

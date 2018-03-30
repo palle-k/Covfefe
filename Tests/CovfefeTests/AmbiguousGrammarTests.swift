@@ -36,7 +36,7 @@ class AmbiguousGrammarTests: XCTestCase {
     let testCases: [(grammar: Grammar, tests: [(input: String, treeCount: Int)])] = [
         (
             grammar: try! Grammar(
-                bnfString: """
+                bnf: """
                 <expression> ::= <expression> '+' <expression> | 'a'
                 """,
                 start: "expression"

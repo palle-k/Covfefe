@@ -1,5 +1,5 @@
 //
-//  BNFImporter.swift
+//  EBNFImporter.swift
 //  Covfefe
 //
 //  Created by Palle Klewitz on 14.08.17.
@@ -26,10 +26,10 @@
 import Foundation
 
 /// A grammar describing the Backus-Naur form
-var bnfGrammar: Grammar {
+var ebnfGrammar: Grammar {
 	
 	let syntax = "syntax" --> n("optional-whitespace") <|> n("newlines") <|> n("rule") <|> n("rule") <+> n("newlines") <|> n("syntax") <+> n("newlines") <+> n("rule") <+> (n("newlines") <|> [[]])
-	let rule = "rule" --> n("optional-whitespace") <+> n("rule-name-container") <+> n("optional-whitespace") <+> n("assignment-operator") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace")
+	let rule = "rule" --> n("optional-whitespace") <+> n("rule-name-container") <+> n("optional-whitespace") <+> n("assignment-operator") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t(";") <+> n("optional-whitespace")
 	
 	let optionalWhitespace = "optional-whitespace" --> [[]] <|> n("whitespace") <+> [n("optional-whitespace")]
 	let whitespace = "whitespace" --> SymbolSet.whitespace <|> n("comment")
@@ -42,19 +42,23 @@ var bnfGrammar: Grammar {
 	let commentAsterisk = "comment-asterisk" --> n("comment-asterisk") <+> t("*") <|> t("*")
 	let commentOpenParenthesis = "comment-open-parenthesis" --> n("comment-open-parenthesis") <+> t("(") <|> t("(")
 	
-	let assignmentOperator = "assignment-operator" --> t(":") <+> t(":") <+> t("=")
+	let assignmentOperator = "assignment-operator" --> t("=")
 	
-	let ruleNameContainer = "rule-name-container" --> t("<") <+> n("rule-name") <+> t(">")
+	let ruleNameContainer = "rule-name-container" --> n("delimiting-rule-name-char") <+> n("rule-name") <+> n("delimiting-rule-name-char") <|> n("delimiting-rule-name-char")
 	let ruleName = "rule-name" --> n("rule-name") <+> n("rule-name-char") <|> [[]]
-	let ruleNameChar = try! "rule-name-char" --> rt("[a-zA-Z0-9-_]")
+	let ruleNameChar = "rule-name-char" --> n("delimiting-rule-name-char") <|> n("whitespace")
+	let delimitingRuleNameChar = try! "delimiting-rule-name-char" --> rt("[a-zA-Z0-9-_]")
 	
 	let expression = "expression" --> n("concatenation") <|> n("alternation")
 	let alternation = "alternation" --> n("expression") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("concatenation")
-	let concatenation = "concatenation" --> n("expression-element") <|> n("concatenation") <+> n("optional-whitespace") <+> n("expression-element")
-	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container") <|> n("expression-group") <|> n("expression-repetition") <|> n("expression-optional")
+	let concatenation = "concatenation" --> n("expression-element") <|> n("concatenation") <+> n("optional-whitespace") <+> t(",") <+> n("optional-whitespace") <+> n("expression-element")
+	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container") <|> n("expression-group") <|> n("expression-repetition") <|> n("expression-optional") <|> n("expression-multiply")
+	
 	let expressionGroup = "expression-group" --> t("(") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t(")")
 	let expressionRepetition = "expression-repetition" --> t("{") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("}")
 	let expressionOptional = "expression-optional" --> t("[") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("]")
+	let expressionMultiply = "expression-multiply" --> n("number") <+> n("optional-whitespace") <+> t("*") <+> n("optional-whitespace") <+> n("expression-element")
+	
 	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"") <|> n("range-literal")
 	let string1 = "string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
 	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
@@ -66,10 +70,14 @@ var bnfGrammar: Grammar {
 	let string1char = try! "string-1-char" --> rt("[^'\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-single-quote")
 	let string2char = try! "string-2-char" --> rt("[^\"\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-double-quote")
 	
+	let digit = try! "digit" --> rt("[0-9]")
+ 	let number = "number" --> n("digit") <|> n("number") <+> n("digit")
+	
 	let stringEscapedChar = "string-escaped-char" --> n("unicode-scalar") <|> n("carriage-return") <|> n("line-feed") <|> n("tab-char") <|> n("backslash")
 	let unicodeScalar = "unicode-scalar" --> t("\\") <+> t("u") <+> t("{") <+>  n("unicode-scalar-digits") <+> t("}")
-	let unicodeScalarDigits = "unicode-scalar-digits" --> [n("digit")] <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]]) <+> (n("digit") <|> [[]])
-	let digit = try! "digit" --> rt("[0-9a-fA-F]")
+	let unicodeScalarDigits = "unicode-scalar-digits" --> [n("hex-digit")] <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]])
+	let hexDigit = try! "hex-digit" --> rt("[0-9a-fA-F]")
+	
 	let carriageReturn = "carriage-return" --> t("\\") <+> t("r")
 	let lineFeed = "line-feed" --> t("\\") <+> t("n")
 	let tabChar = "tab-char" --> t("\\") <+> t("t")
@@ -89,9 +97,10 @@ var bnfGrammar: Grammar {
 	productions.append(contentsOf: commentOpenParenthesis)
 	productions.append(contentsOf: newlines)
 	productions.append(assignmentOperator)
-	productions.append(ruleNameContainer)
+	productions.append(contentsOf: ruleNameContainer)
 	productions.append(contentsOf: ruleName)
-	productions.append(ruleNameChar)
+	productions.append(contentsOf: ruleNameChar)
+	productions.append(delimitingRuleNameChar)
 	productions.append(contentsOf: expression)
 	productions.append(alternation)
 	productions.append(contentsOf: concatenation)
@@ -99,17 +108,20 @@ var bnfGrammar: Grammar {
 	productions.append(expressionGroup)
 	productions.append(expressionRepetition)
 	productions.append(expressionOptional)
+	productions.append(expressionMultiply)
 	productions.append(contentsOf: literal)
 	productions.append(contentsOf: string1)
 	productions.append(contentsOf: string2)
 	productions.append(contentsOf: string1char)
 	productions.append(contentsOf: string2char)
+	productions.append(digit)
+	productions.append(contentsOf: number)
 	productions.append(rangeLiteral)
 	productions.append(contentsOf: singleCharLiteral)
 	productions.append(contentsOf: stringEscapedChar)
 	productions.append(unicodeScalar)
 	productions.append(contentsOf: unicodeScalarDigits)
-	productions.append(digit)
+	productions.append(hexDigit)
 	productions.append(carriageReturn)
 	productions.append(lineFeed)
 	productions.append(tabChar)
@@ -120,40 +132,21 @@ var bnfGrammar: Grammar {
 	return Grammar(productions: productions, start: "syntax")
 }
 
-enum LiteralParsingError: Error {
-	case invalidUnicodeScalar(Int)
-	case invalidRange(lowerBound: Character, upperBound: Character, description: String)
-}
-
 public extension Grammar {
 	
-	/// Creates a new grammar from a specification in Backus-Naur Form (BNF)
+	/// Creates a new grammar from a specification in Extended Backus-Naur Form (EBNF)
 	///
-	/// 	<pattern1> ::= <alternative1> | <alternative2>
-	///		<pattern2> ::= 'con' 'catenation'
-	///
-	/// - Parameters:
-	///   - bnfString: String describing the grammar in BNF
-	///   - start: Start non-terminal
-	@available(*, deprecated: 1.0, renamed: "init(bnf:start:)")
-	public init(bnfString: String, start: String) throws {
-		try self.init(bnf: bnfString, start: start)
-	}
-	
-	/// Creates a new grammar from a specification in Backus-Naur Form (BNF)
-	///
-	/// 	<pattern1> ::= <alternative1> | <alternative2>
-	///		<pattern2> ::= 'con' 'catenation'
+	/// 	pattern1 = alternative1 | alternative2;
+	///		pattern2 = 'con', 'catenation';
 	///
 	/// - Parameters:
-	///   - bnf: String describing the grammar in BNF
+	///   - bnfString: String describing the grammar in EBNF
 	///   - start: Start non-terminal
-	public init(bnf bnfString: String, start: String) throws {
-		let grammar = bnfGrammar
-		let tokenizer = DefaultTokenizer(grammar: grammar)
+	public init(ebnf ebnfString: String, start: String) throws {
+		let grammar = ebnfGrammar
 		let parser = EarleyParser(grammar: grammar)
 		let syntaxTree = try parser
-			.syntaxTree(for: bnfString)
+			.syntaxTree(for: ebnfString)
 			.explode{["expression"].contains($0)}
 			.first!
 			.filter{!["optional-whitespace", "newlines"].contains($0)}!
@@ -161,11 +154,9 @@ public extension Grammar {
 		let ruleDeclarations = syntaxTree.allNodes(where: {$0.name == "rule"})
 		
 		func ruleName(from container: SyntaxTree<NonTerminal, Range<String.Index>>) -> String {
-			return container
-				.allNodes(where: {$0.name == "rule-name-char"})
-				.flatMap{$0.leafs}
+			return container.leafs
 				.reduce("") { partialResult, range -> String in
-					partialResult.appending(bnfString[range])
+					partialResult.appending(ebnfString[range])
 			}
 		}
 		
@@ -175,7 +166,7 @@ public extension Grammar {
 			}
 			switch child {
 			case .leaf(let range):
-				return bnfString[range.lowerBound]
+				return ebnfString[range.lowerBound]
 				
 			case .node(key: "string-escaped-char", children: let children):
 				guard let child = children.first else {
@@ -186,14 +177,14 @@ public extension Grammar {
 					fatalError()
 					
 				case .node(key: "unicode-scalar", children: let children):
-					let hexString: String = children.dropFirst(3).dropLast().flatMap {$0.leafs}.map {bnfString[$0]}.joined()
+					let hexString: String = children.dropFirst(3).dropLast().flatMap {$0.leafs}.map {ebnfString[$0]}.joined()
 					// Grammar guarantees that hexString is always a valid hex integer literal
 					let charValue = Int(hexString, radix: 16)!
 					guard let scalar = UnicodeScalar(charValue) else {
 						throw LiteralParsingError.invalidUnicodeScalar(charValue)
 					}
 					return Character(scalar)
-				
+					
 				case .node(key: "carriage-return", children: _):
 					return "\r"
 					
@@ -272,9 +263,9 @@ public extension Grammar {
 				return ((lhs + rhs).map {Production(pattern: NonTerminal(name: name), production: $0.production)}, lhsAdd + rhsAdd)
 				
 			case "concatenation":
-				if children.count == 2 {
+				if children.count == 3 {
 					let (lhsProductions, lhsAdd) = try makeProductions(from: children[0], named: "\(name)-c0")
-					let (rhsProductions, rhsAdd) = try makeProductions(from: children[1], named: "\(name)-c1")
+					let (rhsProductions, rhsAdd) = try makeProductions(from: children[2], named: "\(name)-c1")
 					
 					return (crossProduct(lhsProductions, rhsProductions).map { arg -> Production in
 						let (lhs, rhs) = arg
@@ -335,6 +326,31 @@ public extension Grammar {
 					let subproduction = Production(pattern: NonTerminal(name: name), production: [n(subruleName)])
 					return ([subproduction], additionalProductions + productions + optionalProductions)
 					
+				case "expression-multiply":
+					guard let group = children[0].children else {
+						fatalError()
+					}
+					let multiplicityExpression = group[0].leafs
+					let multiplicityRange = multiplicityExpression.first!.lowerBound ..< multiplicityExpression.last!.upperBound
+					let multiplicity = Int(ebnfString[multiplicityRange])!
+					
+					let subruleName = "\(name)-m"
+					let (subrules, additionalExpressions) = try makeProductions(from: group[2], named: subruleName)
+					
+					let repeatedSubrules = repeatElement(subrules, count: multiplicity).reduce([]) { (acc, subrules) -> [Production] in
+						if acc.isEmpty {
+							return subrules.map { rule in
+								return Production(pattern: NonTerminal(name: name), production: rule.production)
+							}
+						} else {
+							return crossProduct(acc, subrules).map { arg in
+								let (lhs, rhs) = arg
+								return Production(pattern: NonTerminal(name: name), production: lhs.production + rhs.production)
+							}
+						}
+					}
+					return (repeatedSubrules, additionalExpressions)
+					
 				default:
 					fatalError()
 				}
@@ -345,7 +361,7 @@ public extension Grammar {
 		}
 		
 		let productions = try ruleDeclarations.flatMap { ruleDeclaration -> [Production] in
-			guard let children = ruleDeclaration.children, children.count == 3 else {
+			guard let children = ruleDeclaration.children, children.count == 4 else {
 				return []
 			}
 			let name = ruleName(from: children[0])

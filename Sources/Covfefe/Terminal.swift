@@ -166,17 +166,17 @@ extension ClosedRange: Codable where Bound == Character {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 		let lower = try container.decode(String.self, forKey: .lowerBound)
 		let upper = try container.decode(String.self, forKey: .upperBound)
-		
+
 		guard lower.count == 1 else {
 			throw DecodingError.dataCorruptedError(forKey: .lowerBound, in: container, debugDescription: "lowerBound must be string of length 1")
 		}
 		guard upper.count == 1 else {
 			throw DecodingError.dataCorruptedError(forKey: .upperBound, in: container, debugDescription: "upperBound must be string of length 1")
 		}
-		
+
 		self.init(uncheckedBounds: (lower[lower.startIndex], upper[upper.startIndex]))
 	}
-	
+
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		let lower = String(lowerBound)
@@ -184,7 +184,7 @@ extension ClosedRange: Codable where Bound == Character {
 		try container.encode(lower, forKey: .lowerBound)
 		try container.encode(upper, forKey: .upperBound)
 	}
-	
+
 	private enum CodingKeys: String, CodingKey {
 		case lowerBound
 		case upperBound
