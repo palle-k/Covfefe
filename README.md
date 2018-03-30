@@ -61,22 +61,22 @@ Some grammar features are not available when using Swift 4.0 (Grouping, Repetiti
 
 ## Example
 
-Grammars can be specified in a language that is a superset of BNF, which adopts some features of EBNF (documented [here](/BNF.md)), or in EBNF:
+Grammars can be specified in EBNF or a language that is a superset of BNF, which adopts some features of EBNF (documented [here](/bnf.html)):
 
 ```swift
-let grammarString = """
-<expression>       ::= <binary-operation> | <brackets> | <unary-operation> | <number> | <variable>
-<brackets>         ::= '(' <expression> ')'
-<binary-operation> ::= <expression> <binary-operator> <expression>
-<binary-operator>  ::= '+' | '-' | '*' | '/'
-<unary-operation>  ::= <unary-operator> <expression>
-<unary-operator>   ::= '+' | '-'
-<number>           ::= {<digit>}
-<digit>            ::= '0' ... '9'
-<variable>         ::= {<letter>}
-<letter>           ::= 'A' ... 'Z' | 'a' ... 'z'
-"""
-let grammar = try Grammar(bnf: grammarString, start: "expression")
+let grammarString = """ 
+expression       = binary-operation | brackets | unary-operation | number | variable;
+brackets         = '(', expression, ')';
+binary-operation = expression, binary-operator, expression;
+binary-operator  = '+' | '-' | '*' | '/';
+unary-operation  = unary-operator, expression;
+unary-operator   = '+' | '-';
+number           = {digit};
+digit            = '0' ... '9';
+variable         = {letter};
+letter           = 'A' ... 'Z' | 'a' ... 'z';
+""" 
+let grammar = try Grammar(ebnf: grammarString, start: "expression")
 ```
 
 This grammar describes simple mathematical expressions consisting of unary and binary operations and parentheses.
