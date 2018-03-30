@@ -274,20 +274,20 @@ It uses the <a href="https://en.wikipedia.org/wiki/Earley_parser">Earley</a> or 
 </ol>
 <h2 id='example' class='heading'>Example</h2>
 
-<p>Grammars can be specified in a language that is a superset of BNF, which adopts some features of EBNF (documented <a href="/bnf.html">here</a>), or in EBNF:</p>
-<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">grammarString</span> <span class="o">=</span> <span class="s">"""
-&lt;expression&gt;       ::= &lt;binary-operation&gt; | &lt;brackets&gt; | &lt;unary-operation&gt; | &lt;number&gt; | &lt;variable&gt;
-&lt;brackets&gt;         ::= '(' &lt;expression&gt; ')'
-&lt;binary-operation&gt; ::= &lt;expression&gt; &lt;binary-operator&gt; &lt;expression&gt;
-&lt;binary-operator&gt;  ::= '+' | '-' | '*' | '/'
-&lt;unary-operation&gt;  ::= &lt;unary-operator&gt; &lt;expression&gt;
-&lt;unary-operator&gt;   ::= '+' | '-'
-&lt;number&gt;           ::= {&lt;digit&gt;}
-&lt;digit&gt;            ::= '0' ... '9'
-&lt;variable&gt;         ::= {&lt;letter&gt;}
-&lt;letter&gt;           ::= 'A' ... 'Z' | 'a' ... 'z'
-"""</span>
-<span class="k">let</span> <span class="nv">grammar</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">Grammar</span><span class="p">(</span><span class="nv">bnf</span><span class="p">:</span> <span class="n">grammarString</span><span class="p">,</span> <span class="nv">start</span><span class="p">:</span> <span class="s">"expression"</span><span class="p">)</span>
+<p>Grammars can be specified in EBNF or a language that is a superset of BNF, which adopts some features of EBNF (documented <a href="/bnf.html">here</a>):</p>
+<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">grammarString</span> <span class="o">=</span> <span class="s">""" 
+expression       = binary-operation | brackets | unary-operation | number | variable;
+brackets         = '(', expression, ')';
+binary-operation = expression, binary-operator, expression;
+binary-operator  = '+' | '-' | '*' | '/';
+unary-operation  = unary-operator, expression;
+unary-operator   = '+' | '-';
+number           = {digit};
+digit            = '0' ... '9';
+variable         = {letter};
+letter           = 'A' ... 'Z' | 'a' ... 'z';
+"""</span> 
+<span class="k">let</span> <span class="nv">grammar</span> <span class="o">=</span> <span class="k">try</span> <span class="kt">Grammar</span><span class="p">(</span><span class="nv">ebnf</span><span class="p">:</span> <span class="n">grammarString</span><span class="p">,</span> <span class="nv">start</span><span class="p">:</span> <span class="s">"expression"</span><span class="p">)</span>
 </code></pre>
 
 <p>This grammar describes simple mathematical expressions consisting of unary and binary operations and parentheses.
