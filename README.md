@@ -61,7 +61,7 @@ Some grammar features are not available when using Swift 4.0 (Grouping, Repetiti
 
 ## Example
 
-Grammars can be specified in EBNF or a language that is a superset of BNF, which adopts some features of EBNF (documented [here](/bnf.html)):
+Grammars can be specified in EBNF or a language that is a superset of BNF, which adopts some features of EBNF (documented [here](/BNF.md)):
 
 ```swift
 let grammarString = """ 
