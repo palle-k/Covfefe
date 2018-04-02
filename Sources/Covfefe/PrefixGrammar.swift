@@ -52,7 +52,7 @@ public extension Grammar {
 		return Grammar(
 			productions: allProductions.uniqueElements().collect(Array.init),
 			start: NonTerminal(name: "\(self.start.name)-pre-start"),
-			normalizationNonTerminals: self.normalizationNonTerminals
+			utilityNonTerminals: self.utilityNonTerminals
 		)
 	}
 }

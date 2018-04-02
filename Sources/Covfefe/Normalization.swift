@@ -258,6 +258,6 @@ extension Grammar {
 		let generatedNonTerminals = reachableProductions.flatMap{[$0.pattern] + $0.generatedNonTerminals}.collect(Set.init)
 		let newNonTerminals = generatedNonTerminals.subtracting(initialNonTerminals)
 		
-		return Grammar(productions: reachableProductions, start: start, normalizationNonTerminals: self.normalizationNonTerminals.union(newNonTerminals))
+		return Grammar(productions: reachableProductions, start: start, utilityNonTerminals: self.utilityNonTerminals.union(newNonTerminals))
 	}
 }

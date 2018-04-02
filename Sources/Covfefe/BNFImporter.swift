@@ -344,23 +344,24 @@ public extension Grammar {
 			}
 		}
 		
-		let productions = try ruleDeclarations.flatMap { ruleDeclaration -> [Production] in
+		let (productions, helperRules): ([Production], [Production]) = try ruleDeclarations.reduce(into: ([], [])) { acc, ruleDeclaration in
 			guard let children = ruleDeclaration.children, children.count == 3 else {
-				return []
+				return
 			}
 			let name = ruleName(from: children[0])
 			let (productions, additionalRules) = try makeProductions(from: children[2], named: name)
-			return productions + additionalRules
+			acc.0.append(contentsOf: productions)
+			acc.1.append(contentsOf: additionalRules)
 		}
 		
-		if productions.contains(where: { (production: Production) -> Bool in
+		if (productions + helperRules).contains(where: { (production: Production) -> Bool in
 			production.generatedNonTerminals.contains("EOL")
-		}) && !productions.contains(where: { (production: Production) -> Bool in
+		}) && !(productions + helperRules).contains(where: { (production: Production) -> Bool in
 			production.pattern == "EOL"
 		}) {
-			self.init(productions: productions + ["EOL" --> t("\n")], start: NonTerminal(name: start))
+			self.init(productions: productions + helperRules + ["EOL" --> t("\n")], start: NonTerminal(name: start), utilityNonTerminals: helperRules.map {$0.pattern}.collect(Set.init))
 		} else {
-			self.init(productions: productions, start: NonTerminal(name: start))
+			self.init(productions: productions + helperRules, start: NonTerminal(name: start), utilityNonTerminals: helperRules.map {$0.pattern}.collect(Set.init))
 		}
 		
 	}
