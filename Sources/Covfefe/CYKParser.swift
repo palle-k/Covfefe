@@ -171,7 +171,7 @@ public struct CYKParser: AmbiguousGrammarParser {
 		if syntaxTrees.isEmpty {
 			throw generateError(cykTable, string: string)
 		}
-		return syntaxTrees.map{unfoldChainProductions($0).explode(normalizedGrammar.normalizationNonTerminals.contains)[0]}
+		return syntaxTrees.map{unfoldChainProductions($0).explode(normalizedGrammar.utilityNonTerminals.contains)[0]}
 	}
 	
 	/// Creates a syntax tree which explains how a word was derived from a grammar
