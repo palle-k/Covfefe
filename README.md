@@ -64,7 +64,7 @@ Some grammar features are not available when using Swift 4.0 (Grouping, Repetiti
 Grammars can be specified in EBNF or a language that is a superset of BNF, which adopts some features of EBNF (documented [here](/BNF.md)):
 
 ```swift
-let grammarString = """ 
+let grammarString = """
 expression       = binary-operation | brackets | unary-operation | number | variable;
 brackets         = '(', expression, ')';
 binary-operation = expression, binary-operator, expression;
