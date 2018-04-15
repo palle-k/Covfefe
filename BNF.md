@@ -125,68 +125,74 @@ The bounds of a range must be exactly one character. The characters can consist 
 
 The grammar that is recognized is the following:
 
-```
+```ebnf
 (* Production rules are separated by newlines and optional whitespace *)
-<syntax> ::= <optional-whitespace> | <newlines> | <rule> | <rule> <newlines> | <syntax> <newlines> <rule> <newlines> | <syntax> <newlines> <rule>
+syntax = optional-whitespace | newlines | rule | rule, newlines | syntax, newlines, rule, newlines | syntax, newlines, rule;
 
 (* A rule consists of a non-terminal pattern name, an assignment operator and a production expression *)
-<rule> ::= <optional-whitespace> <rule-name-container> <optional-whitespace> <assignment-operator> <optional-whitespace> <expression> <optional-whitespace>
+rule = optional-whitespace, rule-name-container, optional-whitespace, assignment-operator, optional-whitespace, expression, optional-whitespace;
 
 (* Rule names are strings of alphanumeric characters *)
-<rule-name-container> ::= "<" {<rule-name-char>} ">"
-<rule-name-char> ::= 'a' ... 'z' | 'A' ... 'Z' | '0' ... '9' | '_' | '-'
+rule-name-container = "<", rule-name, ">";
+rule-name = rule-name, rule-name-char | "";
+rule-name-char = "[a-zA-Z0-9-_]";
 
-<assignment-operator> ::= ":" ":" "="
+assignment-operator = ":", ":", "=";
 
 (* An expression can either be a concatenation or an alternation *)
-<expression> ::= <concatenation> [{<optional-whitespace> "|" <optional-whitespace> <concatenation>}]
+expression = concatenation | alternation;
+
+(* An alternation is a sequence of one or more concatenations separated by | *)
+alternation = expression, optional-whitespace, "|", optional-whitespace, concatenation;
 
 (* A concatenation is a string of terminals and non-terminals *)
-<concatenation> ::= [{<expression-element> <optional-whitespace>}] <expression-element>
+concatenation = expression-element | concatenation, optional-whitespace, expression-element;
 
 (* An atom of a expression can either be a terminal literal, a non-terminal or a group *)
-<expression-element> ::= <literal> | <rule-name-container> | <expression-group> | <expression-repetition> | <expression-optional>
+expression-element = literal | rule-name-container | expression-group | expression-repetition | expression-optional;
 
 (* Expression containers *)
-<expression-group> ::= "(" <optional-whitespace> <expression> <optional-whitespace> ")"
-<expression-repetition> ::= "{" <optional-whitespace> <expression> <optional-whitespace> "}"
-<expression-optional> ::= "[" <optional-whitespace> <expression> <optional-whitespace> "]"
+expression-group = "(", optional-whitespace, expression, optional-whitespace, ")";
+expression-optional = "[", optional-whitespace, expression, optional-whitespace, "]";
+expression-repetition = "{", optional-whitespace, expression, optional-whitespace, "}";
 
 (* Terminal literals *)
-<literal> ::= "'" <string-1> "'" | '"' <string-2> '"' | <range-literal>
-<range-literal> ::= <single-char-literal> <optional-whitespace> "." "." "." <optional-whitespace> <single-char-literal>
+literal = "'", string-1, "'" | '"', string-2, '"' | range-literal;
+range-literal = single-char-literal, optional-whitespace, ".", ".", ".", optional-whitespace, single-char-literal;
 
 (* Strings and characters *)
-<string-1> ::= [{<string-1-char>}]
-<string-1-char> ::= <any-char> | '"' | <string-escaped-char> | <escaped-single-quote>
-<string-2> ::= [{<string-2-char>}]
-<string-2-char> ::= <any-char> | "'" | <string-escaped-char> | <escaped-double-quote>
-<single-char-literal> ::= "'" <string-1-char> "'" | '"' <string-2-char> '"'
+string-1 = string-1, string-1-char | "";
+string-1-char = ? any character except '"' ? | string-escaped-char | escaped-single-quote;
+string-2 = string-2, string-2-char | "";
+string-2-char = ? any character except "'" ? | string-escaped-char | escaped-double-quote;
 
-<any-char> ::= '!' | '#' ... '&' | '(' ... '[' | ']' ... '~' | ' ' | '\t'
+single-char-literal = "'", string-1-char, "'" | '"', string-2-char, '"';
 
 (* Escape sequences *)
-<string-escaped-char> ::= <unicode-scalar> | <carriage-return> | <line-feed> | <tab-char> | <backslash>
+string-escaped-char = unicode-scalar | carriage-return | line-feed | tab-char | backslash;
 
-<backslash> ::= "\\" "\\"
-<line-feed> ::= "\\" "n"
-<carriage-return> ::= "\\" "r"
-<tab-char> ::= "\\" "t"
+backslash = "\\", "\\";
+line-feed = "\\", "n";
+carriage-return = "\\", "r";
+tab-char = "\\", "t";
 
-<escaped-double-quote> ::= "\\" '"'
-<escaped-single-quote> ::= "\\" "'"
+escaped-double-quote = "\\", '"';
+escaped-single-quote = "\\", "'";
 
-<unicode-scalar> ::= "\\" "u" "{" <unicode-scalar-digits> "}"
-<unicode-scalar-digits> ::= <digit> [<digit>] [<digit>] [<digit>] [<digit>] [<digit>] [<digit>] [<digit>]
-<digit> ::= '0' ... '9' | 'A' ... 'F' | 'a' ... 'f'
+unicode-scalar = "\\", "u", "{", unicode-scalar-digits, "}";
+unicode-scalar-digits = [digit], [digit], [digit], [digit], [digit], [digit], [digit], digit;
+digit = '0' ... '9' | 'A' ... 'F' | 'a' ... 'f';
 
 (* Whitespace *)
-<newlines> ::= {"\n" <optional-whitespace>}
+newlines = "\n" | "\n", optional-whitespace, newlines;
 
-<optional-whitespace> ::= [{<whitespace>}]
-<whitespace> ::= " " | "\t" | "\n" | <comment>
+optional-whitespace = "" | whitespace, optional-whitespace;
+whitespace = " " | "\t" | "\n" | comment;
 
 (* Comments *)
-<comment> ::= "(" "*" ({<comment-content-char>} | '*') "*" ")"
-<comment-content-char> ::= '!' ... "'" | '+' ... '~' | ')' | " " | "\t" | "\n" | '"' | "'" | {'('} ('!' ... ')' | '+' ... '~' | " " | "\t" | "\n") | {'*'} ('!' ... '(' | '+' ... '~') | <comment>
+comment = "(", "*", comment-content, "*", ")" | "(", "*", "*", "*", ")";
+comment-asterisk = comment-asterisk, "*" | "*";
+comment-content = comment-content, comment-content-char | "";
+comment-content-char = "[^*(]" | comment-asterisk, "[^)]" | comment-open-parenthesis, "[^*]" | comment;
+comment-open-parenthesis = comment-open-parenthesis, "(" | "(";
 ```
