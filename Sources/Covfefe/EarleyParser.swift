@@ -522,7 +522,7 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			}
 		}
 		
-		return buildSyntaxTrees(stateCollection: parseStates, tokenization: tokenization, rootItem: match, startIndex: 0, ignoreAmbiguousItems: true)[0]
+		return buildSyntaxTrees(stateCollection: parseStates, tokenization: tokenization, rootItem: match, startIndex: 0, ignoreAmbiguousItems: true)[0].explode(grammar.utilityNonTerminals.contains)[0]
 	}
 	
 	/// Generates all syntax trees explaining how a word can be derived from a grammar.
@@ -553,7 +553,9 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			}
 		}
 		return matches.flatMap { match in
-			buildSyntaxTrees(stateCollection: parseStates, tokenization: tokenization, rootItem: match, startIndex: 0, ignoreAmbiguousItems: false)
+			buildSyntaxTrees(stateCollection: parseStates, tokenization: tokenization, rootItem: match, startIndex: 0, ignoreAmbiguousItems: false).map {
+				$0.explode(grammar.utilityNonTerminals.contains)[0]
+			}
 		}
 	}
 }
