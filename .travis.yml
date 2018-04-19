@@ -8,7 +8,7 @@ osx_image: xcode9.3
 install:
   - eval "$(curl -sL https://swiftenv.fuller.li/en/latest/install.sh)"
 env:
-  - SWIFT_VERSION=4.1.0
+  - SWIFT_VERSION=4.1
 script:
   - swift test -c release -Xswiftc -enable-testing
 notifications:
