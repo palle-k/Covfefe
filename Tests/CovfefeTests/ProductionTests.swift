@@ -86,3 +86,12 @@ class ProductionTests: XCTestCase {
 		_ = Grammar(productions: ["A" --> n("C"), "B" --> n("D")], start: "A").chomskyNormalized()
 	}
 }
+
+extension ProductionTests {
+	static let allTests = [
+		("testDecomposition", testDecomposition),
+		("testChainElimination", testChainElimination),
+		("testEmptyElimination", testEmptyElimination),
+		("testNormalization", testNormalization)
+	]
+}

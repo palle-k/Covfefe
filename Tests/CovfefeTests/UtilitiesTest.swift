@@ -113,3 +113,14 @@ class StringUtilitiesTest: XCTestCase {
 		XCTAssertEqual(bRef, b)
 	}
 }
+
+extension StringUtilitiesTest {
+	static let allTests = [
+		("testPrefix", testPrefix),
+		("testRegularPrefix", testRegularPrefix),
+		("testCharacterRangePrefix", testCharacterRangePrefix),
+		("testUnique", testUnique),
+		("testCrossProduct", testCrossProduct),
+		("testUnzip", testUnzip)
+	]
+}

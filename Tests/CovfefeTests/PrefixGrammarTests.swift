@@ -56,3 +56,10 @@ class PrefixGrammarTests: XCTestCase {
 		XCTAssertFalse(parser.recognizes("(a+)"))
 	}
 }
+
+
+extension PrefixGrammarTests {
+	static let allTests = [
+		("testPrefixGrammar", testPrefixGrammar),
+	]
+}

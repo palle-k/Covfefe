@@ -91,3 +91,9 @@ class PerformanceTests: XCTestCase {
 		}
 	}
 }
+
+extension PerformanceTests {
+	static let allTests = [
+		("testEarleyPerformance", testEarleyPerformance),
+	]
+}

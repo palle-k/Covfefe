@@ -89,3 +89,9 @@ class SyntaxTreeTests: XCTestCase {
 		XCTAssertTrue(CYKParser(grammar: dotGrammar).recognizes(description))
 	}
 }
+
+extension SyntaxTreeTests {
+	static let allTests = [
+		("testTreeDescription", testTreeDescription),
+	]
+}

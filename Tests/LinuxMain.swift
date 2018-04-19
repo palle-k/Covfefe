@@ -1,6 +1,4 @@
 import XCTest
-@testable import GrammarTests
+import CovfefeTests
 
-XCTMain([
-    testCase(GrammarTests.allTests),
-])
+XCTMain(CovfefeTests.allTests())

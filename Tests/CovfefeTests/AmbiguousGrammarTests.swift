@@ -62,5 +62,10 @@ class AmbiguousGrammarTests: XCTestCase {
             }
         }
     }
-    
+}
+
+extension AmbiguousGrammarTests {
+	static let allTests = [
+		("testAll", testAll)
+	]
 }

@@ -113,3 +113,9 @@ class ParserTests: XCTestCase {
 		}
 	}
 }
+
+extension ParserTests {
+	static let allTests = [
+		("testAll", testAll),
+	]
+}

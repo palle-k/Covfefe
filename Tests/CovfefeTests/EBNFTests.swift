@@ -577,3 +577,35 @@ class EBNFTests: XCTestCase {
 		XCTAssertFalse(parser.recognizes("abaaaa"))
 	}
 }
+
+extension EBNFTests {
+	static let allTests = [
+		("testEBNFRecognition", testEBNFRecognition),
+		("testImport", testImport),
+		("testImportQuotes", testImportQuotes),
+		("testUnicodeScalars", testUnicodeScalars),
+		("testEscaped", testEscaped),
+		("testEmpty", testEmpty),
+		("testComments", testComments),
+		("testCharacterRangeParsing", testCharacterRangeParsing),
+		("testCharacterRanges", testCharacterRanges),
+		("testExpressionGroupParsing", testExpressionGroupParsing),
+		("testExpressionGroups", testExpressionGroups),
+		("testExpressionGroups2", testExpressionGroups2),
+		("testExpressionGroup3", testExpressionGroups3),
+		("testExpressionGroup4", testExpressionGroups4),
+		("testRepetitionGrammar", testRepetitionGrammar),
+		("testRepetition", testRepetition),
+		("testRepetition2", testRepetition2),
+		("testRepetition3", testRepetition3),
+		("testRepetition4", testRepetition4),
+		("testRepetition5", testRepetition5),
+		("testOptionalGrammar", testOptionalGrammar),
+		("testOptional", testOptional),
+		("testOptional2", testOptional2),
+		("testOptional3", testOptional3),
+		("testMultiplicityGrammar", testMultiplicityGrammar),
+		("testMultiplicity", testMultiplicity),
+		("testMultiplicity2", testMultiplicity2),
+	]
+}

@@ -243,10 +243,16 @@ class GrammarTests: XCTestCase {
 		})
 		XCTAssertTrue(grammar.isInChomskyNormalForm)
 	}
+}
 
-    static var allTests = [
-        ("testCYK1", testCYK),
-        ("testCYK2", testCYK2),
-        ("testCYK3", testCYK3),
-    ]
+
+extension GrammarTests {
+	static let allTests = [
+		("testCYK", testCYK),
+		("testCYK2", testCYK2),
+		("testCYK3", testCYK3),
+		("testCYKEmpty", testCYKEmpty),
+		("testProgrammingLanguage", testProgrammingLanguage),
+		("testNonNormalizedGrammar", testNonNormalizedGrammar),
+	]
 }

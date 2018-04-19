@@ -175,3 +175,13 @@ class EarleyParserTests: XCTestCase {
 		}
 	}
 }
+
+extension EarleyParserTests {
+	static let allTests = [
+		("testEarleyParser1", testEarleyParser1),
+		("testEarleyParser2", testEarleyParser2),
+		("testEarleyEmpty", testEarleyEmpty),
+		("testEarleyJSON", testEarleyJSON),
+		("testEarleyBNF", testEarleyBNF),
+	]
+}
