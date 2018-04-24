@@ -293,3 +293,11 @@ public extension String {
 		return literalEscaped.replacingOccurrences(of: "\"", with: "\\\"")
 	}
 }
+
+#if os(Linux)
+extension Substring {
+	func hasPrefix(_ prefix: String) -> Bool {
+		return String(self).hasPrefix(prefix)
+	}
+}
+#endif

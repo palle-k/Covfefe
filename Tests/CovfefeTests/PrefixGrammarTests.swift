@@ -3,7 +3,7 @@
 //  CovfefeTests
 //
 //  Created by Palle Klewitz on 23.08.17.
-//  Copyright (c) 2017 Palle Klewitz
+//  Copyright (c) 2017 - 2018 Palle Klewitz
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
