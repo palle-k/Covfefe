@@ -191,8 +191,10 @@ extension ClosedRange: Codable where Bound == Character {
 	}
 }
 
+#if !swift(>=4.1)
 extension ClosedRange: Hashable where Bound: Hashable {
 	public var hashValue: Int {
 		return lowerBound.hashValue ^ upperBound.hashValue
 	}
 }
+#endif
