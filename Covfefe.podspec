@@ -1,11 +1,13 @@
 Pod::Spec.new do |s|
   s.name = 'Covfefe'
-  s.version = '0.4.2'
+  s.version = '0.4.3'
   s.license = 'MIT'
   s.summary = 'A parser generator for nondeterministic context free languages'
   s.homepage = 'https://github.com/palle-k/Covfefe'
   s.authors = 'Palle Klewitz'
   s.source = { :git => 'https://github.com/palle-k/Covfefe.git', :tag => s.version }
+
+  s.swift_version = '5.0'
 
   s.osx.deployment_target = '10.9'
   s.ios.deployment_target = '8.0'

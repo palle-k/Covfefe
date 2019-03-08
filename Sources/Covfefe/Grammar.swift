@@ -312,8 +312,8 @@ public extension Grammar {
 	/// - A production generates an empty string and is generated from the start non-terminal
 	///
 	/// Certain parsing algorithms, such as the CYK parser, require the recognized grammar to be in Chomsky normal form.
-	public var isInChomskyNormalForm: Bool {
-		return productions.allMatch { production -> Bool in
+	var isInChomskyNormalForm: Bool {
+        return productions.allSatisfy { production -> Bool in
 			(production.isFinal && production.production.count == 1)
 			|| (!production.isFinal && production.generatedNonTerminals.count == 2 && production.generatedTerminals.count == 0)
 			|| (production.production.isEmpty && production.pattern == start)

@@ -34,7 +34,7 @@ public extension Grammar {
 	/// `a*(b+` `a*(b+c` and `a*(b+c)`
 	///
 	/// - Returns: A grammar generating all prefixes of the original grammar
-	public func prefixGrammar() -> Grammar {
+	func prefixGrammar() -> Grammar {
 		let prefixProductions = productions.flatMap { (production) -> [Production] in
 			let prefixes = production.production.prefixes().map { sequence -> [Symbol] in
 				guard let last = sequence.last else {

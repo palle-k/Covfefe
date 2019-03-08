@@ -112,7 +112,7 @@ extension Grammar {
 					return true
 				}
 				return production.generatedNonTerminals.count == production.production.count
-					&& production.generatedNonTerminals.allMatch { pattern -> Bool in
+                    && production.generatedNonTerminals.allSatisfy { pattern -> Bool in
 						generatesEmpty(pattern, path: path.union([nonTerminal]))
 					}
 			}

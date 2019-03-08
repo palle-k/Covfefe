@@ -102,7 +102,7 @@ class StringUtilitiesTest: XCTestCase {
 		let b = 5...8
 		let axb = crossProduct(a, b)
 		let axbRef = [(1,5), (1,6), (1,7), (1,8), (2,5), (2,6), (2,7), (2,8), (3,5), (3,6), (3,7), (3,8), (4,5), (4,6), (4,7), (4,8)]
-		XCTAssertTrue(axb.allMatch{el in axbRef.contains(where: {$0 == el})})
+        XCTAssertTrue(axb.allSatisfy{el in axbRef.contains(where: {$0 == el})})
 	}
 	
 	func testUnzip() {

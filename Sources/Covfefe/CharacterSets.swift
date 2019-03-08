@@ -136,7 +136,7 @@ public extension ProductionResult {
 	/// Creates a new production result from a symbol set where every symbol generates a different result independent of other symbols
 	///
 	/// - Parameter set: The symbol set to create a production result from
-	public init(_ set: SymbolSet) {
+	init(_ set: SymbolSet) {
 		self.elements = set.symbols.map{ProductionString([$0])}
 	}
 }

@@ -142,7 +142,7 @@ public extension Grammar {
 	/// - Parameters:
 	///   - bnfString: String describing the grammar in EBNF
 	///   - start: Start non-terminal
-	public init(ebnf ebnfString: String, start: String) throws {
+	init(ebnf ebnfString: String, start: String) throws {
 		let grammar = ebnfGrammar
 		let parser = EarleyParser(grammar: grammar)
 		let syntaxTree = try parser

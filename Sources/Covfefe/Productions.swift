@@ -68,7 +68,7 @@ public struct Production: Codable {
 	
 	/// A production is final if it only generates terminal symbols
 	public var isFinal: Bool {
-		return self.production.allMatch { symbol -> Bool in
+        return self.production.allSatisfy { symbol -> Bool in
 			if case .terminal(_) = symbol {
 				return true
 			} else {
@@ -83,7 +83,7 @@ public struct Production: Codable {
 		if isFinal {
 			return production.count == 1
 		}
-		return self.production.allMatch { symbol -> Bool in
+        return self.production.allSatisfy { symbol -> Bool in
 			if case .nonTerminal(_) = symbol {
 				return true
 			} else {
@@ -158,13 +158,13 @@ public struct Production: Codable {
 					return true
 				}
 				return production.generatedNonTerminals.count == production.production.count
-					&& production.generatedNonTerminals.allMatch { pattern -> Bool in
+                    && production.generatedNonTerminals.allSatisfy { pattern -> Bool in
 						generatesEmpty(pattern, path: path.union([nonTerminal]))
 				}
 			}
 		}
 		
-		return self.production.allMatch { symbol -> Bool in
+        return self.production.allSatisfy { symbol -> Bool in
 			switch symbol {
 			case .terminal:
 				return false

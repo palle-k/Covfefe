@@ -32,7 +32,7 @@ public extension String {
 	/// - Parameter pattern: Regular expression for which matches should be searched
 	/// - Returns: Ranges of matches in the string for the given regular expression
 	/// - Throws: An error indicating that the provided regular expression is invalid.
-	public func matches(for pattern: String) throws -> [Range<String.Index>] {
+	func matches(for pattern: String) throws -> [Range<String.Index>] {
 		return try matches(for: pattern, in: startIndex ..< endIndex)
 	}
 	
@@ -40,7 +40,7 @@ public extension String {
 	///
 	/// - Parameter expression: Regular expression for which matches should be searched
 	/// - Returns: Ranges of matches in the string for the given regular expression
-	public func matches(for expression: NSRegularExpression) -> [Range<String.Index>] {
+	func matches(for expression: NSRegularExpression) -> [Range<String.Index>] {
 		return matches(for: expression, in: startIndex ..< endIndex)
 	}
 
@@ -51,7 +51,7 @@ public extension String {
 	///   - range: Range of the string which should be checked
 	/// - Returns: Ranges of matches in the string for the given regular expression
 	/// - Throws: An error indicating that the provided regular expression is invalid.
-	public func matches(for pattern: String, in range: Range<String.Index>) throws -> [Range<String.Index>] {
+	func matches(for pattern: String, in range: Range<String.Index>) throws -> [Range<String.Index>] {
 		let expression = try NSRegularExpression(pattern: pattern, options: [])
 		return matches(for: expression, in: range)
 	}
@@ -62,7 +62,7 @@ public extension String {
 	///   - expression: Regular expression for which matches should be searched
 	///   - range: Range of the string which should be checked
 	/// - Returns: Ranges of matches in the string for the given regular expression
-	public func matches(for expression: NSRegularExpression, in range: Range<String.Index>) -> [Range<String.Index>] {
+	func matches(for expression: NSRegularExpression, in range: Range<String.Index>) -> [Range<String.Index>] {
 		let range = NSRange(range, in: self)
 		let matches = expression.matches(in: self, options: [], range: range)
 		return matches.compactMap { match -> Range<String.Index>? in
@@ -75,7 +75,7 @@ public extension String {
 	/// - Parameter pattern: Regular expression
 	/// - Returns: True, if the regular expression matches a substring beginning at the start index of the string
 	/// - Throws: An error indicating that the provided regular expression is invalid
-	public func hasRegularPrefix(_ pattern: String) throws -> Bool {
+	func hasRegularPrefix(_ pattern: String) throws -> Bool {
 		return try hasRegularPrefix(pattern, from: self.startIndex)
 	}
 	
@@ -83,7 +83,7 @@ public extension String {
 	///
 	/// - Parameter pattern: Regular expression
 	/// - Returns: True, if the regular expression matches a substring beginning at the start index of the string
-	public func hasRegularPrefix(_ expression: NSRegularExpression) -> Bool {
+	func hasRegularPrefix(_ expression: NSRegularExpression) -> Bool {
 		return hasRegularPrefix(expression, from: self.startIndex)
 	}
 	
@@ -94,7 +94,7 @@ public extension String {
 	/// - Parameter startIndex: Start index for the search
 	/// - Returns: True, if the regular expression matches a substring beginning at the start index of the string
 	/// - Throws: An error indicating that the provided regular expression is invalid
-	public func hasRegularPrefix(_ pattern: String, from startIndex: String.Index) throws -> Bool {
+	func hasRegularPrefix(_ pattern: String, from startIndex: String.Index) throws -> Bool {
 		return try rangeOfRegularPrefix(pattern, from: startIndex) != nil
 	}
 	
@@ -105,7 +105,7 @@ public extension String {
 	/// - Parameter startIndex: Start index for the search
 	/// - Returns: True, if the regular expression matches a substring beginning at the start index of the string
 	/// - Throws: An error indicating that the provided regular expression is invalid
-	public func hasRegularPrefix(_ expression: NSRegularExpression, from startIndex: String.Index) -> Bool {
+	func hasRegularPrefix(_ expression: NSRegularExpression, from startIndex: String.Index) -> Bool {
 		return rangeOfRegularPrefix(expression, from: startIndex) != nil
 	}
 	
@@ -114,7 +114,7 @@ public extension String {
 	/// - Parameter pattern: Regular expression
 	/// - Returns: Range of the prefix matched by the regular expression or nil, if no match was found
 	/// - Throws: An error indicating that the provided regular expression is invalid
-	public func rangeOfRegularPrefix(_ pattern: String) throws -> Range<String.Index>? {
+	func rangeOfRegularPrefix(_ pattern: String) throws -> Range<String.Index>? {
 		return try rangeOfRegularPrefix(pattern, from: self.startIndex)
 	}
 	
@@ -123,7 +123,7 @@ public extension String {
 	/// - Parameter pattern: Regular expression
 	/// - Returns: Range of the prefix matched by the regular expression or nil, if no match was found
 	/// - Throws: An error indicating that the provided regular expression is invalid
-	public func rangeOfRegularPrefix(_ expression: NSRegularExpression) -> Range<String.Index>? {
+	func rangeOfRegularPrefix(_ expression: NSRegularExpression) -> Range<String.Index>? {
 		return rangeOfRegularPrefix(expression, from: self.startIndex)
 	}
 	
@@ -133,7 +133,7 @@ public extension String {
 	/// - Parameter startIndex: Start index for the search
 	/// - Returns: Range of the prefix matched by the regular expression or nil, if no match was found
 	/// - Throws: An error indicating that the provided regular expression is invalid
-	public func rangeOfRegularPrefix(_ pattern: String, from lowerBound: String.Index) throws -> Range<String.Index>? {
+	func rangeOfRegularPrefix(_ pattern: String, from lowerBound: String.Index) throws -> Range<String.Index>? {
 		let expression = try NSRegularExpression(pattern: pattern, options: [])
 		return rangeOfRegularPrefix(expression, from: lowerBound)
 	}
@@ -144,7 +144,7 @@ public extension String {
 	/// - Parameter startIndex: Start index for the search
 	/// - Returns: Range of the prefix matched by the regular expression or nil, if no match was found
 	/// - Throws: An error indicating that the provided regular expression is invalid
-	public func rangeOfRegularPrefix(_ expression: NSRegularExpression, from lowerBound: String.Index) -> Range<String.Index>? {
+	func rangeOfRegularPrefix(_ expression: NSRegularExpression, from lowerBound: String.Index) -> Range<String.Index>? {
 		let range = NSRange(lowerBound ..< self.endIndex, in: self)
 		guard let match = expression.firstMatch(in: self, options: .anchored, range: range) else {
 			return nil

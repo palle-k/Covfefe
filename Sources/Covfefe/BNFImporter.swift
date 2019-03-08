@@ -135,8 +135,8 @@ public extension Grammar {
 	/// - Parameters:
 	///   - bnfString: String describing the grammar in BNF
 	///   - start: Start non-terminal
-	@available(*, deprecated: 1.0, renamed: "init(bnf:start:)")
-	public init(bnfString: String, start: String) throws {
+	@available(*, unavailable, renamed: "init(bnf:start:)")
+	init(bnfString: String, start: String) throws {
 		try self.init(bnf: bnfString, start: start)
 	}
 	
@@ -148,7 +148,7 @@ public extension Grammar {
 	/// - Parameters:
 	///   - bnf: String describing the grammar in BNF
 	///   - start: Start non-terminal
-	public init(bnf bnfString: String, start: String) throws {
+	init(bnf bnfString: String, start: String) throws {
 		let grammar = bnfGrammar
 		let tokenizer = DefaultTokenizer(grammar: grammar)
 		let parser = EarleyParser(grammar: grammar)

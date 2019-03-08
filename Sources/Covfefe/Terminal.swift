@@ -25,14 +25,14 @@ public extension Terminal {
 	/// Creates a terminal that is a string. The terminal is matched when the tokenized subsequence of a word is equal to this string.
 	///
 	/// - Parameter string: Terminal string
-	public init(string: String) {
+	init(string: String) {
 		self = .string(string: string, hash: string.hashValue)
 	}
 	
 	/// Creates a terminal that is a range of characters. The terminal is matched when the tokenized subsequence is a character contained in this range.
 	///
 	/// - Parameter range: Range of matched characters
-	public init(range: ClosedRange<Character>) {
+	init(range: ClosedRange<Character>) {
 		self = .characterRange(range: range, hash: range.hashValue)
 	}
 	
@@ -40,14 +40,14 @@ public extension Terminal {
 	///
 	/// - Parameter expression: Regular expression specifying the language matched by terminal
 	/// - Throws: An error indicating that the regular expression is invalid
-	public init(expression: String) throws {
+	init(expression: String) throws {
 		let regex = try NSRegularExpression(pattern: expression, options: [])
 		self = .regularExpression(expression: regex, hash: expression.hashValue)
 	}
 	
 	
 	/// Indicates that this terminal matches the empty string and only the empty string.
-	public var isEmpty: Bool {
+	var isEmpty: Bool {
 		switch self {
 		case .characterRange:
 			return false
@@ -141,7 +141,7 @@ extension Terminal: Codable {
 			
 		case .characterRange(let range, _):
 			try container.encode(TerminalCoding.characterRange, forKey: .type)
-			try container.encode(range, forKey: .value)
+			try container.encode(range, forKey: CodingKeys.value)
 			
 		case .regularExpression(let expression, _):
 			try container.encode(TerminalCoding.regularExpression, forKey: .type)
@@ -161,34 +161,20 @@ extension Terminal: Codable {
 	}
 }
 
-extension ClosedRange: Codable where Bound == Character {
-	public init(from decoder: Decoder) throws {
-		let container = try decoder.container(keyedBy: CodingKeys.self)
-		let lower = try container.decode(String.self, forKey: .lowerBound)
-		let upper = try container.decode(String.self, forKey: .upperBound)
-
-		guard lower.count == 1 else {
-			throw DecodingError.dataCorruptedError(forKey: .lowerBound, in: container, debugDescription: "lowerBound must be string of length 1")
-		}
-		guard upper.count == 1 else {
-			throw DecodingError.dataCorruptedError(forKey: .upperBound, in: container, debugDescription: "upperBound must be string of length 1")
-		}
-
-		self.init(uncheckedBounds: (lower[lower.startIndex], upper[upper.startIndex]))
-	}
-
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.container(keyedBy: CodingKeys.self)
-		let lower = String(lowerBound)
-		let upper = String(upperBound)
-		try container.encode(lower, forKey: .lowerBound)
-		try container.encode(upper, forKey: .upperBound)
-	}
-
-	private enum CodingKeys: String, CodingKey {
-		case lowerBound
-		case upperBound
-	}
+extension Character: Codable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(String(self))
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let str = try container.decode(String.self)
+        guard let char = str.first, str.count == 1 else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Missing character")
+        }
+        self = char
+    }
 }
 
 #if !swift(>=4.1)

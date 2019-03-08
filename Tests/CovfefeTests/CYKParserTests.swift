@@ -176,7 +176,11 @@ class GrammarTests: XCTestCase {
 		
 		let varAssignmentExpressionProductions = valueExpression + [valueExpressionBegin] + openParenthesis + closeParenthesis
 		
-		let grammar = Grammar(productions: [whitespaceProduction, assignmentOperator, binaryOperationStart, colon] + binaryOperator + prefixOperator + varDeclarationProductions + varAssignmentProductions + varAssignmentExpressionProductions, start: "VarDeclaration")
+        let p1 = [whitespaceProduction, assignmentOperator, binaryOperationStart, colon]
+        let p2 = binaryOperator + prefixOperator + varDeclarationProductions
+        let p3 = varAssignmentProductions + varAssignmentExpressionProductions
+        
+		let grammar = Grammar(productions: p1 + p2 + p3, start: "VarDeclaration")
 		let parser = CYKParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("let hello"))
@@ -226,14 +230,14 @@ class GrammarTests: XCTestCase {
 		
 		let grammar = Grammar(productions: expression + BinOp + UnOp + [Num, Var, BracketExpr, BinOperation, UnOperation, Whitespace], start: "Expr").chomskyNormalized()
 		
-		XCTAssertTrue(grammar.productions.allMatch { production -> Bool in
-			(production.production.count == 2 && production.production.allMatch({ symbol -> Bool in
+        XCTAssertTrue(grammar.productions.allSatisfy { production -> Bool in
+            (production.production.count == 2 && production.production.allSatisfy({ symbol -> Bool in
 				if case .nonTerminal = symbol {
 					return true
 				} else {
 					return false
 				}
-			})) || (production.production.count == 1 && production.production.allMatch({ symbol -> Bool in
+            })) || (production.production.count == 1 && production.production.allSatisfy({ symbol -> Bool in
 				if case .terminal = symbol {
 					return true
 				} else {
