@@ -71,6 +71,10 @@ extension ParseStateItem: Hashable {
 	var hashValue: Int {
 		return production.hashValue ^ productionPosition.hashValue ^ (startTokenIndex.hashValue << 32) ^ (startTokenIndex.hashValue >> 32)
 	}
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(hashValue)
+    }
 }
 
 extension ParseStateItem: CustomStringConvertible {
@@ -111,6 +115,10 @@ extension ParsedItem: Hashable {
 	var hashValue: Int {
 		return production.hashValue ^ completedIndex.hashValue
 	}
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(hashValue)
+    }
 	
 	static func ==(lhs: ParsedItem, rhs: ParsedItem) -> Bool {
 		return lhs.production == rhs.production && lhs.completedIndex == rhs.completedIndex

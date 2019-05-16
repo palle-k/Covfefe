@@ -36,6 +36,10 @@ public struct NonTerminal: Codable, Hashable {
 	public let name: String
 	
 	public let hashValue: Int
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(hashValue)
+    }
 	
 	/// Creates a new non-terminal symbol with a given name
 	///
@@ -140,6 +144,16 @@ extension Symbol: Hashable {
 			return n.hashValue
 		}
 	}
+    
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .terminal(let t):
+            hasher.combine(t.hashValue)
+            
+        case .nonTerminal(let n):
+            hasher.combine(n.hashValue)
+        }
+    }
 	
 	public static func == (lhs: Symbol, rhs: Symbol) -> Bool {
 		switch (lhs, rhs) {

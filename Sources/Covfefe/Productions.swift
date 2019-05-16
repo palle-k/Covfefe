@@ -38,6 +38,10 @@ public struct Production: Codable {
 	public let nonTerminalChain: [NonTerminal]?
 	
 	public let hashValue: Int
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(hashValue)
+    }
 	
 	/// Creates a new production
 	///

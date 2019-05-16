@@ -96,6 +96,10 @@ extension Terminal: Hashable {
 			return hash
 		}
 	}
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(hashValue)
+    }
 }
 
 extension Terminal: CustomStringConvertible {

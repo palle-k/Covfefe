@@ -37,7 +37,7 @@ class StringUtilitiesTest: XCTestCase {
 		XCTAssertNotEqual(testedString.rangeOfPrefix("world", from: testedString.index(testedString.startIndex, offsetBy: 8)), testedString.range(of: "world"))
 		
 		XCTAssertFalse(testedString.hasPrefix("world", from: testedString.startIndex))
-		XCTAssertTrue(testedString.hasPrefix("world", from: testedString.index(of: "w")!))
+        XCTAssertTrue(testedString.hasPrefix("world", from: testedString.firstIndex(of: "w")!))
 		XCTAssertFalse(testedString.hasPrefix("world", from: testedString.index(testedString.startIndex, offsetBy: 8)))
 	}
 	
@@ -78,11 +78,11 @@ class StringUtilitiesTest: XCTestCase {
 		
 		XCTAssertTrue(testedString.hasPrefix(Terminal(range: "a" ... "z")))
 		XCTAssertTrue(testedString.hasPrefix(Terminal(range: "h" ... "h")))
-		XCTAssertTrue(testedString.hasPrefix(Terminal(range: "e" ... "e"), from: testedString.index(of: "e")!))
+        XCTAssertTrue(testedString.hasPrefix(Terminal(range: "e" ... "e"), from: testedString.firstIndex(of: "e")!))
 		
 		XCTAssertFalse(testedString.hasPrefix(Terminal(range: "i" ... "i")))
 		XCTAssertFalse(testedString.hasPrefix(Terminal(range: "A" ... "Z")))
-		XCTAssertFalse(testedString.hasPrefix(Terminal(range: "f" ... "g"), from: testedString.index(of: "e")!))
+        XCTAssertFalse(testedString.hasPrefix(Terminal(range: "f" ... "g"), from: testedString.firstIndex(of: "e")!))
 		
 		XCTAssertEqual(testedString.rangeOfPrefix(Terminal(range: "a" ... "z"), from: testedString.startIndex), testedString.startIndex ..< testedString.index(after: testedString.startIndex))
 		XCTAssertEqual(testedString.rangeOfPrefix(Terminal(range: "z" ... "z"), from: testedString.startIndex), nil)

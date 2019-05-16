@@ -88,6 +88,10 @@ extension NonTerminalString: Hashable {
 			return partialHash ^ ((element.element.hashValue >> (element.offset % 64)) | (element.element.hashValue << (64 - (element.offset % 64))))
 		})
 	}
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(hashValue)
+    }
 	
 	public static func ==(lhs: NonTerminalString, rhs: NonTerminalString) -> Bool {
 		return lhs.characters == rhs.characters
