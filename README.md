@@ -15,14 +15,6 @@ It implements the [Earley](https://en.wikipedia.org/wiki/Earley_parser) and [CYK
 
 This framework can be imported as a Swift Package by adding it as a dependency to the `Package.swift` file:
 
-#### Swift 5.0
-
-```swift
-.package(url: "https://github.com/palle-k/Covfefe.git", majorVersion: 0, minor: 5)
-```
-
-#### Swift 4.2
-
 ```swift
 .package(url: "https://github.com/palle-k/Covfefe.git", majorVersion: 0, minor: 4)
 ```
