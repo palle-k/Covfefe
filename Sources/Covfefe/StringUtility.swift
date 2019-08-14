@@ -134,8 +134,9 @@ public extension String {
 	/// - Returns: Range of the prefix matched by the regular expression or nil, if no match was found
 	/// - Throws: An error indicating that the provided regular expression is invalid
 	func rangeOfRegularPrefix(_ pattern: String, from lowerBound: String.Index) throws -> Range<String.Index>? {
-		let expression = try NSRegularExpression(pattern: pattern, options: [])
-		return rangeOfRegularPrefix(expression, from: lowerBound)
+		//let expression = try NSRegularExpression(pattern: pattern, options: [])
+		//return rangeOfRegularPrefix(expression, from: lowerBound)
+        return pattern[lowerBound...].range(of: pattern, options: [.regularExpression, .anchored])
 	}
 	
 	/// Returns the range of a match for the given regular expression beginning at the start of the string

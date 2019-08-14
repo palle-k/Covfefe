@@ -55,12 +55,13 @@ var bnfGrammar: Grammar {
 	let expressionGroup = "expression-group" --> t("(") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t(")")
 	let expressionRepetition = "expression-repetition" --> t("{") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("}")
 	let expressionOptional = "expression-optional" --> t("[") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("]")
-	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"") <|> n("range-literal")
+	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"") <|> n("range-literal") <|> n("regex-literal")
 	let string1 = "string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
 	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
 	
 	let rangeLiteral = "range-literal" --> n("single-char-literal") <+> n("optional-whitespace") <+> t(".") <+> t(".") <+> t(".") <+> n("optional-whitespace") <+> n("single-char-literal")
 	let singleCharLiteral = "single-char-literal" --> t("'") <+> n("string-1-char") <+> t("'") <|> t("\"") <+> n("string-2-char") <+> t("\"")
+    let regexLiteral = "regex-literal" --> t("r") <+> t("'") <+> n("string-1") <+> t("'") <|> t("r") <+> t("\"") <+> n("string-2") <+> t("\"")
 	
 	// no ', \, \r or \n
 	let string1char = try! "string-1-char" --> rt("[^'\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-single-quote")
@@ -106,6 +107,7 @@ var bnfGrammar: Grammar {
 	productions.append(contentsOf: string2char)
 	productions.append(rangeLiteral)
 	productions.append(contentsOf: singleCharLiteral)
+    productions.append(contentsOf: regexLiteral)
 	productions.append(contentsOf: stringEscapedChar)
 	productions.append(unicodeScalar)
 	productions.append(contentsOf: unicodeScalarDigits)
@@ -238,21 +240,30 @@ public extension Grammar {
 				let stringNode = children[1]
 				return try Terminal(string: string(fromStringExpression: stringNode))
 			} else if children.count == 1 {
-				let rangeExpression = children[0]
-				guard rangeExpression.root == "range-literal" else {
-					fatalError()
-				}
-				guard let children = rangeExpression.children, children.count == 5 else {
-					fatalError()
-				}
-				let lowerBound = try character(fromCharacterExpression: children[0].children![1])
-				let upperBound = try character(fromCharacterExpression: children[4].children![1])
-				
-				guard lowerBound <= upperBound else {
-					throw LiteralParsingError.invalidRange(lowerBound: lowerBound, upperBound: upperBound, description: "lowerBound must be less than or equal to upperBound")
-				}
-				
-				return Terminal(range: lowerBound ... upperBound)
+				let subexpression = children[0]
+                switch subexpression.root?.name {
+                case .some("range-literal"):
+                    let rangeExpression = subexpression
+                    guard let children = rangeExpression.children, children.count == 5 else {
+                        fatalError()
+                    }
+                    let lowerBound = try character(fromCharacterExpression: children[0].children![1])
+                    let upperBound = try character(fromCharacterExpression: children[4].children![1])
+                    
+                    guard lowerBound <= upperBound else {
+                        throw LiteralParsingError.invalidRange(lowerBound: lowerBound, upperBound: upperBound, description: "lowerBound must be less than or equal to upperBound")
+                    }
+                    
+                    return Terminal(range: lowerBound ... upperBound)
+                case .some("regex-literal"):
+                    guard let children = subexpression.children, children.count == 4 else {
+                        fatalError()
+                    }
+                    let stringNode = subexpression.children![2]
+                    return try Terminal(expression: string(fromStringExpression: stringNode))
+                default:
+                    fatalError()
+                }
 			}
 			
 			fatalError()

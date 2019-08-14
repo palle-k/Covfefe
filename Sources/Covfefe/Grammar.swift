@@ -77,7 +77,15 @@ public struct SyntaxError: Error {
 
 extension SyntaxError: CustomStringConvertible {
 	public var description: String {
-		let main = "Error: \(reason) at \(NSRange(range, in: string)): '\(string[range])'"
+        let line = string[...range.lowerBound].filter({$0.isNewline}).count + 1
+        let lineStartIdx = string[...range.lowerBound]
+            .range(of: "\n", options: .backwards)?
+            .upperBound ?? string.startIndex
+        
+        let offset = string.distance(from: lineStartIdx, to: range.lowerBound)
+        let offsetEnd = string.distance(from: lineStartIdx, to: range.upperBound)
+        
+        let main = "Error: \(reason) at \(line):\(offset)-\(offsetEnd): '\(string[range])'"
 		if !context.isEmpty {
 			return "\(main), expected: \(context.map{$0.description}.joined(separator: " | "))"
 		} else {
@@ -325,4 +333,45 @@ extension Grammar: Equatable {
 	public static func == (lhs: Grammar, rhs: Grammar) -> Bool {
 		return lhs.start == rhs.start && Set(lhs.productions) == Set(rhs.productions)
 	}
+}
+
+public extension Grammar {
+    private func sample(start: NonTerminal) -> String {
+        let productions = self.productions.filter {$0.pattern == start}
+        guard let pick = productions.randomElement() else {
+            return ""
+        }
+        return pick.production.map { symbol -> String in
+            switch symbol {
+            case .nonTerminal(let nt):
+                return self.sample(start: nt)
+            case .terminal(Terminal.characterRange(range: let range, _)):
+                guard let start = range.lowerBound.unicodeScalars.first, let end = range.upperBound.unicodeScalars.first else {
+                    return ""
+                }
+                let rng: CountableClosedRange = start ... end
+                return String(rng.randomElement()!)
+            case .terminal(.string(string: let str, _)):
+                return str
+            case .terminal(.regularExpression):
+                fatalError("Cannot sample from regular expression terminal \(symbol)")
+            }
+        }.joined()
+    }
+    
+    func sample() -> String {
+        return sample(start: start)
+    }
+}
+
+extension Unicode.Scalar: Strideable {
+    public func distance(to other: Unicode.Scalar) -> Int {
+        return Int(UInt32(other)) - Int(UInt32(self))
+    }
+    
+    public func advanced(by n: Int) -> Unicode.Scalar {
+        return Unicode.Scalar(Int(UInt32(self)) + n)!
+    }
+    
+    public typealias Stride = Int
 }
