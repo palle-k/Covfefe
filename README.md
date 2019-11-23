@@ -11,19 +11,24 @@ It implements the [Earley](https://en.wikipedia.org/wiki/Earley_parser) and [CYK
 
 ## Usage
 
+### Swift Package Dependency in Xcode
+
+1. Go to "File" > "Swift Packages" > "Add Package Dependency..."
+2. Enter "https://github.com/palle-k/Covfefe.git" as the repository URL.
+3. Select "Version", "Up to next major", "0.5.0" < "1.0.0"
+4. Add Covfefe to your desired target.
+
 ### Swift Package Manager
 
 This framework can be imported as a Swift Package by adding it as a dependency to the `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/palle-k/Covfefe.git", majorVersion: 0, minor: 4)
+.package(url: "https://github.com/palle-k/Covfefe.git", from: "0.5.0")
 ```
 
 ### CocoaPods
 
 Alternatively, it can be added as a dependency via CocoaPods (iOS, tvOS, watchOS and macOS).
-
-#### Swift 5.0
 
 ```ruby
 target 'Your-App-Name' do
@@ -31,25 +36,6 @@ target 'Your-App-Name' do
   pod 'Covfefe', '~> 0.5.0'
 end
 ```
-
-#### Swift 4.2
-
-```ruby
-target 'Your-App-Name' do
-use_frameworks!
-pod 'Covfefe', '0.4.2'
-end
-```
-
-Some grammar features are not available when using Swift 4.0 (Grouping, Repetitions, Optional Sequences and Character Ranges, EBNF import)
-
-### To add this framework manually:
-
-1. `git clone https://github.com/palle-k/Covfefe.git`
-2. `cd Covfefe`
-3. `swift package generate-xcodeproj`
-4. Drag the generated project file into your project
-5. Add `Covfefe.framework` in the Embedded Binaries section of your project settings
 
 ## Example
 
