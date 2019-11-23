@@ -150,7 +150,6 @@ public extension Grammar {
 	///   - start: Start non-terminal
 	init(bnf bnfString: String, start: String) throws {
 		let grammar = bnfGrammar
-		let tokenizer = DefaultTokenizer(grammar: grammar)
 		let parser = EarleyParser(grammar: grammar)
 		let syntaxTree = try parser
 			.syntaxTree(for: bnfString)
