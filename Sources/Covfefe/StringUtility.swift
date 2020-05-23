@@ -3,7 +3,7 @@
 //  Covfefe
 //
 //  Created by Palle Klewitz on 19.09.17.
-//  Copyright (c) 2017 Palle Klewitz
+//  Copyright (c) 2017 - 2020 Palle Klewitz
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -276,7 +276,7 @@ public extension String {
 				("\\", "\\\\"),
 				("\n", "\\n"),
 				("\r", "\\r"),
-				("\t", "\\t")
+				("\t", "\\t"),
 			]
 		)
 	}

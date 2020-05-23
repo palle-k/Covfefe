@@ -3,7 +3,7 @@
 //  Covfefe
 //
 //  Created by Palle Klewitz on 07.08.17.
-//  Copyright (c) 2017 Palle Klewitz
+//  Copyright (c) 2017 - 2020 Palle Klewitz
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -57,8 +57,28 @@ public struct SyntaxError: Error {
 	/// The context around the error
 	public let context: [NonTerminal]
 	
-	/// The string for which the parsing was unsuccessful
+	/// The string for which the parsing was unsuccessful.
 	public let string: String
+    
+    /// The line in which the error occurred.
+    ///
+    /// The first line of the input string is line 0.
+    public var line: Int {
+        if string.count == 0 {
+            return 0
+        }
+        return string[...range.lowerBound].filter { (char: Character) in
+            char.isNewline
+        }.count
+    }
+    
+    public var column: Int {
+        if string.count == 0 {
+            return 0
+        }
+        let lastNewlineIndex = string[...range.lowerBound].lastIndex(where: {$0.isNewline}) ?? string.startIndex
+        return string.distance(from: lastNewlineIndex, to: range.lowerBound)
+    }
 	
 	/// Creates a new syntax error with a given range and reason
 	///
@@ -77,7 +97,7 @@ public struct SyntaxError: Error {
 
 extension SyntaxError: CustomStringConvertible {
 	public var description: String {
-		let main = "Error: \(reason) at \(NSRange(range, in: string)): '\(string[range])'"
+		let main = "Error: \(reason) at L\(line):\(column): '\(string[range])'"
 		if !context.isEmpty {
 			return "\(main), expected: \(context.map{$0.description}.joined(separator: " | "))"
 		} else {
@@ -136,8 +156,8 @@ public struct Grammar {
 	public init(productions: [Production], start: NonTerminal) {
 		self.init(productions: productions, start: start, utilityNonTerminals: [])
 		
-		assertNonFatal(unreachableNonTerminals.isEmpty, "Grammar contains unreachable non-terminals (\(unreachableNonTerminals))")
-		assertNonFatal(unterminatedNonTerminals.isEmpty, "Grammar contains non-terminals which can never reach terminals (\(unterminatedNonTerminals))")
+		// assertNonFatal(unreachableNonTerminals.isEmpty, "Grammar contains unreachable non-terminals (\(unreachableNonTerminals))")
+		// assertNonFatal(unterminatedNonTerminals.isEmpty, "Grammar contains non-terminals which can never reach terminals (\(unterminatedNonTerminals))")
 	}
 	
 	/// Creates a new grammar with a given set of productions, a start non-terminal and
@@ -294,6 +314,55 @@ extension Grammar: CustomStringConvertible {
 			return "\(pattern.name) = \(productionString);"
 		}.joined(separator: "\n")
 	}
+    
+    /// Returns a Augmented Backus-Naur form representation of the grammar.
+    ///
+    /// Production rules are encoded in the following form:
+    /// `pattern = production-result`, where the pattern is always a single non-terminal and the production-result
+    /// is a list of alternative results separated by `/` (or just one single result). The production result is a concatenation
+    /// of terminal and non-terminal symbols.
+    ///
+    /// Example:
+    ///
+    ///        non-terminal-pattern = produced non-terminal / "terminal" concatenated non-terminal;
+    public var abnf: String {
+        let groupedProductions = Dictionary(grouping: self.productions) { production in
+            production.pattern
+        }
+        return groupedProductions.sorted(by: {$0.key.name < $1.key.name}).map { entry -> String in
+            let (pattern, productions) = entry
+            
+            let productionString = productions.map { production in
+                if production.production.isEmpty {
+                    return "\"\""
+                }
+                return production.production.map { symbol -> String in
+                    switch symbol {
+                    case .nonTerminal(let nonTerminal):
+                        return nonTerminal.name
+   
+                    case .terminal(.string(let string, _)):
+                        if let scalar = string.unicodeScalars.first, string.unicodeScalars.count == 1 {
+                            return "%x\(String(scalar.value, radix: 16))"
+                        }
+                        let escapedValue = string.doubleQuoteLiteralEscaped
+                        return "\"\(escapedValue)\""
+                        
+                    case .terminal(.regularExpression):
+                        fatalError("Regular expressions cannot be expressed in standard ABNF")
+                        
+                    case .terminal(.characterRange(let range, _)):
+                        let lowerBound = String(range.lowerBound.unicodeScalars.first!.value, radix: 16)
+                        let upperBound = String(range.upperBound.unicodeScalars.first!.value, radix: 16)
+                        
+                        return "%x\(lowerBound)-\(upperBound)"
+                    }
+                }.joined(separator: " ")
+            }.joined(separator: " / ")
+            
+            return "\(pattern.name) = \(productionString);"
+        }.joined(separator: "\n")
+    }
 	
 	public var description: String {
 		return bnf
