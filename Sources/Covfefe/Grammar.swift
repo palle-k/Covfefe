@@ -395,3 +395,5 @@ extension Grammar: Equatable {
 		return lhs.start == rhs.start && Set(lhs.productions) == Set(rhs.productions)
 	}
 }
+
+extension Grammar: Codable {}
