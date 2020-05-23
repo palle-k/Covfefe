@@ -51,18 +51,25 @@ let abnfGrammar: Grammar = {
     terminal = string-literal | charcode-literal | charcode-range-literal;
 
     string-literal = '"', [{string-content}], '"';
-    charcode-literal = "%", "x", hex-int;
-    charcode-range-literal = "%", "x", hex-int, "-", hex-int;
+    charcode-literal = hex-literal | dec-literal;
+    charcode-range-literal = hex-range-literal;
+    hex-literal = "%", "x", hex-int-seq;
+    dec-literal = "%", "d", dec-int-seq;
+    hex-range-literal = "%", "x", hex-int, "-", hex-int;
+    dec-range-literal = "%", "d", dec-int, "-", dec-int;
+
+    hex-int-seq = hex-int | hex-int-seq, ".", hex-int;
+    dec-int-seq = dec-int | dec-int-seq, ".", dec-int;
 
     integer-literal = {digit};
     hex-int = {hex-digit};
     hex-digit = "0" ... "9" | "a" ... "f" | "A" ... "F";
+    dec-int = {digit};
     digit = "0" ... "9";
     whitespace = {" " | "\\t" | "\\n" | "\\r", "\\n" | comment};
     comment = ";", [{any-except-linebreak}], "\\n";
     eof-comment = ";", [{any-except-linebreak}];
-    string-content = "\\u{01}" ... "\\u{21}" | "\\u{23}" ... "\\u{5B}" | "\\u{5D}" ... "\\u{FFFF}" | escape-sequence;
-    escape-sequence = "\\\\", '"';
+    string-content = "\\u{01}" ... "\\u{21}" | "\\u{23}" ... "\\u{FFFF}" | escape-sequence;
     any-except-linebreak = "\\u{01}" ... "\\u{09}" | "\\u{0B}" ... "\\u{0C}" | "\\u{0E}" ... "\\u{FFFF}";
     """
     
@@ -74,7 +81,10 @@ let abnfGrammar: Grammar = {
 public enum ABNFImportError: Error {
     /// The grammar contains a range expression with a lower bound higher than the upper bound
     case invalidRange(line: Int, column: Int)
+    /// The grammar contains a charcode that is not a valid unicode scalar
     case invalidCharcode(line: Int, column: Int)
+    /// The grammar contains a charcode range with a lower bound higher than the upper bound
+    case invalidCharacterRange(line: Int, column: Int)
 }
 
 public extension Grammar {
@@ -103,11 +113,17 @@ public extension Grammar {
         Production(pattern: NonTerminal(name: "BIT"), production: [.terminal("0"), .terminal("1")]),
     ]
     
+    
+    /// Creates a grammar from the production rules defined in the provided ABNF grammar.
+    /// - Parameters:
+    ///   - abnf: ABNF grammar
+    ///   - start: Starting symbol
+    /// - Throws: Syntax error if the abnf string is not in ABNF format. ABNFImportError, when the grammar contains semantic issues.
     init(abnf: String, start: String) throws {
-        // Clean up string so parser has easier job
+        // Strip lines containing only comments
         let abnf = abnf
-            .replacingOccurrences(of: #";[^\n]*\n"#, with: "\n", options: .regularExpression)
-            .replacingOccurrences(of: #"\n\s*\n"#, with: "\n", options: .regularExpression)
+            .replacingOccurrences(of: "\n\\s*;[^\n]*\n", with: "\n\n", options: .regularExpression)
+            .replacingOccurrences(of: "\n\\s*\n", with: "\n", options: .regularExpression)
         
         func flatten(parseTree: ParseTree, nodeName: String) -> [ParseTree] {
             switch parseTree {
@@ -136,31 +152,116 @@ public extension Grammar {
             let hexDigits = hexInt.leafs.map {abnf[$0]}.joined()
             
             guard let scalar = UInt32(hexDigits, radix: 16), let unichar = UnicodeScalar(scalar) else {
-                throw ABNFImportError.invalidRange(
-                    line: abnf[...hexInt.leafs[0].lowerBound].filter {$0.isNewline}.count,
+                let errorBound = hexInt.leafs[0].lowerBound
+                throw ABNFImportError.invalidCharcode(
+                    line: abnf[...errorBound].filter {$0.isNewline}.count,
                     column: abnf.distance(
-                        from: abnf[...hexInt.leafs[0].lowerBound].lastIndex(where: {$0.isNewline}) ?? abnf.startIndex,
-                        to: hexInt.leafs[0].lowerBound
+                        from: abnf[...errorBound].lastIndex(where: {$0.isNewline}) ?? abnf.startIndex,
+                        to: errorBound
                     )
                 )
             }
             return Character(unichar)
         }
         
-        func parse(charcodeLiteral: ParseTree) throws -> Character {
-            guard case .node(key: "charcode-literal", children: let children) = charcodeLiteral, children.count == 3 else {
-                fatalError("Invalid parse tree")
+        func parse(decInt: ParseTree) throws -> Character {
+            let hexDigits = decInt.leafs.map {abnf[$0]}.joined()
+            
+            guard let scalar = UInt32(hexDigits), let unichar = UnicodeScalar(scalar) else {
+                let errorBound = decInt.leafs[0].lowerBound
+                throw ABNFImportError.invalidCharcode(
+                    line: abnf[...errorBound].filter {$0.isNewline}.count,
+                    column: abnf.distance(
+                        from: abnf[...errorBound].lastIndex(where: {$0.isNewline}) ?? abnf.startIndex,
+                        to: errorBound
+                    )
+                )
             }
-            return try parse(hexInt: children[2])
+            return Character(unichar)
         }
         
-        func parse(charcodeRangeLiteral: ParseTree) throws -> Terminal {
-            guard case .node(key: "charcode-range-literal", children: let children) = charcodeRangeLiteral, children.count == 5 else {
+        func parse(decimalIntegerSequence: ParseTree) throws -> String {
+            let integers = decimalIntegerSequence.allNodes(where: {$0.name == "dec-int"})
+            return try String(integers.map(parse(decInt:)))
+        }
+        
+        func parse(hexIntegerSequence: ParseTree) throws -> String {
+            let integers = hexIntegerSequence.allNodes(where: {$0.name == "hex-int"})
+            return try String(integers.map(parse(hexInt:)))
+        }
+        
+        func parse(charcodeLiteral: ParseTree) throws -> String {
+            guard case .node(key: "charcode-literal", children: let children) = charcodeLiteral, children.count == 1, let firstChild = children.first else {
+                fatalError("Invalid parse tree")
+            }
+            switch firstChild {
+            case .node(key: "hex-literal", children: let hexLiteralChildren):
+                return try parse(hexIntegerSequence: hexLiteralChildren[2])
+                
+            case .node(key: "dec-literal", children: let decLiteralChildren):
+                return try parse(decimalIntegerSequence: decLiteralChildren[2])
+                
+            default:
+                fatalError("Invalid parse tree")
+            }
+        }
+        
+        func parse(hexRangeLiteral: ParseTree) throws -> Terminal {
+            guard case .node(key: "hex-range-literal", children: let children) = hexRangeLiteral, children.count == 5 else {
                 fatalError("Invalid parse tree")
             }
             let lowerBound = try parse(hexInt: children[2])
             let upperBound = try parse(hexInt: children[4])
+            
+            if lowerBound > upperBound {
+                let errorBound = hexRangeLiteral.leafs[0].lowerBound
+                throw ABNFImportError.invalidCharacterRange(
+                    line: abnf[...errorBound].filter {$0.isNewline}.count,
+                    column: abnf.distance(
+                        from: abnf[...errorBound].lastIndex(where: {$0.isNewline}) ?? abnf.startIndex,
+                        to: errorBound
+                    )
+                )
+            }
+            
             return Terminal(range: lowerBound ... upperBound)
+        }
+        
+        func parse(decimalRangeLiteral: ParseTree) throws -> Terminal {
+            guard case .node(key: "dec-range-literal", children: let children) = decimalRangeLiteral, children.count == 5 else {
+                fatalError("Invalid parse tree")
+            }
+            let lowerBound = try parse(decInt: children[2])
+            let upperBound = try parse(decInt: children[4])
+            
+            if lowerBound > upperBound {
+                let errorBound = decimalRangeLiteral.leafs[0].lowerBound
+                throw ABNFImportError.invalidCharacterRange(
+                    line: abnf[...errorBound].filter {$0.isNewline}.count,
+                    column: abnf.distance(
+                        from: abnf[...errorBound].lastIndex(where: {$0.isNewline}) ?? abnf.startIndex,
+                        to: errorBound
+                    )
+                )
+            }
+            
+            return Terminal(range: lowerBound ... upperBound)
+        }
+        
+        func parse(charcodeRangeLiteral: ParseTree) throws -> Terminal {
+            guard case .node(key: "charcode-range-literal", children: let children) = charcodeRangeLiteral, children.count == 1, let firstChild = children.first else {
+                fatalError("Invalid parse tree")
+            }
+            switch firstChild {
+            case .node(key: "hex-range-literal", children: _):
+                return try parse(hexRangeLiteral: firstChild)
+                
+            case .node(key: "dec-range-literal", children: _):
+                return try parse(decimalRangeLiteral: firstChild)
+                
+            default:
+                fatalError("Invalid parse tree")
+            }
         }
         
         func parse(terminal: ParseTree) throws -> Terminal {
@@ -169,7 +270,7 @@ public extension Grammar {
             }
             switch firstChild {
             case .node(key: "charcode-literal", children: _):
-                return try Terminal(string: String(parse(charcodeLiteral: firstChild)))
+                return try Terminal(string: parse(charcodeLiteral: firstChild))
                 
             case .node(key: "charcode-range-literal", children: _):
                 return try parse(charcodeRangeLiteral: firstChild)
