@@ -3,7 +3,7 @@
 //  Covfefe
 //
 //  Created by Palle Klewitz on 07.08.17.
-//  Copyright (c) 2017 Palle Klewitz
+//  Copyright (c) 2017 - 2020 Palle Klewitz
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -57,8 +57,22 @@ public struct SyntaxError: Error {
 	/// The context around the error
 	public let context: [NonTerminal]
 	
-	/// The string for which the parsing was unsuccessful
+	/// The string for which the parsing was unsuccessful.
 	public let string: String
+    
+    /// The line in which the error occurred.
+    ///
+    /// The first line of the input string is line 0.
+    public var line: Int {
+        return string[...range.lowerBound].filter { (char: Character) in
+            char.isNewline
+        }.count
+    }
+    
+    public var column: Int {
+        let lastNewlineIndex = string[...range.lowerBound].lastIndex(where: {$0.isNewline}) ?? string.startIndex
+        return string.distance(from: lastNewlineIndex, to: range.lowerBound)
+    }
 	
 	/// Creates a new syntax error with a given range and reason
 	///
@@ -77,7 +91,7 @@ public struct SyntaxError: Error {
 
 extension SyntaxError: CustomStringConvertible {
 	public var description: String {
-		let main = "Error: \(reason) at \(NSRange(range, in: string)): '\(string[range])'"
+		let main = "Error: \(reason) at L\(line):\(column): '\(string[range])'"
 		if !context.isEmpty {
 			return "\(main), expected: \(context.map{$0.description}.joined(separator: " | "))"
 		} else {
