@@ -15,7 +15,7 @@ It implements the [Earley](https://en.wikipedia.org/wiki/Earley_parser) and [CYK
 
 1. Go to "File" > "Swift Packages" > "Add Package Dependency..."
 2. Enter "https://github.com/palle-k/Covfefe.git" as the repository URL.
-3. Select "Version", "Up to next major", "0.5.0" < "1.0.0"
+3. Select "Version", "Up to next major", "0.6.0" < "1.0.0"
 4. Add Covfefe to your desired target.
 
 ### Swift Package Manager
@@ -23,7 +23,7 @@ It implements the [Earley](https://en.wikipedia.org/wiki/Earley_parser) and [CYK
 This framework can be imported as a Swift Package by adding it as a dependency to the `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/palle-k/Covfefe.git", from: "0.5.0")
+.package(url: "https://github.com/palle-k/Covfefe.git", from: "0.6.0")
 ```
 
 ### CocoaPods
@@ -33,7 +33,7 @@ Alternatively, it can be added as a dependency via CocoaPods (iOS, tvOS, watchOS
 ```ruby
 target 'Your-App-Name' do
   use_frameworks!
-  pod 'Covfefe', '~> 0.5.0'
+  pod 'Covfefe', '~> 0.6.0'
 end
 ```
 
