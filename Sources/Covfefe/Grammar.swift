@@ -314,6 +314,55 @@ extension Grammar: CustomStringConvertible {
 			return "\(pattern.name) = \(productionString);"
 		}.joined(separator: "\n")
 	}
+    
+    /// Returns a Augmented Backus-Naur form representation of the grammar.
+    ///
+    /// Production rules are encoded in the following form:
+    /// `pattern = production-result`, where the pattern is always a single non-terminal and the production-result
+    /// is a list of alternative results separated by `/` (or just one single result). The production result is a concatenation
+    /// of terminal and non-terminal symbols.
+    ///
+    /// Example:
+    ///
+    ///        non-terminal-pattern = produced non-terminal / "terminal" concatenated non-terminal;
+    public var abnf: String {
+        let groupedProductions = Dictionary(grouping: self.productions) { production in
+            production.pattern
+        }
+        return groupedProductions.sorted(by: {$0.key.name < $1.key.name}).map { entry -> String in
+            let (pattern, productions) = entry
+            
+            let productionString = productions.map { production in
+                if production.production.isEmpty {
+                    return "\"\""
+                }
+                return production.production.map { symbol -> String in
+                    switch symbol {
+                    case .nonTerminal(let nonTerminal):
+                        return nonTerminal.name
+   
+                    case .terminal(.string(let string, _)):
+                        if let scalar = string.unicodeScalars.first, string.unicodeScalars.count == 1 {
+                            return "%x\(String(scalar.value, radix: 16))"
+                        }
+                        let escapedValue = string.doubleQuoteLiteralEscaped
+                        return "\"\(escapedValue)\""
+                        
+                    case .terminal(.regularExpression):
+                        fatalError("Regular expressions cannot be expressed in standard ABNF")
+                        
+                    case .terminal(.characterRange(let range, _)):
+                        let lowerBound = String(range.lowerBound.unicodeScalars.first!.value, radix: 16)
+                        let upperBound = String(range.upperBound.unicodeScalars.first!.value, radix: 16)
+                        
+                        return "%x\(lowerBound)-\(upperBound)"
+                    }
+                }.joined(separator: " ")
+            }.joined(separator: " / ")
+            
+            return "\(pattern.name) = \(productionString);"
+        }.joined(separator: "\n")
+    }
 	
 	public var description: String {
 		return bnf

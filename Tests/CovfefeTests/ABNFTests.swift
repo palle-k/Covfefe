@@ -187,4 +187,57 @@ class ABNFTests: XCTestCase {
         XCTAssertFalse(parser.recognizes("abd"))
         XCTAssertTrue(parser.recognizes("abcd"))
     }
+    
+    func testABNFExport() throws {
+        let testStrings = [
+            """
+            root = hello world
+            """,
+            "root = a",
+            """
+            root = hello world
+            root =/ a / b
+            """,
+            """
+            root = a ; trailing comment
+            """,
+            """
+            root = %x0a %xA0 ; hex literals
+            root = %d99 ; decimal liteerals
+            """,
+            """
+            root = %xaa.bb.cc ; hex sequences
+            """,
+            """
+            root = %d77.78.79 ; decimal sequences
+            """,
+            """
+            root = %x00-42 ; hex range
+            """,
+            """
+            root = %d00-42 ; integer range
+            """,
+            "",
+            "; only comment", // only comment
+            """
+            root = 2*4repeat
+            root =/ 2*4"literal"
+            root =/ *4%x42
+            root =/ 4*%d12
+            root =/ *(hello world)
+            root =/ 8repeat
+            """,
+            """
+            root = [optional]
+            """
+        ]
+        for example in testStrings {
+            let grammar = try Grammar(abnf: example, start: "root")
+            do {
+                _ = try Grammar(abnf: grammar.abnf, start: "root")
+            } catch {
+                XCTFail()
+            }
+        }
+    }
 }
