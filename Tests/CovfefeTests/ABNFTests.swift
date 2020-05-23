@@ -97,8 +97,9 @@ class ABNFTests: XCTestCase {
         ]
         for example in testStrings {
             do {
-                _ = try Grammar(abnf: example, start: "root")
-                XCTFail("Error expected")
+                let grammar = try Grammar(abnf: example, start: "root")
+                print(grammar.ebnf)
+                XCTFail("Error expected for \(example)")
             } catch {}
         }
     }

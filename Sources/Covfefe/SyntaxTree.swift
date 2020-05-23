@@ -189,7 +189,9 @@ extension SyntaxTree: CustomStringConvertible {
 			switch tree {
 			case .leaf(let leaf):
 				let (id, leafElement) = leaf
-				let leafDescription = "\(leafElement)".literalEscaped
+                let leafDescription = "\(leafElement)"
+                    .literalEscaped
+                    .replacingOccurrences(of: "\"", with: "\\\"")
 				return "node\(id) [label=\"\(leafDescription)\" shape=box]"
 				
 			case .node(key: let key, children: let children):

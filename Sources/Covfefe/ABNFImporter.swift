@@ -39,8 +39,9 @@ let abnfGrammar: Grammar = {
     optional = "[", [whitespace], alternation, [whitespace], "]";
     sequence-group = "(", [whitespace], alternation, [whitespace], ")";
     repetition = variable-repetition | specific-repetition;
-    variable-repetition = (closed-range | partial-range-to | partial-range-from | unlimited-range), atom;
-    specific-repetition = integer-literal, atom;
+    variable-repetition = (closed-range | partial-range-to | partial-range-from | unlimited-range), repeated-atom;
+    repeated-atom = optional | sequence-group | nonterminal | terminal;
+    specific-repetition = integer-literal, repeated-atom;
 
     closed-range = integer-literal, '*', integer-literal;
     partial-range-to = '*', integer-literal;
@@ -436,7 +437,7 @@ public extension Grammar {
         }
         
         func parse(atom: ParseTree, alternationIndex: Int, concatenationIndex: Int, ruleName: String) throws -> ([Symbol], Set<Production>) {
-            guard case .node(key: "atom", children: let children) = atom, children.count == 1, let firstChild = children.first else {
+            guard case .node(key: let key, children: let children) = atom, children.count == 1, let firstChild = children.first, ["atom", "repeated-atom"].contains(key) else {
                 fatalError("Invalid parse tree")
             }
             switch firstChild {
@@ -528,7 +529,6 @@ public extension Grammar {
             self = Grammar(productions: [], start: NonTerminal(name: start))
             return
         }
-        
         let ruleExpressions = tree.allNodes(where: {$0.name == "rule"})
         let allProductions = try ruleExpressions.map(parse(rule:))
         let (visibleRules, hiddenRules): ([[Production]], [Set<Production>]) = unzip(allProductions)
