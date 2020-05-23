@@ -40,6 +40,7 @@ end
 ## Example
 
 Grammars can be specified in a superset of EBNF or a superset of BNF, which adopts some features of EBNF (documented [here](/BNF.md)).
+Alternatively, ABNF is supported.
 
 ```swift
 let grammarString = """
