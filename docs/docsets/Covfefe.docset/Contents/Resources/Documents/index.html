@@ -20,7 +20,7 @@
     <header class="header">
       <p class="header-col header-col--primary">
         <a class="header-link" href="index.html">
-          Covfefe 0.5.1 Docs
+          Covfefe 0.6.1 Docs
         </a>
          (99% documented)
       </p>
@@ -248,25 +248,26 @@ It implements the <a href="https://en.wikipedia.org/wiki/Earley_parser">Earley</
 <ol>
 <li>Go to &ldquo;File&rdquo; &gt; &ldquo;Swift Packages&rdquo; &gt; &ldquo;Add Package Dependency&hellip;&rdquo;</li>
 <li>Enter &ldquo;<a href="https://github.com/palle-k/Covfefe.git">https://github.com/palle-k/Covfefe.git</a>&rdquo; as the repository URL.</li>
-<li>Select &ldquo;Version&rdquo;, &ldquo;Up to next major&rdquo;, &ldquo;0.5.0&rdquo; &lt; &ldquo;1.0.0&rdquo;</li>
+<li>Select &ldquo;Version&rdquo;, &ldquo;Up to next major&rdquo;, &ldquo;0.6.1&rdquo; &lt; &ldquo;1.0.0&rdquo;</li>
 <li>Add Covfefe to your desired target.</li>
 </ol>
 <h3 id='swift-package-manager' class='heading'>Swift Package Manager</h3>
 
 <p>This framework can be imported as a Swift Package by adding it as a dependency to the <code>Package.swift</code> file:</p>
-<pre class="highlight swift"><code><span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/palle-k/Covfefe.git"</span><span class="p">,</span> <span class="nv">from</span><span class="p">:</span> <span class="s">"0.5.0"</span><span class="p">)</span>
+<pre class="highlight swift"><code><span class="o">.</span><span class="nf">package</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="s">"https://github.com/palle-k/Covfefe.git"</span><span class="p">,</span> <span class="nv">from</span><span class="p">:</span> <span class="s">"0.6.1"</span><span class="p">)</span>
 </code></pre>
 <h3 id='cocoapods' class='heading'>CocoaPods</h3>
 
 <p>Alternatively, it can be added as a dependency via CocoaPods (iOS, tvOS, watchOS and macOS).</p>
 <pre class="highlight ruby"><code><span class="n">target</span> <span class="s1">'Your-App-Name'</span> <span class="k">do</span>
   <span class="n">use_frameworks!</span>
-  <span class="n">pod</span> <span class="s1">'Covfefe'</span><span class="p">,</span> <span class="s1">'~&gt; 0.5.0'</span>
+  <span class="n">pod</span> <span class="s1">'Covfefe'</span><span class="p">,</span> <span class="s1">'~&gt; 0.6.1'</span>
 <span class="k">end</span>
 </code></pre>
 <h2 id='example' class='heading'>Example</h2>
 
-<p>Grammars can be specified in a superset of EBNF or a superset of BNF, which adopts some features of EBNF (documented <a href="/BNF.md">here</a>).</p>
+<p>Grammars can be specified in a superset of EBNF or a superset of BNF, which adopts some features of EBNF (documented <a href="/BNF.md">here</a>).
+Alternatively, ABNF is supported.</p>
 <pre class="highlight swift"><code><span class="k">let</span> <span class="nv">grammarString</span> <span class="o">=</span> <span class="s">"""
 expression       = binary-operation | brackets | unary-operation | number | variable;
 brackets         = '(', expression, ')';
