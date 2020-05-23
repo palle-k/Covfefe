@@ -27,7 +27,7 @@ import Foundation
 
 let abnfGrammar: Grammar = {
     let abnfStr = """
-    rule-list = [whitespace], [{rule, whitespace}], rule, [eof-comment] | [whitespace];
+    rule-list = [whitespace], [{rule, whitespace}], rule, [whitespace], [eof-comment] | [whitespace], [eof-comment];
 
     rule = init-rule | incremental-alternation;
     init-rule = [whitespace], nonterminal, [whitespace], '=', [whitespace], alternation;
@@ -47,12 +47,12 @@ let abnfGrammar: Grammar = {
     partial-range-from = integer-literal, '*';
     unlimited-range = '*';
 
-    nonterminal = ("a" ... "z" | "A" ... "Z" | "_" | "-"), {"a" ... "z" | "A" ... "Z" | "0" ... "9" | "_" | "-"};
+    nonterminal = ("a" ... "z" | "A" ... "Z" | "_" | "-"), [{"a" ... "z" | "A" ... "Z" | "0" ... "9" | "_" | "-"}];
     terminal = string-literal | charcode-literal | charcode-range-literal;
 
     string-literal = '"', [{string-content}], '"';
     charcode-literal = hex-literal | dec-literal;
-    charcode-range-literal = hex-range-literal;
+    charcode-range-literal = hex-range-literal | dec-range-literal;
     hex-literal = "%", "x", hex-int-seq;
     dec-literal = "%", "d", dec-int-seq;
     hex-range-literal = "%", "x", hex-int, "-", hex-int;
@@ -118,7 +118,7 @@ public extension Grammar {
     /// - Parameters:
     ///   - abnf: ABNF grammar
     ///   - start: Starting symbol
-    /// - Throws: Syntax error if the abnf string is not in ABNF format. ABNFImportError, when the grammar contains semantic issues.
+    /// - Throws: Syntax error if the abnf string is not in ABNF format. ABNFImportError, when the grammar has semantic issues.
     init(abnf: String, start: String) throws {
         // Strip lines containing only comments
         let abnf = abnf

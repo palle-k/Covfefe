@@ -29,30 +29,162 @@ import XCTest
 
 
 class ABNFTests: XCTestCase {
-    func testABNFParser() throws {
-        let testStr = """
-        postal-address   = name-part street zip-part
-
-        name-part        = *(personal-part SP) last-name [SP suffix] CRLF
-        name-part        =/ personal-part CRLF
-
-        personal-part    = first-name / (initial ".")
-        first-name       = *ALPHA
-        initial          = ALPHA
-        last-name        = *ALPHA
-        suffix           = ("Jr." / "Sr." / 1*("I" / "V" / "X"))
-
-        street           = [apt SP] house-num SP street-name CRLF
-        apt              = 1*4DIGIT
-        house-num        = 1*8(DIGIT / ALPHA)
-        street-name      = 1*VCHAR
-
-        zip-part         = town-name "," SP state 1*2SP zip-code CRLF
-        town-name        = 1*(ALPHA / SP)
-        state            = 2ALPHA
-        zip-code         = 5DIGIT ["-" 4DIGIT]
-        """
+    func testGrammarExamples() throws {
+        let testStrings = [
+            """
+            root = hello world
+            """,
+            "root = a",
+            """
+            root = hello world
+            root =/ a / b
+            """,
+            """
+            root = a ; trailing comment
+            """,
+            """
+            root = %x0a %xA0 ; hex literals
+            root = %d99 ; decimal liteerals
+            """,
+            """
+            root = %xaa.bb.cc ; hex sequences
+            """,
+            """
+            root = %d77.78.79 ; decimal sequences
+            """,
+            """
+            root = %x00-42 ; hex range
+            """,
+            """
+            root = %d00-42 ; integer range
+            """,
+            "",
+            "; only comment", // only comment
+            """
+            root = 2*4repeat
+            root =/ 2*4"literal"
+            root =/ *4%x42
+            root =/ 4*%d12
+            root =/ *(hello world)
+            root =/ 8repeat
+            """,
+            """
+            root = [optional]
+            """
+        ]
         
-        print(try Grammar(abnf: testStr, start: "postal-address").ebnf)
+        for example in testStrings {
+            do {
+                _ = try Grammar(abnf: example, start: "root")
+            } catch {
+                print(error)
+                XCTFail(example)
+            }
+        }
+    }
+    
+    func testIncorrectExamples() {
+        let testStrings = [
+            "root =",
+            "= hello",
+            "root = ; hello",
+            "root = test = hello",
+            "root = %x42-40 ; invalid range",
+            "root = %d298423985729328 ; invalid unicode scalar",
+            "root = %dFF ; hex instead of decimal",
+            "root = %xG ; invalid hexadecimal",
+            "root = 4*2hello ; invalid range"
+        ]
+        for example in testStrings {
+            do {
+                _ = try Grammar(abnf: example, start: "root")
+                XCTFail("Error expected")
+            } catch {}
+        }
+    }
+    
+    func testConcat() throws {
+        let grammar = try Grammar(abnf: "root = \"a\" \"b\"", start: "root")
+        let parser = EarleyParser(grammar: grammar)
+        XCTAssertTrue(parser.recognizes("ab"))
+        XCTAssertFalse(parser.recognizes("b"))
+        XCTAssertFalse(parser.recognizes("a"))
+        XCTAssertFalse(parser.recognizes("aa"))
+        XCTAssertFalse(parser.recognizes(""))
+    }
+    
+    func testAlternation() throws {
+        let grammar = try Grammar(abnf: "root = \"a\" / \"b\"", start: "root")
+        let parser = EarleyParser(grammar: grammar)
+        XCTAssertTrue(parser.recognizes("a"))
+        XCTAssertTrue(parser.recognizes("b"))
+        XCTAssertFalse(parser.recognizes("ab"))
+        XCTAssertFalse(parser.recognizes(""))
+    }
+    
+    func testRange1() throws {
+        let grammar = try Grammar(abnf: "root = 3\"a\"", start: "root")
+        let parser = EarleyParser(grammar: grammar)
+        XCTAssertTrue(parser.recognizes("aaa"))
+        XCTAssertFalse(parser.recognizes("aaaa"))
+        XCTAssertFalse(parser.recognizes("aa"))
+    }
+    
+    func testRange2() throws {
+        let grammar = try Grammar(abnf: "root = *3\"a\"", start: "root")
+        let parser = EarleyParser(grammar: grammar)
+        XCTAssertTrue(parser.recognizes("aaa"))
+        XCTAssertFalse(parser.recognizes("aaaa"))
+        XCTAssertTrue(parser.recognizes("aa"))
+        XCTAssertTrue(parser.recognizes("a"))
+        XCTAssertTrue(parser.recognizes(""))
+    }
+    
+    func testRange3() throws {
+        let grammar = try Grammar(abnf: "root = 3*\"a\"", start: "root")
+        let parser = EarleyParser(grammar: grammar)
+        XCTAssertTrue(parser.recognizes("aaa"))
+        XCTAssertFalse(parser.recognizes("aa"))
+        XCTAssertFalse(parser.recognizes(""))
+        XCTAssertTrue(parser.recognizes("aaaa"))
+        XCTAssertTrue(parser.recognizes("aaaaaaaaaaaaa"))
+    }
+    
+    func testRange4() throws {
+        let grammar = try Grammar(abnf: "root = *\"a\"", start: "root")
+        let parser = EarleyParser(grammar: grammar)
+        XCTAssertTrue(parser.recognizes("aaa"))
+        XCTAssertTrue(parser.recognizes("aa"))
+        XCTAssertTrue(parser.recognizes(""))
+        XCTAssertTrue(parser.recognizes("aaaa"))
+        XCTAssertTrue(parser.recognizes("aaaaaaaaaaaaa"))
+        XCTAssertFalse(parser.recognizes("b"))
+    }
+    
+    func testOptional() throws {
+        let grammar = try Grammar(abnf: "root = [\"a\"]", start: "root")
+        let parser = EarleyParser(grammar: grammar)
+        XCTAssertTrue(parser.recognizes("a"))
+        XCTAssertTrue(parser.recognizes(""))
+        XCTAssertFalse(parser.recognizes("b"))
+        XCTAssertFalse(parser.recognizes("aa"))
+    }
+    
+    func testNesting1() throws {
+        let grammar = try Grammar(abnf: "root = \"a\" (\"b\" / \"c\") \"d\"", start: "root")
+        let parser = EarleyParser(grammar: grammar)
+        XCTAssertTrue(parser.recognizes("abd"))
+        XCTAssertTrue(parser.recognizes("acd"))
+        XCTAssertFalse(parser.recognizes("ad"))
+        XCTAssertFalse(parser.recognizes("abcd"))
+    }
+    
+    func testNesting2() throws {
+        let grammar = try Grammar(abnf: "root = \"a\" 2(\"b\" / \"c\") \"d\"", start: "root")
+        let parser = EarleyParser(grammar: grammar)
+        XCTAssertTrue(parser.recognizes("abbd"))
+        XCTAssertTrue(parser.recognizes("accd"))
+        XCTAssertFalse(parser.recognizes("abd"))
+        XCTAssertTrue(parser.recognizes("abcd"))
     }
 }

@@ -64,12 +64,18 @@ public struct SyntaxError: Error {
     ///
     /// The first line of the input string is line 0.
     public var line: Int {
+        if string.count == 0 {
+            return 0
+        }
         return string[...range.lowerBound].filter { (char: Character) in
             char.isNewline
         }.count
     }
     
     public var column: Int {
+        if string.count == 0 {
+            return 0
+        }
         let lastNewlineIndex = string[...range.lowerBound].lastIndex(where: {$0.isNewline}) ?? string.startIndex
         return string.distance(from: lastNewlineIndex, to: range.lowerBound)
     }
