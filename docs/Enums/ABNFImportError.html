@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Tokenizer Protocol Reference</title>
+    <title>ABNFImportError Enumeration Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset="utf-8">
@@ -14,9 +14,9 @@
   </head>
   <body>
 
-    <a name="//apple_ref/swift/Protocol/Tokenizer" class="dashAnchor"></a>
+    <a name="//apple_ref/swift/Enum/ABNFImportError" class="dashAnchor"></a>
 
-    <a title="Tokenizer Protocol Reference"></a>
+    <a title="ABNFImportError Enumeration Reference"></a>
 
     <header class="header">
       <p class="header-col header-col--primary">
@@ -44,7 +44,7 @@
     <p class="breadcrumbs">
       <a class="breadcrumb" href="../index.html">Covfefe Reference</a>
       <img class="carat" src="../img/carat.png" />
-      Tokenizer Protocol Reference
+      ABNFImportError Enumeration Reference
     </p>
 
     <div class="content-wrapper">
@@ -232,14 +232,14 @@
 
         <section class="section">
           <div class="section-content top-matter">
-            <h1>Tokenizer</h1>
+            <h1>ABNFImportError</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Tokenizer</span></code></pre>
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">ABNFImportError</span> <span class="p">:</span> <span class="kt">Error</span></code></pre>
 
                 </div>
               </div>
-            <p>A string tokenizer which tokenizes a string based on final productions of a context free grammar.</p>
+            <p>Errors specific to the import of ABNF grammars</p>
 
           </div>
         </section>
@@ -251,9 +251,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:7Covfefe9TokenizerP8tokenizeySaySayAA8TerminalO8terminal_SnySS5IndexVG5rangetGGSSKF"></a>
-                    <a name="//apple_ref/swift/Method/tokenize(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:7Covfefe9TokenizerP8tokenizeySaySayAA8TerminalO8terminal_SnySS5IndexVG5rangetGGSSKF">tokenize(_:<wbr>)</a>
+                    <a name="/s:7Covfefe15ABNFImportErrorO12invalidRangeyACSi_SitcACmF"></a>
+                    <a name="//apple_ref/swift/Element/invalidRange(line:column:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:7Covfefe15ABNFImportErrorO12invalidRangeyACSi_SitcACmF">invalidRange(line:<wbr>column:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -261,55 +261,70 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Tokenizes the given word and returns a sequence of possible tokens for each unit of the string</p>
-
-<p>For a grammar</p>
-<pre class="highlight swift"><code><span class="kt">A</span> <span class="o">-&gt;</span> <span class="n">a</span> <span class="o">|</span> <span class="kt">A</span> <span class="kt">B</span>
-<span class="kt">B</span> <span class="o">-&gt;</span> <span class="n">a</span> <span class="o">|</span> <span class="kt">B</span> <span class="n">b</span>
-</code></pre>
-
-<p>and a string &ldquo;ab&rdquo;</p>
-
-<p>The tokenizer generates the tokenization</p>
-<pre class="highlight swift"><code><span class="p">[[</span><span class="n">a</span><span class="p">],</span> <span class="p">[</span><span class="n">b</span><span class="p">]]</span>
-</code></pre>
-<div class="aside aside-throws">
-    <p class="aside-title">Throws</p>
-    A syntax error if the word could not be tokenized according to rules of the recognized language
-
-</div>
+                        <p>The grammar contains a range expression with a lower bound higher than the upper bound</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">_</span> <span class="nv">word</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">[[(</span><span class="nv">terminal</span><span class="p">:</span> <span class="kt"><a href="../Enums/Terminal.html">Terminal</a></span><span class="p">,</span> <span class="nv">range</span><span class="p">:</span> <span class="kt">Range</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">.</span><span class="kt">Index</span><span class="o">&gt;</span><span class="p">)]]</span></code></pre>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">invalidRange</span><span class="p">(</span><span class="nv">line</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">column</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>word</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Word which should be tokenized</p>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:7Covfefe15ABNFImportErrorO15invalidCharcodeyACSi_SitcACmF"></a>
+                    <a name="//apple_ref/swift/Element/invalidCharcode(line:column:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:7Covfefe15ABNFImportErrorO15invalidCharcodeyACSi_SitcACmF">invalidCharcode(line:<wbr>column:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The grammar contains a charcode that is not a valid unicode scalar</p>
+
                       </div>
-                      <div>
-                        <h4>Return Value</h4>
-                        <p>Tokenization of the word</p>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">invalidCharcode</span><span class="p">(</span><span class="nv">line</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">column</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:7Covfefe15ABNFImportErrorO21invalidCharacterRangeyACSi_SitcACmF"></a>
+                    <a name="//apple_ref/swift/Element/invalidCharacterRange(line:column:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:7Covfefe15ABNFImportErrorO21invalidCharacterRangeyACSi_SitcACmF">invalidCharacterRange(line:<wbr>column:<wbr>)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The grammar contains a charcode range with a lower bound higher than the upper bound</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="k">case</span> <span class="nf">invalidCharacterRange</span><span class="p">(</span><span class="nv">line</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">column</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span></code></pre>
+
+                        </div>
                       </div>
                     </section>
                   </div>
