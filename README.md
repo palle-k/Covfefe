@@ -69,3 +69,4 @@ let syntaxTree = try parser.syntaxTree(for: "(a+b)*(-c)")
 
 ![Example Syntax Tree](https://raw.githubusercontent.com/palle-k/Covfefe/master/example-syntax-tree.png)
 
+For a more complete example, i.e. how to evaluate syntax tree, check out [ExpressionSolver](https://github.com/palle-k/ExpressionSolver).
