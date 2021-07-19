@@ -238,6 +238,10 @@ extension Grammar: CustomStringConvertible {
 						}
 						
 						return "\(lowerString) ... \(upperString)"
+					
+					case .terminal(.characterSet(let aSet, _)):
+						#warning("Do we want to print a Character Set?")
+						return "%chacater set \(aSet)%"
 					}
 				}.joined(separator: " ")
 			}.joined(separator: " | ")
@@ -307,6 +311,10 @@ extension Grammar: CustomStringConvertible {
 						}
 						
 						return "\(lowerString) ... \(upperString)"
+					
+					case .terminal(.characterSet(let aSet, _)):
+						#warning("Do we want to print a Character Set?")
+						return "%chacater set \(aSet)%"
 					}
 				}.joined(separator: ", ")
 			}.joined(separator: " | ")
@@ -356,6 +364,10 @@ extension Grammar: CustomStringConvertible {
                         let upperBound = String(range.upperBound.unicodeScalars.first!.value, radix: 16)
                         
                         return "%x\(lowerBound)-\(upperBound)"
+					
+					case .terminal(.characterSet(let aSet, _)):
+						#warning("Do we want to print a Character Set?")
+						return "%chacater set \(aSet)%"
                     }
                 }.joined(separator: " ")
             }.joined(separator: " / ")

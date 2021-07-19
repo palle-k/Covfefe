@@ -1,5 +1,5 @@
 import XCTest
-@testable import GrammarTests
+@testable import CovfefeTests
 
 XCTMain([
     testCase(GrammarTests.allTests),
