@@ -526,4 +526,31 @@ class BNFTests: XCTestCase {
 		XCTAssertFalse(parser.recognizes("bcde"))
 		XCTAssertFalse(parser.recognizes("bcdfg"))
 	}
+
+    static var allTests = [
+        ("testImport", testImport),
+		("testImportQuotes", testImportQuotes),
+		("testUnicodeScalars", testUnicodeScalars),
+		("testEscaped", testEscaped),
+		("testEmpty", testEmpty),
+		("testComments", testComments),
+		("testCharacterRangeParsing", testCharacterRangeParsing),
+		("testCharacterRanges", testCharacterRanges),
+		("testBNFExport", testBNFExport),
+		("testExpressionGroupParsing", testExpressionGroupParsing),
+		("testExpressionGroups", testExpressionGroups),
+		("testExpressionGroups2", testExpressionGroups2),
+		("testExpressionGroups3", testExpressionGroups3),
+		("testExpressionGroups4", testExpressionGroups4),
+		("testRepetitionGrammar", testRepetitionGrammar),
+		("testRepetition", testRepetition),
+		("testRepetition2", testRepetition2),
+		("testRepetition3", testRepetition3),
+		("testRepetition4", testRepetition4),
+		("testRepetition5", testRepetition5),
+		("testOptionalGrammar", testOptionalGrammar),
+		("testOptional", testOptional),
+		("testOptional2", testOptional2),
+		("testOptional3", testOptional3),
+    ]
 }

@@ -1,5 +1,5 @@
 //
-//  GrammarTests.swift
+//  CYKParserTests.swift
 //  CovfefeTests
 //
 //  Created by Palle Klewitz on 07.08.17.
@@ -26,7 +26,7 @@
 import XCTest
 @testable import Covfefe
 
-class GrammarTests: XCTestCase {
+class CYKParserTests: XCTestCase {
 	func testCYKEmpty() {
 		let S = "S" --> [[]]
 		let grammar = Grammar(productions: S, start: "S")
@@ -249,8 +249,11 @@ class GrammarTests: XCTestCase {
 	}
 
     static var allTests = [
-        ("testCYK1", testCYK),
-        ("testCYK2", testCYK2),
-        ("testCYK3", testCYK3),
+        ("testCYKEmpty", testCYKEmpty),
+		("testCYK", testCYK),
+		("testCYK2", testCYK2),
+		("testCYK3", testCYK3),
+		("testProgrammingLanguage", testProgrammingLanguage),
+		("testNonNormalizedGrammar", testNonNormalizedGrammar),
     ]
 }

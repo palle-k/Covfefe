@@ -112,4 +112,8 @@ class ParserTests: XCTestCase {
 			}
 		}
 	}
+
+    static var allTests = [
+        ("testAll", testAll)
+    ]
 }

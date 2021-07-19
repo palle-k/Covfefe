@@ -241,4 +241,19 @@ class ABNFTests: XCTestCase {
             }
         }
     }
+    
+    static var allTests = [
+        ("testGrammarExamples", testGrammarExamples),
+		("testIncorrectExamples", testIncorrectExamples),
+		("testConcat", testConcat),
+		("testAlternation", testAlternation),
+		("testRange1", testRange1),
+		("testRange2", testRange2),
+		("testRange3", testRange3),
+		("testRange4", testRange4),
+		("testOptional", testOptional),
+		("testNesting1", testNesting1),
+		("testNesting2", testNesting2),
+		("testABNFExport", testABNFExport),
+    ]
 }

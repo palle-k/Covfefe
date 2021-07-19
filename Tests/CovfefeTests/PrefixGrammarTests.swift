@@ -55,4 +55,8 @@ class PrefixGrammarTests: XCTestCase {
 		XCTAssertTrue(parser.recognizes("(a+b)/(c"))
 		XCTAssertFalse(parser.recognizes("(a+)"))
 	}
+
+    static var allTests = [
+        ("testPrefixGrammar", testPrefixGrammar)
+    ]
 }

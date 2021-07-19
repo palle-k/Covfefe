@@ -62,5 +62,9 @@ class AmbiguousGrammarTests: XCTestCase {
             }
         }
     }
+
+    static var allTests = [
+        ("testAll", testAll),
+    ]
     
 }

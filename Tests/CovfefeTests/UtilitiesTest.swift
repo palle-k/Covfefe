@@ -112,4 +112,13 @@ class StringUtilitiesTest: XCTestCase {
 		XCTAssertEqual(aRef, a)
 		XCTAssertEqual(bRef, b)
 	}
+
+    static var allTests = [
+        ("testPrefix", testPrefix),
+        ("testRegularPrefix", testRegularPrefix),
+        ("testCharacterRangePrefix", testCharacterRangePrefix),
+        ("testUnique", testUnique),
+        ("testCrossProduct", testCrossProduct),
+        ("testUnzip", testUnzip),
+    ]
 }
