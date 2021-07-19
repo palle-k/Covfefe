@@ -46,6 +46,10 @@ public extension Terminal {
 		let regex = try NSRegularExpression(pattern: expression, options: [])
 		self = .regularExpression(expression: regex, hash: expression.hashValue)
 	}
+
+	init(characterSet: CharacterSet) {
+		self = .characterSet(set: characterSet, hash: characterSet.hashValue)
+	}
 	
 	
 	/// Indicates that this terminal matches the empty string and only the empty string.
