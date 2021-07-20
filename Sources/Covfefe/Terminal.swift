@@ -88,6 +88,9 @@ extension Terminal: Hashable {
 		case (.regularExpression(expression: let le, hash: _), .regularExpression(expression: let re, hash: _)):
 			return le.pattern == re.pattern
 			
+		case (.characterSet(set: let lSet, hash: _), .characterSet(set: let rSet, hash: _)):
+			return lSet == rSet
+			
 		default:
 			return false
 		}
