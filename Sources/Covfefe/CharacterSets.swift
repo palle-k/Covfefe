@@ -25,40 +25,8 @@
 
 import Foundation
 
-/// A set of terminal or non-terminal symbols
-public struct SymbolSet {
-	
-	/// Whitespace characters (space, tab and line break)
-	public static let whitespace = ProductionResult(SymbolSet(" \t\n".map(String.init).map(t)))
-	
-	/// Lower case letters a to z
-	public static let lowercase = ProductionResult(SymbolSet("abcdefghijklmnopqrstuvwxyz".map(String.init).map(t)))
-	
-	/// Upper case letters A to Z
-	public static let uppercase = ProductionResult(SymbolSet("ABCDEFGHIJKLMNOPQRSTUVWXYZ".map(String.init).map(t)))
-	
-	/// Decimal digits 0 to 9
-	public static let numbers = ProductionResult(SymbolSet((0...9).map(String.init).map(t)))
-	
-	/// Lower and upper case letters a to z and A to Z
-	public static var letters: ProductionResult {
-		return lowercase <|> uppercase
-	}
-	
-	/// Alphanumeric characters (Letters and numbers)
-	public static var alphanumerics: ProductionResult {
-		return letters <|> numbers
-	}
-	
-	/// Symbols contained in this symbol set
-	public let symbols: [Symbol]
-	
-	/// Creates a new symbol set given a sequence of symbols
-	///
-	/// - Parameter sequence: Sequence of symbols which the symbol set should contain
-	public init<S: Sequence>(_ sequence: S) where S.Element == Symbol {
-		self.symbols = Array(sequence)
-	}
+public func t() -> ProductionString {
+	return []
 }
 
 /// A string of symbols which can be used in a production of a grammar
@@ -132,16 +100,6 @@ extension ProductionResult: ExpressibleByArrayLiteral {
 	
 	public init(arrayLiteral elements: ProductionString...) {
 		self.init(symbols: elements)
-	}
-}
-
-public extension ProductionResult {
-	
-	/// Creates a new production result from a symbol set where every symbol generates a different result independent of other symbols
-	///
-	/// - Parameter set: The symbol set to create a production result from
-	init(_ set: SymbolSet) {
-		self.elements = set.symbols.map{ProductionString([$0])}
 	}
 }
 

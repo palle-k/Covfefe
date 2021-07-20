@@ -32,7 +32,7 @@ var bnfGrammar: Grammar {
 	let rule = "rule" --> n("optional-whitespace") <+> n("rule-name-container") <+> n("optional-whitespace") <+> n("assignment-operator") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace")
 	
 	let optionalWhitespace = "optional-whitespace" --> [[]] <|> n("whitespace") <+> [n("optional-whitespace")]
-	let whitespace = "whitespace" --> SymbolSet.whitespace <|> n("comment")
+	let whitespace = "whitespace" --> t(.whitespacesAndNewlines) <|> n("comment")
 	let newlines = "newlines" --> t("\n") <|> t("\n") <+> n("optional-whitespace") <+> n("newlines")
 	
 	let comment = "comment" --> t("(") <+> t("*") <+> n("comment-content") <+> t("*") <+> t(")") <|> t("(") <+> t("*") <+> t("*") <+> t("*") <+> t(")")

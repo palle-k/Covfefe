@@ -32,7 +32,7 @@ var ebnfGrammar: Grammar {
 	let rule = "rule" --> n("optional-whitespace") <+> n("rule-name-container") <+> n("optional-whitespace") <+> n("assignment-operator") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t(";") <+> n("optional-whitespace")
 	
 	let optionalWhitespace = "optional-whitespace" --> [[]] <|> n("whitespace") <+> [n("optional-whitespace")]
-	let whitespace = "whitespace" --> SymbolSet.whitespace <|> n("comment")
+	let whitespace = "whitespace" --> t(.whitespacesAndNewlines) <|> n("comment")
 	let newlines = "newlines" --> t("\n") <|> t("\n") <+> n("optional-whitespace") <+> n("newlines")
 	
 	let comment = "comment" --> t("(") <+> t("*") <+> n("comment-content") <+> t("*") <+> t(")") <|> t("(") <+> t("*") <+> t("*") <+> t("*") <+> t(")")
@@ -45,7 +45,7 @@ var ebnfGrammar: Grammar {
 	let assignmentOperator = "assignment-operator" --> t("=")
 	
 	let ruleNameContainer = "rule-name-container" --> n("delimiting-rule-name-char") <+> n("rule-name") <+> n("delimiting-rule-name-char") <|> n("delimiting-rule-name-char")
-	let ruleName = "rule-name" --> n("rule-name") <+> n("rule-name-char") <|> [[]]
+	let ruleName = "rule-name" --> n("rule-name") <+> n("rule-name-char") <|> t()
 	let ruleNameChar = "rule-name-char" --> n("delimiting-rule-name-char") <|> n("whitespace")
 	let delimitingRuleNameChar = try! "delimiting-rule-name-char" --> rt("[a-zA-Z0-9-_]")
 	

@@ -73,15 +73,15 @@ class CYKParserTests: XCTestCase {
 	}
 	
 	func testCYK3() {
-		let S = "S" --> (n("X") <+> n("U")) <|> (n("S") <+> n("V")) <|> (n("Neg") <+> n("S")) <|> SymbolSet.letters <|> (n("VarStart") <+> n("Var"))
+		let S = "S" --> (n("X") <+> n("U")) <|> (n("S") <+> n("V")) <|> (n("Neg") <+> n("S")) <|> t(.letters) <|> (n("VarStart") <+> n("Var"))
 		let X = "X" --> t("(")
 		let Y = "Y" --> t(")")
 		let V = "V" --> n("Op") <+> n("S")
 		let U = "U" --> n("S") <+> n("Y")
 		let Op = "Op" --> t("+") <|> t("-") <|> t("*") <|> t("/")
 		let Neg = "Neg" --> t("-")
-		let VarStart = "VarStart" --> SymbolSet.letters <|> (n("VarStart") <+> n("Var"))
-		let Var = "Var" --> SymbolSet.alphanumerics <|> (n("Var") <+> n("Var"))
+		let VarStart = "VarStart" --> t(.letters) <|> (n("VarStart") <+> n("Var"))
+		let Var = "Var" --> t(.alphanumerics) <|> (n("Var") <+> n("Var"))
 		
 		let grammar = Grammar(productions: S + Op + VarStart + Var + [X, Y, U, V, Neg], start: "S")
 		let parser = CYKParser(grammar: grammar)

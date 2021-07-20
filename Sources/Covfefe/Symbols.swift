@@ -114,6 +114,10 @@ public func t(_ value: String) -> Symbol {
 	return Symbol.terminal(Terminal(string: value))
 }
 
+public func t(_ aSet: CharacterSet) -> Symbol {
+	return Symbol.terminal(Terminal(characterSet: aSet))
+}
+
 /// Creates a new non-terminal symbol
 ///
 /// - Parameter name: Name of the non-terminal symbol
