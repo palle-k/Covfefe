@@ -8,7 +8,7 @@ public final class GrammarBuilder {
 }
 
 extension Grammar {
-    init(start: NonTerminal, @GrammarBuilder builder: () throws ->[Production]) rethrows {
+    public init(start: NonTerminal, @GrammarBuilder builder: () throws ->[Production]) rethrows {
         self = Grammar(productions: try builder(), start: start)
     }
 }
