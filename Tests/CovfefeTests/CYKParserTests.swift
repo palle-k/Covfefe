@@ -44,7 +44,7 @@ class CYKParserTests: XCTestCase {
 		let C = "C" --> [t("{")]
 		let D = "D" --> [t("}")]
 		
-		let grammar = Grammar(productions: S + [T, U, A, B, C, D], start: "S")
+		let grammar = Grammar(productions: S + T + U + A + B + C + D, start: "S")
 		let parser = CYKParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("(){()}"))
@@ -66,7 +66,7 @@ class CYKParserTests: XCTestCase {
 		let B = "B" --> t("b")
 		let C = "C" --> t("c")
 		
-		let grammar = Grammar(productions: S + T + U + [A, B, C], start: "S")
+		let grammar = Grammar(productions: S + T + U + A + B + C, start: "S")
 		let parser = CYKParser(grammar: grammar)
 		XCTAssertTrue(parser.recognizes(("ccaab")))
 		XCTAssertTrue(parser.recognizes(("aabcc")))
@@ -83,7 +83,7 @@ class CYKParserTests: XCTestCase {
 		let VarStart = "VarStart" --> t(.letters) <|> (n("VarStart") <+> n("Var"))
 		let Var = "Var" --> t(.alphanumerics) <|> (n("Var") <+> n("Var"))
 		
-		let grammar = Grammar(productions: S + Op + VarStart + Var + [X, Y, U, V, Neg], start: "S")
+		let grammar = Grammar(productions: S + Op + VarStart + Var + X + Y + U + V + Neg, start: "S")
 		let parser = CYKParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes(("(-a+b)*-(b+a)/(((b-a)+(a-b)*(a-b))/-(b-a))")))
@@ -135,7 +135,7 @@ class CYKParserTests: XCTestCase {
 		
 		let varName = "VarName" --> anyIdentifier
 		
-		let varDeclarationProductions = [varDeclaration, varName, varNameTypeRest, varTypeBegin] + varType + varNameType + varKeyword + varDeclarationRest
+		let varDeclarationProductions = varDeclaration + varName + varNameTypeRest + varTypeBegin + varType + varNameType + varKeyword + varDeclarationRest
 		
 		let varNameAssignment = "VarNameAssignment" -->
 			n("VarNameType") <+> n("VarNameAssignmentRest")
@@ -149,7 +149,7 @@ class CYKParserTests: XCTestCase {
 		let varAssignment = "VarAssignment" -->
 			n("Assignment") <+> n("ValueExpression")
 		
-		let varAssignmentProductions = varNameAssignment + [varAssignment, varNameAssignmentRest]
+		let varAssignmentProductions = varNameAssignment + varAssignment + varNameAssignmentRest
 		
 		let valueExpression = "ValueExpression" -->
 			n("ParenthesisExpressionBegin") <+> n("CloseParenthesis")
@@ -174,9 +174,9 @@ class CYKParserTests: XCTestCase {
 			t(")")
 			<|> n("Whitespace") <+> n("CloseParenthesis")
 		
-		let varAssignmentExpressionProductions = valueExpression + [valueExpressionBegin] + openParenthesis + closeParenthesis
+		let varAssignmentExpressionProductions = valueExpression + valueExpressionBegin + openParenthesis + closeParenthesis
 		
-        let p1 = [whitespaceProduction, assignmentOperator, binaryOperationStart, colon]
+        let p1 = whitespaceProduction + assignmentOperator + binaryOperationStart + colon
         let p2 = binaryOperator + prefixOperator + varDeclarationProductions
         let p3 = varAssignmentProductions + varAssignmentExpressionProductions
         
@@ -228,7 +228,7 @@ class CYKParserTests: XCTestCase {
 		let Var = try! "Var" --> rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
 		let Whitespace = try! "Whitespace" --> rt("\\s+")
 		
-		let grammar = Grammar(productions: expression + BinOp + UnOp + [Num, Var, BracketExpr, BinOperation, UnOperation, Whitespace], start: "Expr").chomskyNormalized()
+		let grammar = Grammar(productions: expression + BinOp + UnOp + Num + Var + BracketExpr + BinOperation + UnOperation + Whitespace, start: "Expr").chomskyNormalized()
 		
         XCTAssertTrue(grammar.productions.allSatisfy { production -> Bool in
             (production.production.count == 2 && production.production.allSatisfy({ symbol -> Bool in

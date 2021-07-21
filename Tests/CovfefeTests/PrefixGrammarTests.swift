@@ -47,7 +47,7 @@ class PrefixGrammarTests: XCTestCase {
 		let Var = try! "Var" --> rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
 		let Whitespace = try! "Whitespace" --> rt("\\s+")
 		
-		let grammar = Grammar(productions: expression + BinOp + UnOp + [Num, Var, BracketExpr, BinOperation, UnOperation, Whitespace], start: "Expr")
+		let grammar = Grammar(productions: expression + BinOp + UnOp + Num + Var + BracketExpr + BinOperation + UnOperation + Whitespace, start: "Expr")
 		let prefixGrammar = grammar.prefixGrammar()
 		let parser = CYKParser(grammar: prefixGrammar)
 		

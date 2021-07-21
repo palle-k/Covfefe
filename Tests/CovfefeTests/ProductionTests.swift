@@ -31,26 +31,26 @@ class ProductionTests: XCTestCase {
 	func testDecomposition() {
 		let production = "A" --> n("B") <+> n("C") <+> n("D")
 		
-		let decomposed = Grammar.decomposeProductions(productions: [production])
+		let decomposed = Grammar.decomposeProductions(productions: production)
 		guard decomposed.count == 2 else {
 			XCTFail()
 			return
 		}
-		XCTAssertTrue(decomposed.contains("A" --> n("B") <+> n("A-C-1")))
-		XCTAssertTrue(decomposed.contains("A-C-1" --> n("C") <+> n("D")))
+		XCTAssertTrue(decomposed.contains(("A" --> n("B") <+> n("A-C-1")).first!))
+		XCTAssertTrue(decomposed.contains(("A-C-1" --> n("C") <+> n("D")).first!))
 	}
 	
 	func testChainElimination() {
 		let pA = "A" --> n("B")
 		let pB = "B" --> t("x")
 		
-		let eliminated = Grammar.eliminateChainProductions(productions: [pA, pB])
+		let eliminated = Grammar.eliminateChainProductions(productions: pA + pB)
 		guard eliminated.count == 2 else {
 			XCTFail()
 			return
 		}
-		XCTAssertTrue(eliminated.contains("A" --> t("x")))
-		XCTAssertTrue(eliminated.contains("B" --> t("x")))
+		XCTAssertTrue(eliminated.contains(("A" --> t("x")).first!))
+		XCTAssertTrue(eliminated.contains(("B" --> t("x")).first!))
 		
 		let pA2 = "A" --> n("A") <|> t("x")
 		let eliminated2 = Grammar.eliminateChainProductions(productions: pA2).uniqueElements().collect(Array.init)
@@ -58,7 +58,7 @@ class ProductionTests: XCTestCase {
 			XCTFail()
 			return
 		}
-		XCTAssertTrue(eliminated2.contains("A" --> t("x")))
+		XCTAssertTrue(eliminated2.contains(("A" --> t("x")).first!))
 	}
 	
 	func testEmptyElimination() {
@@ -70,20 +70,20 @@ class ProductionTests: XCTestCase {
 			print(eliminated)
 			return
 		}
-		XCTAssertTrue(eliminated.contains("A" --> t("x")))
+		XCTAssertTrue(eliminated.contains(("A" --> t("x")).first!))
 		
 		let p1 = "A" --> [[]] <|> n("B") <+> n("A")
 		let p2 = "B" --> t("x")
-		let eliminated2 = Grammar.eliminateEmpty(productions: p1 + [p2], start: "A")
+		let eliminated2 = Grammar.eliminateEmpty(productions: p1 + p2, start: "A")
 		
-		XCTAssertTrue(eliminated2.contains("A" --> []))
-		XCTAssertTrue(eliminated2.contains("A" --> n("B")))
-		XCTAssertTrue(eliminated2.contains("A" --> n("B") <+> n("A")))
-		XCTAssertTrue(eliminated2.contains("B" --> t("x")))
+		XCTAssertTrue(eliminated2.contains(("A" --> t()).first!))
+		XCTAssertTrue(eliminated2.contains(("A" --> n("B")).first!))
+		XCTAssertTrue(eliminated2.contains(("A" --> n("B") <+> n("A")).first!))
+		XCTAssertTrue(eliminated2.contains(("B" --> t("x")).first!))
 	}
 	
 	func testNormalization() {
-		_ = Grammar(productions: ["A" --> n("C"), "B" --> n("D")], start: "A").chomskyNormalized()
+		_ = Grammar(productions: ("A" --> n("C")) + ("B" --> n("D")), start: "A").chomskyNormalized()
 	}
 
     static var allTests = [

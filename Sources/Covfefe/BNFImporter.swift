@@ -77,45 +77,7 @@ var bnfGrammar: Grammar {
 	let singleQuote = "escaped-single-quote" --> t("\\") <+> t("'")
 	let doubleQuote = "escaped-double-quote" --> t("\\") <+> t("\"")
 	
-	var productions: [Production] = []
-	productions.append(contentsOf: syntax)
-	productions.append(rule)
-	productions.append(contentsOf: optionalWhitespace)
-	productions.append(contentsOf: whitespace)
-	productions.append(contentsOf: comment)
-	productions.append(contentsOf: commentContent)
-	productions.append(contentsOf: commentContentChar)
-	productions.append(contentsOf: commentAsterisk)
-	productions.append(contentsOf: commentOpenParenthesis)
-	productions.append(contentsOf: newlines)
-	productions.append(assignmentOperator)
-	productions.append(ruleNameContainer)
-	productions.append(contentsOf: ruleName)
-	productions.append(ruleNameChar)
-	productions.append(contentsOf: expression)
-	productions.append(alternation)
-	productions.append(contentsOf: concatenation)
-	productions.append(contentsOf: expressionElement)
-	productions.append(expressionGroup)
-	productions.append(expressionRepetition)
-	productions.append(expressionOptional)
-	productions.append(contentsOf: literal)
-	productions.append(contentsOf: string1)
-	productions.append(contentsOf: string2)
-	productions.append(contentsOf: string1char)
-	productions.append(contentsOf: string2char)
-	productions.append(rangeLiteral)
-	productions.append(contentsOf: singleCharLiteral)
-	productions.append(contentsOf: stringEscapedChar)
-	productions.append(unicodeScalar)
-	productions.append(contentsOf: unicodeScalarDigits)
-	productions.append(digit)
-	productions.append(carriageReturn)
-	productions.append(lineFeed)
-	productions.append(tabChar)
-	productions.append(backslash)
-	productions.append(singleQuote)
-	productions.append(doubleQuote)
+	let productions = Array([syntax, rule, optionalWhitespace, whitespace, comment, commentContent, commentContentChar, commentAsterisk, commentOpenParenthesis, newlines, assignmentOperator, ruleNameContainer, ruleName, ruleNameChar, expression, alternation, concatenation, expressionElement, expressionGroup, expressionRepetition, expressionOptional, literal, string1, string2, string1char, string2char, rangeLiteral, singleCharLiteral, stringEscapedChar, unicodeScalar, unicodeScalarDigits, digit, carriageReturn, lineFeed, tabChar, backslash, singleQuote, doubleQuote].joined ())
 	
 	return Grammar(productions: productions, start: "syntax")
 }
@@ -358,7 +320,7 @@ public extension Grammar {
 		}) && !(productions + helperRules).contains(where: { (production: Production) -> Bool in
 			production.pattern == "EOL"
 		}) {
-			self.init(productions: productions + helperRules + ["EOL" --> t("\n")], start: NonTerminal(name: start), utilityNonTerminals: helperRules.map {$0.pattern}.collect(Set.init))
+			self.init(productions: productions + helperRules + ("EOL" --> t("\n")), start: NonTerminal(name: start), utilityNonTerminals: helperRules.map {$0.pattern}.collect(Set.init))
 		} else {
 			self.init(productions: productions + helperRules, start: NonTerminal(name: start), utilityNonTerminals: helperRules.map {$0.pattern}.collect(Set.init))
 		}

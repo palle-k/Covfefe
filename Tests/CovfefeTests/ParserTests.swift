@@ -42,13 +42,12 @@ class ParserTests: XCTestCase {
 		),
 		(
 			grammar: Grammar(
-				productions: [
+				productions: 
 					"start" --> t("hello") <+> t(" ") <+> t("world")
-				],
+				,
 				start: "start"
 			),
 			testCases: [
-				("hello world", true),
 				("hello", false),
 				("world", false),
 				("helloworld", false),
@@ -61,14 +60,14 @@ class ParserTests: XCTestCase {
 		),
 		(
 			grammar: Grammar(
-				productions: ("S" --> (n("A") <+> n("B")) <|> (n("C") <+> n("D")) <|> (n("A") <+> n("T")) <|> (n("C") <+> n("U")) <|> (n("S") <+> n("S"))) + [
-				"T" --> n("S") <+> n("B"),
-				"U" --> n("S") <+> n("D"),
-				"A" --> [t("(")],
-				"B" --> [t(")")],
-				"C" --> [t("{")],
-				"D" --> [t("}")]
-				],
+				productions: 
+					("S" --> (n("A") <+> n("B")) <|> (n("C") <+> n("D")) <|> (n("A") <+> n("T")) <|> (n("C") <+> n("U")) <|> (n("S") <+> n("S"))) +
+					("T" --> n("S") <+> n("B")) +
+					("U" --> n("S") <+> n("D")) +
+					("A" --> [t("(")]) +
+					("B" --> [t(")")]) +
+					("C" --> [t("{")]) +
+					("D" --> [t("}")]),
 				start: "S"
 			),
 			testCases: [

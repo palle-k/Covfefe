@@ -44,10 +44,10 @@ class EBNFTests: XCTestCase {
 		world = "world";
 		"""
 		let grammar = try Grammar(ebnf: grammarString, start: "hello")
-		XCTAssertTrue(grammar.productions.contains("hello" --> t("hello") <+> n("world")))
-		XCTAssertTrue(grammar.productions.contains("hello" --> t("foo") <+> t("bar") <+> t("baz")))
-		XCTAssertTrue(grammar.productions.contains("hello" --> t("xyz")))
-		XCTAssertTrue(grammar.productions.contains("world" --> t("world")))
+		XCTAssertTrue(grammar.productions.contains(("hello" --> t("hello") <+> n("world")).first!))
+		XCTAssertTrue(grammar.productions.contains(("hello" --> t("foo") <+> t("bar") <+> t("baz")).first!))
+		XCTAssertTrue(grammar.productions.contains(("hello" --> t("xyz")).first!))
+		XCTAssertTrue(grammar.productions.contains(("world" --> t("world")).first!))
 	}
 	
 	func testImportQuotes() throws {
@@ -55,8 +55,8 @@ class EBNFTests: XCTestCase {
 		s = "'" | '"';
 		"""
 		let grammar = try Grammar(ebnf: grammarString, start: "s")
-		XCTAssertTrue(grammar.productions.contains("s" --> t("'")))
-		XCTAssertTrue(grammar.productions.contains("s" --> t("\"")))
+		XCTAssertTrue(grammar.productions.contains(("s" --> t("'")).first!))
+		XCTAssertTrue(grammar.productions.contains(("s" --> t("\"")).first!))
 	}
 	
 	func testUnicodeScalars() throws {
