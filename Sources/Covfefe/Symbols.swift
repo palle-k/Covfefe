@@ -114,6 +114,12 @@ public func t(_ value: String) -> Symbol {
 	return Symbol.terminal(Terminal(string: value))
 }
 
+/// Creates a new terminal symbol representing a set of characters.
+///
+/// **Note**: The value of the terminal string may not overlap partially with any other non-terminal
+/// contained in a grammar.
+///
+/// - Returns: A terminal symbol with the given value
 public func t(_ aSet: CharacterSet) -> Symbol {
 	return Symbol.terminal(Terminal(characterSet: aSet))
 }

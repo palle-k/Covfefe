@@ -25,6 +25,7 @@
 
 import Foundation
 
+/// Creates new empty terminal. Represents `ε` word.
 public func t() -> ProductionString {
 	return []
 }

@@ -151,7 +151,6 @@ extension Terminal: Codable {
 		}
 	}
 	
-	#warning("Codable is synthetisis is available, should we remove this?")
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
 		
