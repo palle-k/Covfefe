@@ -94,12 +94,12 @@ class CYKParserTests: XCTestCase {
 	}
 	
 	func testProgrammingLanguage() throws {
-		let anyIdentifier = try rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
-		let whitespace = try rt("\\s+")
-		let constant = try rt("\\blet\\b")
-		let variable = try rt("\\bvar\\b")
-		let numberLiteral = try rt("\\b[0-9]+(\\.[0-9]+)?\\b")
-		let stringLiteral = try rt("\"[^\\\"]*\"")
+		let anyIdentifier = try re("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
+		let whitespace = try re("\\s+")
+		let constant = try re("\\blet\\b")
+		let variable = try re("\\bvar\\b")
+		let numberLiteral = try re("\\b[0-9]+(\\.[0-9]+)?\\b")
+		let stringLiteral = try re("\"[^\\\"]*\"")
 		
 		let whitespaceProduction = "Whitespace" --> whitespace
 		let assignmentOperator = "Assignment" --> t("=")
@@ -224,9 +224,9 @@ class CYKParserTests: XCTestCase {
 		
 		let UnOperation = "UnOperation" --> n("UnOp") <+> n("Expr")
 		let UnOp = "UnOp" --> t("+") <|> t("-")
-		let Num = try! "Num" --> rt("\\b\\d+(\\.\\d+)?\\b")
-		let Var = try! "Var" --> rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
-		let Whitespace = try! "Whitespace" --> rt("\\s+")
+		let Num = try! "Num" --> re("\\b\\d+(\\.\\d+)?\\b")
+		let Var = try! "Var" --> re("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
+		let Whitespace = try! "Whitespace" --> re("\\s+")
 		
 		let grammar = Grammar(productions: expression + BinOp + UnOp + Num + Var + BracketExpr + BinOperation + UnOperation + Whitespace, start: "Expr").chomskyNormalized()
 		

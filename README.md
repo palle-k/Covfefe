@@ -37,8 +37,13 @@ target 'Your-App-Name' do
 end
 ```
 
-## Example
+## Examples
 
+There are multiple ways for expressing a grammar. Both examples declare the same grammar. 
+This grammar describes simple mathematical expressions consisting of unary and binary operations and parentheses.
+A syntax tree can be generated, which describes how a given word was derived from the grammar above:
+
+### Textual declarations
 Grammars can be specified in a superset of EBNF or a superset of BNF, which adopts some features of EBNF (documented [here](/BNF.md)).
 Alternatively, ABNF is supported.
 
@@ -56,12 +61,7 @@ variable         = {letter};
 letter           = 'A' ... 'Z' | 'a' ... 'z';
 """ 
 let grammar = try Grammar(ebnf: grammarString, start: "expression")
-```
 
-This grammar describes simple mathematical expressions consisting of unary and binary operations and parentheses.
-A syntax tree can be generated, which describes how a given word was derived from the grammar above:
-
- ```swift
 let parser = EarleyParser(grammar: grammar)
  
 let syntaxTree = try parser.syntaxTree(for: "(a+b)*(-c)")
@@ -69,3 +69,61 @@ let syntaxTree = try parser.syntaxTree(for: "(a+b)*(-c)")
 
 ![Example Syntax Tree](https://raw.githubusercontent.com/palle-k/Covfefe/master/example-syntax-tree.png)
 
+### Declaration via Result Builder
+Grammar can be initialized using Result Builder called `GrammarBuilder`. The Result Builder collects  the inidividual productions and combines them. 
+
+Production rule is declared using operator ` <non-terminal-name> --> <productions>` which expects `String` representing the name of the non-terminal on the left side and possible productions on the right side.
+
+**Concatenation**
+Use operator `<+>` in order to declare a concatenation of terminals and non-terminals. 
+
+**Alternations**
+Use operator `<|>` in order to declare an alternation. Alternation operator has lower precedence than concatenation operator. 
+
+**Non-terminal**
+If the non-terminal is on the left side of `-->` operator, the non-terminal is represented by a `String` literal. If the non-terminal is on the right side if `-->` operator, use free function `n(_:)` which accepts the name of the non-terminal as the argument.
+
+**Terminal**
+Terminal may be declared in multiple ways. We recognize 4 types of terminals: strings, character ranges, regular expressions and character sets.
+ * Use `t(_:)` to initialize a terminal representing either `String` or `CharacterSet`. For example `t("Hello")` or `t(.letters)`.
+ * Use `re(_:)` to initialize a terminal representing a regular expression. For example `re("[^*(]")`
+ * Use `ra(_:)` to initialize a terminal representing a range of characters. For example `ra("A" ... "Z")`
+ * Use `t()` to initialize an empty word - the `ϵ` word.
+
+```swift
+let directGrammar = Grammar(start: "expression") {
+    "expression"        --> n("binary-operation")
+                        <|> n("brackets")
+                        <|> n("unary-operation")
+                        <|> n("number")
+                        <|> n("variable")
+
+    "brackets"          --> t("(") <+> n("expression") <+> t(")")
+
+    "binary-operation"  --> n("expression") <+> n("binary-operator") <+> n("expression")
+
+    "binary-operator"   --> t("+")
+                        <|> t("-")
+                        <|> t("*")
+                        <|> t("/")
+
+    "unary-operation"   --> n("unary-operator") <+> n("expression")
+
+    "unary-operator"    --> t("+")
+                        <|> t("-")
+
+    "number"            --> n("digit")
+                        <|> n("digit") <+> n("number")
+
+    "digit"             --> t(.decimalDigits)
+
+    "variable"          --> n("letter")
+                        <|> n("letter") <+> n("variable")
+
+    "letter"            --> t(.letters)
+}
+
+let parser = EarleyParser(grammar: directGrammar)
+
+let syntaxTree = try parser.syntaxTree(for: "(a+b)*(-c)")
+```

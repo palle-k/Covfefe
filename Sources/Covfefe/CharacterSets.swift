@@ -25,11 +25,6 @@
 
 import Foundation
 
-/// Creates new empty terminal. Represents `ε` word.
-public func t() -> ProductionString {
-	return []
-}
-
 /// A string of symbols which can be used in a production of a grammar
 public struct ProductionString {
 	

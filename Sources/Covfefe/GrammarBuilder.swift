@@ -8,6 +8,11 @@ import Foundation
 ///
 /// Example:
 /// ```swift
+/// // Recognizes:
+/// // ""
+/// // "abc()"
+/// // "abc(abd)((def))"
+/// // etc... 
 /// let grammar = Grammar(start: "S") {
 ///     "S" --> n("S") <+> n("S")
 ///         <|> t("(") <+> n("S") <+> t(")")
@@ -17,6 +22,7 @@ import Foundation
 ///                  <|> t(CharacterSet.letters) <+> n("OptLetters")
 /// }
 /// ```
+///
 ///
 /// For more complex examples, refer to `BNFImporter.swift`
 @resultBuilder

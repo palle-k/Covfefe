@@ -38,7 +38,7 @@ var ebnfGrammar: Grammar {
 		"comment" --> t("(") <+> t("*") <+> n("comment-content") <+> t("*") <+> t(")") <|> t("(") <+> t("*") <+> t("*") <+> t("*") <+> t(")")
 		"comment-content" --> n("comment-content") <+> n("comment-content-char") <|> [[]]
 		// a comment cannot contain a * followed by a ) or a ( followed by a *
-		try! "comment-content-char" --> rt("[^*(]") <|> n("comment-asterisk") <+> rt("[^)]") <|> n("comment-open-parenthesis") <+> rt("[^*]") <|> n("comment")
+		try! "comment-content-char" --> re("[^*(]") <|> n("comment-asterisk") <+> re("[^)]") <|> n("comment-open-parenthesis") <+> re("[^*]") <|> n("comment")
 		"comment-asterisk" --> n("comment-asterisk") <+> t("*") <|> t("*")
 		"comment-open-parenthesis" --> n("comment-open-parenthesis") <+> t("(") <|> t("(")
 		
@@ -47,7 +47,7 @@ var ebnfGrammar: Grammar {
 		"rule-name-container" --> n("delimiting-rule-name-char") <+> n("rule-name") <+> n("delimiting-rule-name-char") <|> n("delimiting-rule-name-char")
 		"rule-name" --> n("rule-name") <+> n("rule-name-char") <|> t()
 		"rule-name-char" --> n("delimiting-rule-name-char") <|> n("whitespace")
-		try! "delimiting-rule-name-char" --> rt("[a-zA-Z0-9-_]")
+		try! "delimiting-rule-name-char" --> re("[a-zA-Z0-9-_]")
 		
 		"expression" --> n("concatenation") <|> n("alternation")
 		"alternation" --> n("expression") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("concatenation")
@@ -67,16 +67,16 @@ var ebnfGrammar: Grammar {
 		"single-char-literal" --> t("'") <+> n("string-1-char") <+> t("'") <|> t("\"") <+> n("string-2-char") <+> t("\"")
 		
 		// no ', \, \r or \n
-		try! "string-1-char" --> rt("[^'\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-single-quote")
-		try! "string-2-char" --> rt("[^\"\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-double-quote")
+		try! "string-1-char" --> re("[^'\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-single-quote")
+		try! "string-2-char" --> re("[^\"\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-double-quote")
 		
-		try! "digit" --> rt("[0-9]")
+		try! "digit" --> re("[0-9]")
 		"number" --> n("digit") <|> n("number") <+> n("digit")
 		
 		"string-escaped-char" --> n("unicode-scalar") <|> n("carriage-return") <|> n("line-feed") <|> n("tab-char") <|> n("backslash")
 		"unicode-scalar" --> t("\\") <+> t("u") <+> t("{") <+>  n("unicode-scalar-digits") <+> t("}")
 		"unicode-scalar-digits" --> [n("hex-digit")] <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]])
-		try! "hex-digit" --> rt("[0-9a-fA-F]")
+		try! "hex-digit" --> re("[0-9a-fA-F]")
 		
 		"carriage-return" --> t("\\") <+> t("r")
 		"line-feed" --> t("\\") <+> t("n")

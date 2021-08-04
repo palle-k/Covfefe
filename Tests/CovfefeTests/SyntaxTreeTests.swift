@@ -31,13 +31,13 @@ class SyntaxTreeTests: XCTestCase {
 	private var dotGrammar: Grammar {
 		var productions: [Production] = []
 		
-		let whitespace = try! "W" --> rt("\\s+")
-		let anyIdentifier = try! "Identifier" --> rt("\\b[a-zA-Z_][a-zA-Z0-9_]+\\b")
-		let anyString = try! "String" --> rt("\"[^\"]*\"")
+		let whitespace = try! "W" --> re("\\s+")
+		let anyIdentifier = try! "Identifier" --> re("\\b[a-zA-Z_][a-zA-Z0-9_]+\\b")
+		let anyString = try! "String" --> re("\"[^\"]*\"")
 		let value = "Value" --> n("Identifier") <|> n("String") <|> n("W") <+> n("Value") <|> n("Value") <+> n("W")
 		productions += whitespace + anyIdentifier + anyString + value
 		
-		let graphType = try! "Type" --> rt("\\bdigraph\\b") <|> rt("\\bgraph\\b")
+		let graphType = try! "Type" --> re("\\bdigraph\\b") <|> re("\\bgraph\\b")
 		let digraph = "Graph" --> n("Type") <+> n("W") <+> n("GraphContentWrap") <|> n("Type") <+> n("GraphContentWrap")
 		let contentWrapper = "GraphContentWrap" --> t("{") <+> n("C") <+> t("}")
 		let content = "C" --> n("C") <+> n("C") <|> n("Node") <|> n("Edge") <|> n("Subgraph") <|> n("Attribute")
@@ -75,9 +75,9 @@ class SyntaxTreeTests: XCTestCase {
 		
 		let UnOperation = "UnOperation" --> n("UnOp") <+> n("Expr")
 		let UnOp = "UnOp" --> t("+") <|> t("-")
-		let Num = try! "Num" --> rt("\\b\\d+(\\.\\d+)?\\b")
-		let Var = try! "Var" --> rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
-		let Whitespace = try! "Whitespace" --> rt("\\s+")
+		let Num = try! "Num" --> re("\\b\\d+(\\.\\d+)?\\b")
+		let Var = try! "Var" --> re("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
+		let Whitespace = try! "Whitespace" --> re("\\s+")
 		
 		return Grammar(productions: expression + BinOp + UnOp + Num + Var + BracketExpr + BinOperation + UnOperation + Whitespace, start: "Expr")
 	}

@@ -103,6 +103,12 @@ public enum Symbol: Codable {
 	}
 }
 
+
+/// Creates new empty terminal. Represents `ε` word.
+public func t() -> ProductionString {
+    return []
+}
+
 /// Creates a new non-regular terminal symbol
 ///
 /// **Note**: The value of the terminal string may not overlap partially with any other non-terminal
@@ -140,8 +146,29 @@ public func n(_ name: String) -> Symbol {
 /// - Parameter value: Regular value of the terminal
 /// - Returns: A regular terminal symbol
 /// - Throws: An error indicating that the given regular expression is invalid
+@available(*, deprecated, renamed: "re")
 public func rt(_ value: String) throws -> Symbol {
 	return try Symbol.terminal(Terminal(expression: value))
+}
+
+/// Creates a new regular terminal symbol
+///
+/// **Note**: The value of the terminal string may not overlap partially with any other non-terminal
+/// contained in a grammar. For regular terminals, it it may be deriable to add word boundary markers: `\b`.
+///
+/// - Parameter value: Regular value of the terminal
+/// - Returns: A regular terminal symbol
+/// - Throws: An error indicating that the given regular expression is invalid
+public func re(_ value: String) throws -> Symbol {
+    return try Symbol.terminal(Terminal(expression: value))
+}
+
+/// Creates a new terminal symbol representing a range of characters.
+///
+/// - Parameter range: Range of characters
+/// - Returns: A terminal represeting a range of characters
+public func ra(_ range: ClosedRange<Character>) -> Symbol {
+    return Symbol.terminal(Terminal(range: range))
 }
 
 extension Symbol: Hashable {
