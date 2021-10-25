@@ -224,6 +224,12 @@ public extension String {
 			
 		case .string(string: let string, hash: _):
 			return self[startIndex...].hasPrefix(string)
+
+		case .characterSet(set: let aSet, hash: _):
+			guard let first = self[startIndex...].first else {
+				return false
+			}
+			return first.unicodeScalars.allSatisfy(aSet.contains(_:))
 		}
 	}
 	
@@ -252,6 +258,16 @@ public extension String {
 		case .string(string: let prefixString, hash: _):
 			let range = startIndex ..< (self.index(startIndex, offsetBy: prefixString.count, limitedBy: endIndex) ?? endIndex)
 			return self.range(of: prefixString, range: range)
+		
+		case .characterSet(set: let aSet, hash: _):
+			guard let first = self[startIndex...].first else {
+				return nil
+			}
+			if first.unicodeScalars.allSatisfy(aSet.contains(_:)) {
+				return startIndex ..< self.index(after: startIndex)
+			} else {
+				return nil
+			}
 		}
 	}
 		

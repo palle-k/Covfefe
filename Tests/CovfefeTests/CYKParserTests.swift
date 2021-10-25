@@ -1,5 +1,5 @@
 //
-//  GrammarTests.swift
+//  CYKParserTests.swift
 //  CovfefeTests
 //
 //  Created by Palle Klewitz on 07.08.17.
@@ -26,7 +26,7 @@
 import XCTest
 @testable import Covfefe
 
-class GrammarTests: XCTestCase {
+class CYKParserTests: XCTestCase {
 	func testCYKEmpty() {
 		let S = "S" --> [[]]
 		let grammar = Grammar(productions: S, start: "S")
@@ -44,7 +44,7 @@ class GrammarTests: XCTestCase {
 		let C = "C" --> [t("{")]
 		let D = "D" --> [t("}")]
 		
-		let grammar = Grammar(productions: S + [T, U, A, B, C, D], start: "S")
+		let grammar = Grammar(productions: S + T + U + A + B + C + D, start: "S")
 		let parser = CYKParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes("(){()}"))
@@ -66,24 +66,24 @@ class GrammarTests: XCTestCase {
 		let B = "B" --> t("b")
 		let C = "C" --> t("c")
 		
-		let grammar = Grammar(productions: S + T + U + [A, B, C], start: "S")
+		let grammar = Grammar(productions: S + T + U + A + B + C, start: "S")
 		let parser = CYKParser(grammar: grammar)
 		XCTAssertTrue(parser.recognizes(("ccaab")))
 		XCTAssertTrue(parser.recognizes(("aabcc")))
 	}
 	
 	func testCYK3() {
-		let S = "S" --> (n("X") <+> n("U")) <|> (n("S") <+> n("V")) <|> (n("Neg") <+> n("S")) <|> SymbolSet.letters <|> (n("VarStart") <+> n("Var"))
+		let S = "S" --> (n("X") <+> n("U")) <|> (n("S") <+> n("V")) <|> (n("Neg") <+> n("S")) <|> t(.letters) <|> (n("VarStart") <+> n("Var"))
 		let X = "X" --> t("(")
 		let Y = "Y" --> t(")")
 		let V = "V" --> n("Op") <+> n("S")
 		let U = "U" --> n("S") <+> n("Y")
 		let Op = "Op" --> t("+") <|> t("-") <|> t("*") <|> t("/")
 		let Neg = "Neg" --> t("-")
-		let VarStart = "VarStart" --> SymbolSet.letters <|> (n("VarStart") <+> n("Var"))
-		let Var = "Var" --> SymbolSet.alphanumerics <|> (n("Var") <+> n("Var"))
+		let VarStart = "VarStart" --> t(.letters) <|> (n("VarStart") <+> n("Var"))
+		let Var = "Var" --> t(.alphanumerics) <|> (n("Var") <+> n("Var"))
 		
-		let grammar = Grammar(productions: S + Op + VarStart + Var + [X, Y, U, V, Neg], start: "S")
+		let grammar = Grammar(productions: S + Op + VarStart + Var + X + Y + U + V + Neg, start: "S")
 		let parser = CYKParser(grammar: grammar)
 		
 		XCTAssertTrue(parser.recognizes(("(-a+b)*-(b+a)/(((b-a)+(a-b)*(a-b))/-(b-a))")))
@@ -94,12 +94,12 @@ class GrammarTests: XCTestCase {
 	}
 	
 	func testProgrammingLanguage() throws {
-		let anyIdentifier = try rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
-		let whitespace = try rt("\\s+")
-		let constant = try rt("\\blet\\b")
-		let variable = try rt("\\bvar\\b")
-		let numberLiteral = try rt("\\b[0-9]+(\\.[0-9]+)?\\b")
-		let stringLiteral = try rt("\"[^\\\"]*\"")
+		let anyIdentifier = try re("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
+		let whitespace = try re("\\s+")
+		let constant = try re("\\blet\\b")
+		let variable = try re("\\bvar\\b")
+		let numberLiteral = try re("\\b[0-9]+(\\.[0-9]+)?\\b")
+		let stringLiteral = try re("\"[^\\\"]*\"")
 		
 		let whitespaceProduction = "Whitespace" --> whitespace
 		let assignmentOperator = "Assignment" --> t("=")
@@ -135,7 +135,7 @@ class GrammarTests: XCTestCase {
 		
 		let varName = "VarName" --> anyIdentifier
 		
-		let varDeclarationProductions = [varDeclaration, varName, varNameTypeRest, varTypeBegin] + varType + varNameType + varKeyword + varDeclarationRest
+		let varDeclarationProductions = varDeclaration + varName + varNameTypeRest + varTypeBegin + varType + varNameType + varKeyword + varDeclarationRest
 		
 		let varNameAssignment = "VarNameAssignment" -->
 			n("VarNameType") <+> n("VarNameAssignmentRest")
@@ -149,7 +149,7 @@ class GrammarTests: XCTestCase {
 		let varAssignment = "VarAssignment" -->
 			n("Assignment") <+> n("ValueExpression")
 		
-		let varAssignmentProductions = varNameAssignment + [varAssignment, varNameAssignmentRest]
+		let varAssignmentProductions = varNameAssignment + varAssignment + varNameAssignmentRest
 		
 		let valueExpression = "ValueExpression" -->
 			n("ParenthesisExpressionBegin") <+> n("CloseParenthesis")
@@ -174,9 +174,9 @@ class GrammarTests: XCTestCase {
 			t(")")
 			<|> n("Whitespace") <+> n("CloseParenthesis")
 		
-		let varAssignmentExpressionProductions = valueExpression + [valueExpressionBegin] + openParenthesis + closeParenthesis
+		let varAssignmentExpressionProductions = valueExpression + valueExpressionBegin + openParenthesis + closeParenthesis
 		
-        let p1 = [whitespaceProduction, assignmentOperator, binaryOperationStart, colon]
+        let p1 = whitespaceProduction + assignmentOperator + binaryOperationStart + colon
         let p2 = binaryOperator + prefixOperator + varDeclarationProductions
         let p3 = varAssignmentProductions + varAssignmentExpressionProductions
         
@@ -224,11 +224,11 @@ class GrammarTests: XCTestCase {
 		
 		let UnOperation = "UnOperation" --> n("UnOp") <+> n("Expr")
 		let UnOp = "UnOp" --> t("+") <|> t("-")
-		let Num = try! "Num" --> rt("\\b\\d+(\\.\\d+)?\\b")
-		let Var = try! "Var" --> rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
-		let Whitespace = try! "Whitespace" --> rt("\\s+")
+		let Num = try! "Num" --> re("\\b\\d+(\\.\\d+)?\\b")
+		let Var = try! "Var" --> re("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
+		let Whitespace = try! "Whitespace" --> re("\\s+")
 		
-		let grammar = Grammar(productions: expression + BinOp + UnOp + [Num, Var, BracketExpr, BinOperation, UnOperation, Whitespace], start: "Expr").chomskyNormalized()
+		let grammar = Grammar(productions: expression + BinOp + UnOp + Num + Var + BracketExpr + BinOperation + UnOperation + Whitespace, start: "Expr").chomskyNormalized()
 		
         XCTAssertTrue(grammar.productions.allSatisfy { production -> Bool in
             (production.production.count == 2 && production.production.allSatisfy({ symbol -> Bool in
@@ -249,8 +249,11 @@ class GrammarTests: XCTestCase {
 	}
 
     static var allTests = [
-        ("testCYK1", testCYK),
-        ("testCYK2", testCYK2),
-        ("testCYK3", testCYK3),
+        ("testCYKEmpty", testCYKEmpty),
+		("testCYK", testCYK),
+		("testCYK2", testCYK2),
+		("testCYK3", testCYK3),
+		("testProgrammingLanguage", testProgrammingLanguage),
+		("testNonNormalizedGrammar", testNonNormalizedGrammar),
     ]
 }

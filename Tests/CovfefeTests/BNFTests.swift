@@ -35,10 +35,10 @@ class BNFTests: XCTestCase {
 		"""
 		let grammar = try Grammar(bnf: grammarString, start: "hello")
 		XCTAssertEqual(grammar.description, grammarString)
-		XCTAssertTrue(grammar.productions.contains("hello" --> t("hello") <+> n("world")))
-		XCTAssertTrue(grammar.productions.contains("hello" --> t("foo") <+> t("bar") <+> t("baz")))
-		XCTAssertTrue(grammar.productions.contains("hello" --> t("xyz")))
-		XCTAssertTrue(grammar.productions.contains("world" --> t("world")))
+		XCTAssertTrue(grammar.productions.contains(("hello" --> t("hello") <+> n("world")).first!))
+		XCTAssertTrue(grammar.productions.contains(("hello" --> t("foo") <+> t("bar") <+> t("baz")).first!))
+		XCTAssertTrue(grammar.productions.contains(("hello" --> t("xyz")).first!))
+		XCTAssertTrue(grammar.productions.contains(("world" --> t("world")).first!))
 	}
 	
 	func testImportQuotes() throws {
@@ -47,8 +47,8 @@ class BNFTests: XCTestCase {
 		"""
 		let grammar = try Grammar(bnf: grammarString, start: "s")
 		XCTAssertEqual(grammar.description, grammarString)
-		XCTAssertTrue(grammar.productions.contains("s" --> t("'")))
-		XCTAssertTrue(grammar.productions.contains("s" --> t("\"")))
+		XCTAssertTrue(grammar.productions.contains(("s" --> t("'")).first!))
+		XCTAssertTrue(grammar.productions.contains(("s" --> t("\"")).first!))
 	}
 	
 	func testUnicodeScalars() throws {
@@ -526,4 +526,31 @@ class BNFTests: XCTestCase {
 		XCTAssertFalse(parser.recognizes("bcde"))
 		XCTAssertFalse(parser.recognizes("bcdfg"))
 	}
+
+    static var allTests = [
+        ("testImport", testImport),
+		("testImportQuotes", testImportQuotes),
+		("testUnicodeScalars", testUnicodeScalars),
+		("testEscaped", testEscaped),
+		("testEmpty", testEmpty),
+		("testComments", testComments),
+		("testCharacterRangeParsing", testCharacterRangeParsing),
+		("testCharacterRanges", testCharacterRanges),
+		("testBNFExport", testBNFExport),
+		("testExpressionGroupParsing", testExpressionGroupParsing),
+		("testExpressionGroups", testExpressionGroups),
+		("testExpressionGroups2", testExpressionGroups2),
+		("testExpressionGroups3", testExpressionGroups3),
+		("testExpressionGroups4", testExpressionGroups4),
+		("testRepetitionGrammar", testRepetitionGrammar),
+		("testRepetition", testRepetition),
+		("testRepetition2", testRepetition2),
+		("testRepetition3", testRepetition3),
+		("testRepetition4", testRepetition4),
+		("testRepetition5", testRepetition5),
+		("testOptionalGrammar", testOptionalGrammar),
+		("testOptional", testOptional),
+		("testOptional2", testOptional2),
+		("testOptional3", testOptional3),
+    ]
 }

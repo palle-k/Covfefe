@@ -31,23 +31,23 @@ class SyntaxTreeTests: XCTestCase {
 	private var dotGrammar: Grammar {
 		var productions: [Production] = []
 		
-		let whitespace = try! "W" --> rt("\\s+")
-		let anyIdentifier = try! "Identifier" --> rt("\\b[a-zA-Z_][a-zA-Z0-9_]+\\b")
-		let anyString = try! "String" --> rt("\"[^\"]*\"")
+		let whitespace = try! "W" --> re("\\s+")
+		let anyIdentifier = try! "Identifier" --> re("\\b[a-zA-Z_][a-zA-Z0-9_]+\\b")
+		let anyString = try! "String" --> re("\"[^\"]*\"")
 		let value = "Value" --> n("Identifier") <|> n("String") <|> n("W") <+> n("Value") <|> n("Value") <+> n("W")
-		productions += [whitespace, anyIdentifier, anyString] + value
+		productions += whitespace + anyIdentifier + anyString + value
 		
-		let graphType = try! "Type" --> rt("\\bdigraph\\b") <|> rt("\\bgraph\\b")
+		let graphType = try! "Type" --> re("\\bdigraph\\b") <|> re("\\bgraph\\b")
 		let digraph = "Graph" --> n("Type") <+> n("W") <+> n("GraphContentWrap") <|> n("Type") <+> n("GraphContentWrap")
 		let contentWrapper = "GraphContentWrap" --> t("{") <+> n("C") <+> t("}")
 		let content = "C" --> n("C") <+> n("C") <|> n("Node") <|> n("Edge") <|> n("Subgraph") <|> n("Attribute")
-		productions += digraph + [contentWrapper] + content + graphType
+		productions += digraph + contentWrapper + content + graphType
 		
 		let node = "Node" --> n("Value") <+> n("W") <+> n("AttributeWrapper") <|> n("Value") <+> n("AttributeWrapper") <|> n("Value")
 		let attributeWrapper = "AttributeWrapper" --> t("[") <+> n("AttributeList") <+> t("]") <|> n("AttributeWrapper") <+> n("W") <|> n("W") <+> n("AttributeWrapper")
 		let attributeList = "AttributeList" --> n("Attribute") <|> n("Attribute") <+> n("AttributeList") <|> [[]]
 		let attribute = "Attribute" --> n("Value") <+> t("=") <+> n("Value")
-		productions += node + [attribute] + attributeWrapper + attributeList
+		productions += node + attribute + attributeWrapper + attributeList
 		
 		let edge = "Edge" --> n("Value") <+> n("EdgeType") <+> n("Value") <|> n("Value") <+> n("EdgeType") <+> n("Value") <+> n("AttributeWrapper")
 		let edgeType = "EdgeType" --> t("->") <|> t("--")
@@ -75,11 +75,11 @@ class SyntaxTreeTests: XCTestCase {
 		
 		let UnOperation = "UnOperation" --> n("UnOp") <+> n("Expr")
 		let UnOp = "UnOp" --> t("+") <|> t("-")
-		let Num = try! "Num" --> rt("\\b\\d+(\\.\\d+)?\\b")
-		let Var = try! "Var" --> rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
-		let Whitespace = try! "Whitespace" --> rt("\\s+")
+		let Num = try! "Num" --> re("\\b\\d+(\\.\\d+)?\\b")
+		let Var = try! "Var" --> re("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
+		let Whitespace = try! "Whitespace" --> re("\\s+")
 		
-		return Grammar(productions: expression + BinOp + UnOp + [Num, Var, BracketExpr, BinOperation, UnOperation, Whitespace], start: "Expr")
+		return Grammar(productions: expression + BinOp + UnOp + Num + Var + BracketExpr + BinOperation + UnOperation + Whitespace, start: "Expr")
 	}
 	
 	func testTreeDescription() throws {
@@ -88,4 +88,8 @@ class SyntaxTreeTests: XCTestCase {
 		let description = tree.description
 		XCTAssertTrue(CYKParser(grammar: dotGrammar).recognizes(description))
 	}
+
+    static var allTests = [
+        ("testTreeDescription", testTreeDescription),
+    ]
 }

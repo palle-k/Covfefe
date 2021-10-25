@@ -90,4 +90,8 @@ class PerformanceTests: XCTestCase {
 			}
 		}
 	}
+
+    static var allTests = [
+        ("testEarleyPerformance", testEarleyPerformance)
+    ]
 }

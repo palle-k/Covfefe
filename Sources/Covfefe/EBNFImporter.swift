@@ -27,109 +27,64 @@ import Foundation
 
 /// A grammar describing the Backus-Naur form
 var ebnfGrammar: Grammar {
-	
-	let syntax = "syntax" --> n("optional-whitespace") <|> n("newlines") <|> n("rule") <|> n("rule") <+> n("newlines") <|> n("syntax") <+> n("newlines") <+> n("rule") <+> (n("newlines") <|> [[]])
-	let rule = "rule" --> n("optional-whitespace") <+> n("rule-name-container") <+> n("optional-whitespace") <+> n("assignment-operator") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t(";") <+> n("optional-whitespace")
-	
-	let optionalWhitespace = "optional-whitespace" --> [[]] <|> n("whitespace") <+> [n("optional-whitespace")]
-	let whitespace = "whitespace" --> SymbolSet.whitespace <|> n("comment")
-	let newlines = "newlines" --> t("\n") <|> t("\n") <+> n("optional-whitespace") <+> n("newlines")
-	
-	let comment = "comment" --> t("(") <+> t("*") <+> n("comment-content") <+> t("*") <+> t(")") <|> t("(") <+> t("*") <+> t("*") <+> t("*") <+> t(")")
-	let commentContent = "comment-content" --> n("comment-content") <+> n("comment-content-char") <|> [[]]
-	// a comment cannot contain a * followed by a ) or a ( followed by a *
-	let commentContentChar = try! "comment-content-char" --> rt("[^*(]") <|> n("comment-asterisk") <+> rt("[^)]") <|> n("comment-open-parenthesis") <+> rt("[^*]") <|> n("comment")
-	let commentAsterisk = "comment-asterisk" --> n("comment-asterisk") <+> t("*") <|> t("*")
-	let commentOpenParenthesis = "comment-open-parenthesis" --> n("comment-open-parenthesis") <+> t("(") <|> t("(")
-	
-	let assignmentOperator = "assignment-operator" --> t("=")
-	
-	let ruleNameContainer = "rule-name-container" --> n("delimiting-rule-name-char") <+> n("rule-name") <+> n("delimiting-rule-name-char") <|> n("delimiting-rule-name-char")
-	let ruleName = "rule-name" --> n("rule-name") <+> n("rule-name-char") <|> [[]]
-	let ruleNameChar = "rule-name-char" --> n("delimiting-rule-name-char") <|> n("whitespace")
-	let delimitingRuleNameChar = try! "delimiting-rule-name-char" --> rt("[a-zA-Z0-9-_]")
-	
-	let expression = "expression" --> n("concatenation") <|> n("alternation")
-	let alternation = "alternation" --> n("expression") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("concatenation")
-	let concatenation = "concatenation" --> n("expression-element") <|> n("concatenation") <+> n("optional-whitespace") <+> t(",") <+> n("optional-whitespace") <+> n("expression-element")
-	let expressionElement = "expression-element" --> n("literal") <|> n("rule-name-container") <|> n("expression-group") <|> n("expression-repetition") <|> n("expression-optional") <|> n("expression-multiply")
-	
-	let expressionGroup = "expression-group" --> t("(") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t(")")
-	let expressionRepetition = "expression-repetition" --> t("{") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("}")
-	let expressionOptional = "expression-optional" --> t("[") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("]")
-	let expressionMultiply = "expression-multiply" --> n("number") <+> n("optional-whitespace") <+> t("*") <+> n("optional-whitespace") <+> n("expression-element")
-	
-	let literal = "literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"") <|> n("range-literal")
-	let string1 = "string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
-	let string2 = "string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
-	
-	let rangeLiteral = "range-literal" --> n("single-char-literal") <+> n("optional-whitespace") <+> t(".") <+> t(".") <+> t(".") <+> n("optional-whitespace") <+> n("single-char-literal")
-	let singleCharLiteral = "single-char-literal" --> t("'") <+> n("string-1-char") <+> t("'") <|> t("\"") <+> n("string-2-char") <+> t("\"")
-	
-	// no ', \, \r or \n
-	let string1char = try! "string-1-char" --> rt("[^'\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-single-quote")
-	let string2char = try! "string-2-char" --> rt("[^\"\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-double-quote")
-	
-	let digit = try! "digit" --> rt("[0-9]")
- 	let number = "number" --> n("digit") <|> n("number") <+> n("digit")
-	
-	let stringEscapedChar = "string-escaped-char" --> n("unicode-scalar") <|> n("carriage-return") <|> n("line-feed") <|> n("tab-char") <|> n("backslash")
-	let unicodeScalar = "unicode-scalar" --> t("\\") <+> t("u") <+> t("{") <+>  n("unicode-scalar-digits") <+> t("}")
-	let unicodeScalarDigits = "unicode-scalar-digits" --> [n("hex-digit")] <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]])
-	let hexDigit = try! "hex-digit" --> rt("[0-9a-fA-F]")
-	
-	let carriageReturn = "carriage-return" --> t("\\") <+> t("r")
-	let lineFeed = "line-feed" --> t("\\") <+> t("n")
-	let tabChar = "tab-char" --> t("\\") <+> t("t")
-	let backslash = "backslash" --> t("\\") <+> t("\\")
-	let singleQuote = "escaped-single-quote" --> t("\\") <+> t("'")
-	let doubleQuote = "escaped-double-quote" --> t("\\") <+> t("\"")
-	
-	var productions: [Production] = []
-	productions.append(contentsOf: syntax)
-	productions.append(rule)
-	productions.append(contentsOf: optionalWhitespace)
-	productions.append(contentsOf: whitespace)
-	productions.append(contentsOf: comment)
-	productions.append(contentsOf: commentContent)
-	productions.append(contentsOf: commentContentChar)
-	productions.append(contentsOf: commentAsterisk)
-	productions.append(contentsOf: commentOpenParenthesis)
-	productions.append(contentsOf: newlines)
-	productions.append(assignmentOperator)
-	productions.append(contentsOf: ruleNameContainer)
-	productions.append(contentsOf: ruleName)
-	productions.append(contentsOf: ruleNameChar)
-	productions.append(delimitingRuleNameChar)
-	productions.append(contentsOf: expression)
-	productions.append(alternation)
-	productions.append(contentsOf: concatenation)
-	productions.append(contentsOf: expressionElement)
-	productions.append(expressionGroup)
-	productions.append(expressionRepetition)
-	productions.append(expressionOptional)
-	productions.append(expressionMultiply)
-	productions.append(contentsOf: literal)
-	productions.append(contentsOf: string1)
-	productions.append(contentsOf: string2)
-	productions.append(contentsOf: string1char)
-	productions.append(contentsOf: string2char)
-	productions.append(digit)
-	productions.append(contentsOf: number)
-	productions.append(rangeLiteral)
-	productions.append(contentsOf: singleCharLiteral)
-	productions.append(contentsOf: stringEscapedChar)
-	productions.append(unicodeScalar)
-	productions.append(contentsOf: unicodeScalarDigits)
-	productions.append(hexDigit)
-	productions.append(carriageReturn)
-	productions.append(lineFeed)
-	productions.append(tabChar)
-	productions.append(backslash)
-	productions.append(singleQuote)
-	productions.append(doubleQuote)
-	
-	return Grammar(productions: productions, start: "syntax")
+	return Grammar(start: "syntax") {
+		"syntax" --> n("optional-whitespace") <|> n("newlines") <|> n("rule") <|> n("rule") <+> n("newlines") <|> n("syntax") <+> n("newlines") <+> n("rule") <+> (n("newlines") <|> [[]])
+		"rule" --> n("optional-whitespace") <+> n("rule-name-container") <+> n("optional-whitespace") <+> n("assignment-operator") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t(";") <+> n("optional-whitespace")
+		
+		"optional-whitespace" --> [[]] <|> n("whitespace") <+> [n("optional-whitespace")]
+		"whitespace" --> t(.whitespacesAndNewlines) <|> n("comment")
+		"newlines" --> t("\n") <|> t("\n") <+> n("optional-whitespace") <+> n("newlines")
+		
+		"comment" --> t("(") <+> t("*") <+> n("comment-content") <+> t("*") <+> t(")") <|> t("(") <+> t("*") <+> t("*") <+> t("*") <+> t(")")
+		"comment-content" --> n("comment-content") <+> n("comment-content-char") <|> [[]]
+		// a comment cannot contain a * followed by a ) or a ( followed by a *
+		try! "comment-content-char" --> re("[^*(]") <|> n("comment-asterisk") <+> re("[^)]") <|> n("comment-open-parenthesis") <+> re("[^*]") <|> n("comment")
+		"comment-asterisk" --> n("comment-asterisk") <+> t("*") <|> t("*")
+		"comment-open-parenthesis" --> n("comment-open-parenthesis") <+> t("(") <|> t("(")
+		
+		"assignment-operator" --> t("=")
+		
+		"rule-name-container" --> n("delimiting-rule-name-char") <+> n("rule-name") <+> n("delimiting-rule-name-char") <|> n("delimiting-rule-name-char")
+		"rule-name" --> n("rule-name") <+> n("rule-name-char") <|> t()
+		"rule-name-char" --> n("delimiting-rule-name-char") <|> n("whitespace")
+		try! "delimiting-rule-name-char" --> re("[a-zA-Z0-9-_]")
+		
+		"expression" --> n("concatenation") <|> n("alternation")
+		"alternation" --> n("expression") <+> n("optional-whitespace") <+> t("|") <+> n("optional-whitespace") <+> n("concatenation")
+		"concatenation" --> n("expression-element") <|> n("concatenation") <+> n("optional-whitespace") <+> t(",") <+> n("optional-whitespace") <+> n("expression-element")
+		"expression-element" --> n("literal") <|> n("rule-name-container") <|> n("expression-group") <|> n("expression-repetition") <|> n("expression-optional") <|> n("expression-multiply")
+		
+		"expression-group" --> t("(") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t(")")
+		"expression-repetition" --> t("{") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("}")
+		"expression-optional" --> t("[") <+> n("optional-whitespace") <+> n("expression") <+> n("optional-whitespace") <+> t("]")
+		"expression-multiply" --> n("number") <+> n("optional-whitespace") <+> t("*") <+> n("optional-whitespace") <+> n("expression-element")
+		
+		"literal" --> t("'") <+> n("string-1") <+> t("'") <|> t("\"") <+> n("string-2") <+> t("\"") <|> n("range-literal")
+		"string-1" --> n("string-1") <+> n("string-1-char") <|> [[]]
+		"string-2" --> n("string-2") <+> n("string-2-char") <|> [[]]
+		
+		"range-literal" --> n("single-char-literal") <+> n("optional-whitespace") <+> t(".") <+> t(".") <+> t(".") <+> n("optional-whitespace") <+> n("single-char-literal")
+		"single-char-literal" --> t("'") <+> n("string-1-char") <+> t("'") <|> t("\"") <+> n("string-2-char") <+> t("\"")
+		
+		// no ', \, \r or \n
+		try! "string-1-char" --> re("[^'\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-single-quote")
+		try! "string-2-char" --> re("[^\"\\\\\r\n]") <|> n("string-escaped-char") <|> n("escaped-double-quote")
+		
+		try! "digit" --> re("[0-9]")
+		"number" --> n("digit") <|> n("number") <+> n("digit")
+		
+		"string-escaped-char" --> n("unicode-scalar") <|> n("carriage-return") <|> n("line-feed") <|> n("tab-char") <|> n("backslash")
+		"unicode-scalar" --> t("\\") <+> t("u") <+> t("{") <+>  n("unicode-scalar-digits") <+> t("}")
+		"unicode-scalar-digits" --> [n("hex-digit")] <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]]) <+> (n("hex-digit") <|> [[]])
+		try! "hex-digit" --> re("[0-9a-fA-F]")
+		
+		"carriage-return" --> t("\\") <+> t("r")
+		"line-feed" --> t("\\") <+> t("n")
+		"tab-char" --> t("\\") <+> t("t")
+		"backslash" --> t("\\") <+> t("\\")
+		"escaped-single-quote" --> t("\\") <+> t("'")
+		"escaped-double-quote" --> t("\\") <+> t("\"")
+	}	
 }
 
 public extension Grammar {
@@ -375,7 +330,7 @@ public extension Grammar {
 		}) && !(productions + helperRules).contains(where: { (production: Production) -> Bool in
 			production.pattern == "EOL"
 		}) {
-			self.init(productions: productions + helperRules + ["EOL" --> t("\n")], start: NonTerminal(name: start), utilityNonTerminals: helperRules.map {$0.pattern}.collect(Set.init))
+			self.init(productions: productions + helperRules + ("EOL" --> t("\n")), start: NonTerminal(name: start), utilityNonTerminals: helperRules.map {$0.pattern}.collect(Set.init))
 		} else {
 			self.init(productions: productions + helperRules, start: NonTerminal(name: start), utilityNonTerminals: helperRules.map {$0.pattern}.collect(Set.init))
 		}

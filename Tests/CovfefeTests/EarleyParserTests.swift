@@ -174,4 +174,12 @@ class EarleyParserTests: XCTestCase {
 			XCTFail()
 		}
 	}
+
+    static var allTests = [
+        ("testEarleyParser1", testEarleyParser1),
+		("testEarleyParser2", testEarleyParser2),
+		("testEarleyEmpty", testEarleyEmpty),
+		("testEarleyJSON", testEarleyJSON),
+		("testEarleyBNF", testEarleyBNF),
+    ]
 }

@@ -238,6 +238,10 @@ extension Grammar: CustomStringConvertible {
 						}
 						
 						return "\(lowerString) ... \(upperString)"
+					
+					case .terminal(.characterSet(let aSet, _)):
+                        // TODO: Using EBNF special sequence to print CharacterSet. Find a solution in BNF.
+						return "? \(aSet) ?"
 					}
 				}.joined(separator: " ")
 			}.joined(separator: " | ")
@@ -307,6 +311,9 @@ extension Grammar: CustomStringConvertible {
 						}
 						
 						return "\(lowerString) ... \(upperString)"
+					
+					case .terminal(.characterSet(let aSet, _)):
+						return "? \(aSet) ?"
 					}
 				}.joined(separator: ", ")
 			}.joined(separator: " | ")
@@ -356,6 +363,9 @@ extension Grammar: CustomStringConvertible {
                         let upperBound = String(range.upperBound.unicodeScalars.first!.value, radix: 16)
                         
                         return "%x\(lowerBound)-\(upperBound)"
+					
+					case .terminal(.characterSet):
+                        fatalError("Character set cannot be expressed in standard ABNF")
                     }
                 }.joined(separator: " ")
             }.joined(separator: " / ")

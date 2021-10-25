@@ -43,11 +43,11 @@ class PrefixGrammarTests: XCTestCase {
 		
 		let UnOperation = "UnOperation" --> n("UnOp") <+> n("Expr")
 		let UnOp = "UnOp" --> t("+") <|> t("-")
-		let Num = try! "Num" --> rt("\\b\\d+(\\.\\d+)?\\b")
-		let Var = try! "Var" --> rt("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
-		let Whitespace = try! "Whitespace" --> rt("\\s+")
+		let Num = try! "Num" --> re("\\b\\d+(\\.\\d+)?\\b")
+		let Var = try! "Var" --> re("\\b[a-zA-Z_][a-zA-Z0-9_]*\\b")
+		let Whitespace = try! "Whitespace" --> re("\\s+")
 		
-		let grammar = Grammar(productions: expression + BinOp + UnOp + [Num, Var, BracketExpr, BinOperation, UnOperation, Whitespace], start: "Expr")
+		let grammar = Grammar(productions: expression + BinOp + UnOp + Num + Var + BracketExpr + BinOperation + UnOperation + Whitespace, start: "Expr")
 		let prefixGrammar = grammar.prefixGrammar()
 		let parser = CYKParser(grammar: prefixGrammar)
 		
@@ -55,4 +55,8 @@ class PrefixGrammarTests: XCTestCase {
 		XCTAssertTrue(parser.recognizes("(a+b)/(c"))
 		XCTAssertFalse(parser.recognizes("(a+)"))
 	}
+
+    static var allTests = [
+        ("testPrefixGrammar", testPrefixGrammar)
+    ]
 }

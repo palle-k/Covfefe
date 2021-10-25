@@ -218,8 +218,11 @@ infix operator --> : ProductionPrecedence
 ///   - lhs: Non-terminal pattern
 ///   - rhs: Produced string of symbols
 /// - Returns: Production with the given pattern and generated result
-public func --> (lhs: NonTerminal, rhs: ProductionString) -> Production {
-	return Production(pattern: lhs, production: rhs)
+///
+/// - Note: The returned array contains exactly 1 item. The operator returns array in order to ensure compatibility
+/// with the `GrammarBuilder`.
+public func --> (lhs: NonTerminal, rhs: ProductionString) ->  [Production] {
+	return [Production(pattern: lhs, production: rhs)]
 }
 
 /// Generates a set of productions from a given non-terminal and produced result
@@ -240,7 +243,10 @@ public func --> (lhs: NonTerminal, rhs: ProductionResult) -> [Production] {
 ///   - lhs: Non-terminal pattern
 ///   - rhs: Produced symbol
 /// - Returns: Production with the given pattern generating the given symbol
-public func --> (lhs: NonTerminal, rhs: Symbol) -> Production {
-	return Production(pattern: lhs, production: [rhs])
+///
+/// - Note: The returned array contains exactly 1 item. The operator returns array in order to ensure compatibility
+/// with the `GrammarBuilder`. 
+public func --> (lhs: NonTerminal, rhs: Symbol) -> [Production] {
+	return [Production(pattern: lhs, production: [rhs])]
 }
 
