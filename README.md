@@ -1,6 +1,6 @@
 # Covfefe
 
-[![Build Status](https://travis-ci.org/palle-k/Covfefe.svg?branch=master)](https://travis-ci.org/palle-k/Covfefe)
+[![Build Status](https://app.travis-ci.com/palle-k/Covfefe.svg?branch=master)](https://app.travis-ci.com/github/palle-k/Covfefe)
 [![docs](https://cdn.rawgit.com/palle-k/Covfefe/66add420af3ce1801629d72ef0eedb9a30af584b/docs/badge.svg)](https://palle-k.github.io/Covfefe/)
 [![CocoaPods](https://img.shields.io/cocoapods/v/Covfefe.svg)](https://cocoapods.org/pods/Covfefe)
 ![CocoaPods](https://img.shields.io/cocoapods/p/Covfefe.svg)
