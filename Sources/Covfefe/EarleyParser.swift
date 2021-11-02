@@ -293,62 +293,15 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			return [SyntaxTree(key: rootItem.production.pattern)]
 		}
 		
-		func resolve(
-			unresolved: ArraySlice<Symbol>,
-			position: Int
-		) -> [[(Int, Either<ParsedItem, Terminal>)]] {
-			guard position <= rootItem.completedIndex else {
-				return []
-			}
-			
-			guard let first = unresolved.first else {
-				if position == rootItem.completedIndex {
-					return [[]]
-				} else {
-					return []
-				}
-			}
-			switch first {
-			case .nonTerminal(let nonTerminal):
-				let candidates = stateCollection[position].lazy.filter { candidate -> Bool in
-					candidate.production.pattern == nonTerminal
-						&& (candidate != rootItem || startIndex != position)
-						&& candidate.completedIndex <= rootItem.completedIndex
-				}
-				let resolvedCandidates = candidates.lazy.flatMap { candidate -> [[(Int, Either<ParsedItem, Terminal>)]] in
-					let resolved = resolve(
-						unresolved: unresolved.dropFirst(),
-						position: candidate.completedIndex
-					)
-					return resolved.map{$0 + [(position, .first(candidate))]}
-				}
-				if ignoreAmbiguousItems {
-					guard let first = resolvedCandidates.first else {
-						return []
-					}
-					return [first]
-				} else {
-					return resolvedCandidates.collect(Array.init)
-				}
-				
-			case .terminal(let terminal):
-				// A terminal can only be scanned if there is at least one token left.
-				guard position < tokenization.count else {
-					return []
-				}
-				// The position might be wrong, so we check that the terminal actually occurred at the current position
-				guard tokenization[position].contains(where: {$0.terminal == terminal}) else {
-					return []
-				}
-				// Try to resolve the rest.
-				let rest = resolve(unresolved: unresolved.dropFirst(), position: position + 1)
-				return rest.map{$0 + [(position, .second(terminal))]}
-			}
-		}
-		
 		// Faster return for unambiguous grammars
 		if ignoreAmbiguousItems {
-			let first = resolve(unresolved: ArraySlice(rootItem.production.production), position: startIndex)[0].reversed()
+			let first = StateProcessor(
+				stateCollection: stateCollection, 
+				tokenization: tokenization, 
+				rootItem: rootItem, 
+				startIndex: startIndex, 
+				ignoreAmbiguousItems: ignoreAmbiguousItems
+			).resolve(unresolved: ArraySlice(rootItem.production.production), position: startIndex)[0].reversed()
 			let children = first.map { (element) -> ParseTree in
 				let (position, root) = element
 				return root.combine({ parsedItem -> ParseTree in
@@ -366,7 +319,13 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			return [ParseTree.node(key: rootItem.production.pattern, children: children)]
 		}
 		
-		let parseTrees = resolve(
+		let parseTrees = StateProcessor(
+			stateCollection: stateCollection, 
+			tokenization: tokenization, 
+			rootItem: rootItem, 
+			startIndex: startIndex, 
+			ignoreAmbiguousItems: ignoreAmbiguousItems
+		).resolve(
 			unresolved: ArraySlice(rootItem.production.production),
 			position: startIndex
 		).map { children -> [(Int, Either<ParsedItem, Terminal>)] in
@@ -564,6 +523,140 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			buildSyntaxTrees(stateCollection: parseStates, tokenization: tokenization, rootItem: match, startIndex: 0, ignoreAmbiguousItems: false).map {
 				$0.explode(grammar.utilityNonTerminals.contains)[0]
 			}
+		}
+	}
+}
+
+private final class StateProcessor {
+	let stateCollection: [Set<ParsedItem>]
+	let tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]
+	let rootItem: ParsedItem
+	let startIndex: Int
+	let ignoreAmbiguousItems: Bool
+
+	init(
+		stateCollection: [Set<ParsedItem>],
+		tokenization: [[(terminal: Terminal, range: Range<String.Index>)]],
+		rootItem: ParsedItem,
+		startIndex: Int,
+		ignoreAmbiguousItems: Bool
+	) {
+		self.stateCollection = stateCollection
+		self.tokenization = tokenization
+		self.rootItem = rootItem
+		self.startIndex = startIndex
+		self.ignoreAmbiguousItems = ignoreAmbiguousItems
+	}
+
+	private var stack = [StateProcessorStackFrame]()
+
+	private enum StateProcessorStackFrame {
+		typealias Result = [[(Int, Either<ParsedItem, Terminal>)]]
+		case nonTerminal(unresolved: ArraySlice<Symbol>, position: Int, result: Result?)
+	} 
+
+
+	func resolve(unresolved: ArraySlice<Symbol>, position: Int) -> [[(Int, Either<ParsedItem, Terminal>)]] {
+		if ignoreAmbiguousItems {
+			return resolveIgnoreAmbiguous(unresolved: unresolved, position: position)
+		} else {
+			return resolveUseAmbiguous(unresolved: unresolved, position: position)
+		}
+	}
+
+	private func resolveUseAmbiguous(unresolved: ArraySlice<Symbol>, position: Int) -> [[(Int, Either<ParsedItem, Terminal>)]] {
+		guard position <= rootItem.completedIndex else {
+			return []
+		}
+		switch unresolved.first {
+		case nil:
+			return position == rootItem.completedIndex ? [[]] : []
+		case .nonTerminal(let nonTerminal)?:
+
+			// FRAME STORE!
+			var result = [[(Int, Either<ParsedItem, Terminal>)]]()
+
+			for index in 0..<stateCollection[position].count {
+				
+				// FRAME STORE!
+				let candidate = stateCollection[position][stateCollection[position].index(stateCollection[position].startIndex, offsetBy: index)]
+				
+				
+				guard candidate.production.pattern == nonTerminal
+					&& (candidate != self.rootItem || self.startIndex != position)
+					&& candidate.completedIndex <= self.rootItem.completedIndex 
+				else {
+					continue
+				}
+				let resolved = self.resolveIgnoreAmbiguous(
+					unresolved: unresolved.dropFirst(),
+					position: candidate.completedIndex
+				)
+				let item = resolved.map{$0 + [(position, .first(candidate))]}
+
+				result.append(contentsOf: item)
+			}
+
+			return result
+		case .terminal(let terminal)?:
+			// A terminal can only be scanned if there is at least one token left.
+			guard position < tokenization.count else {
+				return []
+			}
+			// The position might be wrong, so we check that the terminal actually occurred at the current position
+			guard tokenization[position].contains(where: {$0.terminal == terminal}) else {
+				return []
+			}
+			// Try to resolve the rest.
+			let rest = resolveUseAmbiguous(unresolved: unresolved.dropFirst(), position: position + 1)
+			return rest.map{$0 + [(position, .second(terminal))]}
+		}
+	}
+
+	private func resolveIgnoreAmbiguous(unresolved: ArraySlice<Symbol>, position: Int) -> [[(Int, Either<ParsedItem, Terminal>)]] {
+		guard position <= rootItem.completedIndex else {
+			return []
+		}
+		switch unresolved.first {
+		case nil:
+			return position == rootItem.completedIndex ? [[]] : []
+		case .nonTerminal(let nonTerminal)?:
+			for index in 0..<stateCollection[position].count {
+				
+				// FRAME STORE!
+				let candidate = stateCollection[position][stateCollection[position].index(stateCollection[position].startIndex, offsetBy: index)]
+				
+				
+				guard candidate.production.pattern == nonTerminal
+					&& (candidate != self.rootItem || self.startIndex != position)
+					&& candidate.completedIndex <= self.rootItem.completedIndex 
+				else {
+					continue
+				}
+				let resolved = self.resolveIgnoreAmbiguous(
+					unresolved: unresolved.dropFirst(),
+					position: candidate.completedIndex
+				)
+				let item = resolved.map{$0 + [(position, .first(candidate))]}
+
+				if !item.isEmpty {
+					return item
+				}
+			}
+
+			return []
+		case .terminal(let terminal)?:
+			// A terminal can only be scanned if there is at least one token left.
+			guard position < tokenization.count else {
+				return []
+			}
+			// The position might be wrong, so we check that the terminal actually occurred at the current position
+			guard tokenization[position].contains(where: {$0.terminal == terminal}) else {
+				return []
+			}
+			// Try to resolve the rest.
+			let rest = resolveIgnoreAmbiguous(unresolved: unresolved.dropFirst(), position: position + 1)
+			return rest.map{$0 + [(position, .second(terminal))]}
 		}
 	}
 }
