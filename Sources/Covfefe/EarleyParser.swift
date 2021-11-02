@@ -550,113 +550,130 @@ private final class StateProcessor {
 
 	private var stack = [StateProcessorStackFrame]()
 
+	typealias Result = [[(Int, Either<ParsedItem, Terminal>)]]
 	private enum StateProcessorStackFrame {
-		typealias Result = [[(Int, Either<ParsedItem, Terminal>)]]
-		case nonTerminal(unresolved: ArraySlice<Symbol>, position: Int, result: Result?)
+		case emptyRequest(result: Result)
+		case terminal(Terminal, unresolved: ArraySlice<Symbol>, position: Int, result: Result?)
+		case anonTerminal(NonTerminal, unresolved: ArraySlice<Symbol>, position: Int, resultCollecor: Result, iteratedIndex: Int, result: Result?)
+		case nonTerminal(NonTerminal, unresolved: ArraySlice<Symbol>, position: Int, resultCollecor: Result, iteratedIndex: Int, result: Result?)
 	} 
 
+	private func runMachine() -> Result {
+		var currentResult: Result?
+
+		while let currentFrame = stack.popLast() {
+			switch currentFrame {
+			case .emptyRequest(result: let result),
+				.terminal(_ , unresolved: _, position: _, result: let result?),
+				.nonTerminal(_, unresolved: _, position: _, resultCollecor: _, iteratedIndex: _, result: let result?),
+				.anonTerminal(_, unresolved: _, position: _, resultCollecor: _, iteratedIndex: _, result: let result?):
+				currentResult = result
+			case let .terminal(terminal, unresolved: unresolved, position: position, result: nil):
+				resolveTerminal(terminal, unresolved: unresolved, position: position, result: currentResult)
+				currentResult = nil
+			case let .nonTerminal(nonTerminal, unresolved: unresolved, position: position, resultCollecor: resultCollecor, iteratedIndex: iteratedIndex, result: nil),
+				let .anonTerminal(nonTerminal, unresolved: unresolved, position: position, resultCollecor: resultCollecor, iteratedIndex: iteratedIndex, result: nil):
+				resolveNonTerminal(nonTerminal, unresolved: unresolved, position: position, resultCollecor: resultCollecor, iteratedIndex: iteratedIndex, result: currentResult)
+				currentResult = nil
+			}
+		}
+
+		// Result may never be nil!
+		return currentResult ?? Result()
+	}
+
+	private func appendNew(unresolved: ArraySlice<Symbol>, position: Int) {
+		guard position <= rootItem.completedIndex else {
+			stack.append(.emptyRequest(result: []))
+			return
+		}
+		switch unresolved.first {
+		case nil:
+			stack.append(.emptyRequest(result: position == rootItem.completedIndex ? [[]] : []))
+		case .nonTerminal(let nonTerminal)?:
+			stack.append(.anonTerminal(nonTerminal, unresolved: unresolved, position: position, resultCollecor: Result(), iteratedIndex: 0, result: nil))
+		case .terminal(let terminal)?:
+			stack.append(.terminal(terminal, unresolved: unresolved, position: position, result: nil))
+		}
+	}
+
+	private func resolveTerminal(_ terminal: Terminal, unresolved: ArraySlice<Symbol>, position: Int, result: Result?) {
+		if let result = result {
+			stack.append(.terminal(terminal, unresolved: unresolved, position: position, result: result.map{$0 + [(position, .second(terminal))]}))
+			return
+		}
+
+		// A terminal can only be scanned if there is at least one token left.
+		guard position < tokenization.count else {
+			stack.append(.terminal(terminal, unresolved: unresolved, position: position, result: []))
+			return
+		}
+		// The position might be wrong, so we check that the terminal actually occurred at the current position
+		guard tokenization[position].contains(where: {$0.terminal == terminal}) else {
+			stack.append(.terminal(terminal, unresolved: unresolved, position: position, result: []))
+			return
+		}
+		// Try to resolve the rest.
+		stack.append(.terminal(terminal, unresolved: unresolved, position: position, result: nil))
+		appendNew(unresolved: unresolved.dropFirst(), position: position + 1)
+	}
+
+	private func resolveNonTerminal(_ nonTerminal: NonTerminal, unresolved: ArraySlice<Symbol>, position: Int, resultCollecor: Result, iteratedIndex: Int, result: Result?) {
+		guard !ignoreAmbiguousItems || result == nil || result?.isEmpty == true else {
+			let candidate = stateCollection[position][stateCollection[position].index(stateCollection[position].startIndex, offsetBy: iteratedIndex - 1)]
+			stack.append(.nonTerminal(
+				nonTerminal, 
+				unresolved: unresolved, 
+				position: position, 
+				resultCollecor: resultCollecor, 
+				iteratedIndex: iteratedIndex, 
+				result: result!.map{$0 + [(position, .first(candidate))]}
+			))
+			return
+		}
+
+		var newCollector = resultCollecor
+		if let result = result {
+			let candidate = stateCollection[position][stateCollection[position].index(stateCollection[position].startIndex, offsetBy: iteratedIndex - 1)]
+			newCollector += result.map{$0 + [(position, .first(candidate))]}
+		} 
+
+		if stateCollection[position].count > iteratedIndex {
+			for index in iteratedIndex..<stateCollection[position].count {
+				let iteratedCandidate = stateCollection[position][stateCollection[position].index(stateCollection[position].startIndex, offsetBy: index)]
+
+				guard iteratedCandidate.production.pattern == nonTerminal
+					&& (iteratedCandidate != self.rootItem || self.startIndex != position)
+					&& iteratedCandidate.completedIndex <= self.rootItem.completedIndex 
+				else {
+					continue
+				}
+				stack.append(.nonTerminal(
+					nonTerminal, 
+					unresolved: unresolved, 
+					position: position, 
+					resultCollecor: newCollector, 
+					iteratedIndex: index + 1, 
+					result: nil
+				))
+				appendNew(unresolved: unresolved.dropFirst(), position: iteratedCandidate.completedIndex)
+				return
+			}
+		}
+
+		stack.append(.nonTerminal(
+			nonTerminal, 
+			unresolved: unresolved, 
+			position: position, 
+			resultCollecor: resultCollecor, 
+			iteratedIndex: iteratedIndex, 
+			result: newCollector
+		))
+	}
 
 	func resolve(unresolved: ArraySlice<Symbol>, position: Int) -> [[(Int, Either<ParsedItem, Terminal>)]] {
-		if ignoreAmbiguousItems {
-			return resolveIgnoreAmbiguous(unresolved: unresolved, position: position)
-		} else {
-			return resolveUseAmbiguous(unresolved: unresolved, position: position)
-		}
+		appendNew(unresolved: unresolved, position: position)
+		return runMachine()
 	}
 
-	private func resolveUseAmbiguous(unresolved: ArraySlice<Symbol>, position: Int) -> [[(Int, Either<ParsedItem, Terminal>)]] {
-		guard position <= rootItem.completedIndex else {
-			return []
-		}
-		switch unresolved.first {
-		case nil:
-			return position == rootItem.completedIndex ? [[]] : []
-		case .nonTerminal(let nonTerminal)?:
-
-			// FRAME STORE!
-			var result = [[(Int, Either<ParsedItem, Terminal>)]]()
-
-			for index in 0..<stateCollection[position].count {
-				
-				// FRAME STORE!
-				let candidate = stateCollection[position][stateCollection[position].index(stateCollection[position].startIndex, offsetBy: index)]
-				
-				
-				guard candidate.production.pattern == nonTerminal
-					&& (candidate != self.rootItem || self.startIndex != position)
-					&& candidate.completedIndex <= self.rootItem.completedIndex 
-				else {
-					continue
-				}
-				let resolved = self.resolveIgnoreAmbiguous(
-					unresolved: unresolved.dropFirst(),
-					position: candidate.completedIndex
-				)
-				let item = resolved.map{$0 + [(position, .first(candidate))]}
-
-				result.append(contentsOf: item)
-			}
-
-			return result
-		case .terminal(let terminal)?:
-			// A terminal can only be scanned if there is at least one token left.
-			guard position < tokenization.count else {
-				return []
-			}
-			// The position might be wrong, so we check that the terminal actually occurred at the current position
-			guard tokenization[position].contains(where: {$0.terminal == terminal}) else {
-				return []
-			}
-			// Try to resolve the rest.
-			let rest = resolveUseAmbiguous(unresolved: unresolved.dropFirst(), position: position + 1)
-			return rest.map{$0 + [(position, .second(terminal))]}
-		}
-	}
-
-	private func resolveIgnoreAmbiguous(unresolved: ArraySlice<Symbol>, position: Int) -> [[(Int, Either<ParsedItem, Terminal>)]] {
-		guard position <= rootItem.completedIndex else {
-			return []
-		}
-		switch unresolved.first {
-		case nil:
-			return position == rootItem.completedIndex ? [[]] : []
-		case .nonTerminal(let nonTerminal)?:
-			for index in 0..<stateCollection[position].count {
-				
-				// FRAME STORE!
-				let candidate = stateCollection[position][stateCollection[position].index(stateCollection[position].startIndex, offsetBy: index)]
-				
-				
-				guard candidate.production.pattern == nonTerminal
-					&& (candidate != self.rootItem || self.startIndex != position)
-					&& candidate.completedIndex <= self.rootItem.completedIndex 
-				else {
-					continue
-				}
-				let resolved = self.resolveIgnoreAmbiguous(
-					unresolved: unresolved.dropFirst(),
-					position: candidate.completedIndex
-				)
-				let item = resolved.map{$0 + [(position, .first(candidate))]}
-
-				if !item.isEmpty {
-					return item
-				}
-			}
-
-			return []
-		case .terminal(let terminal)?:
-			// A terminal can only be scanned if there is at least one token left.
-			guard position < tokenization.count else {
-				return []
-			}
-			// The position might be wrong, so we check that the terminal actually occurred at the current position
-			guard tokenization[position].contains(where: {$0.terminal == terminal}) else {
-				return []
-			}
-			// Try to resolve the rest.
-			let rest = resolveIgnoreAmbiguous(unresolved: unresolved.dropFirst(), position: position + 1)
-			return rest.map{$0 + [(position, .second(terminal))]}
-		}
-	}
 }

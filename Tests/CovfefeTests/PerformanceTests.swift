@@ -103,6 +103,7 @@ class PerformanceTests: XCTestCase {
 	}
 
 	func testCYKStackOverflow() {
+		/*
 		let grammar = Grammar(start: "initial") {
             "initial"       --> n("initial") <+> t("a")
                             <|> t()
@@ -111,6 +112,7 @@ class PerformanceTests: XCTestCase {
         let parser = EarleyParser(grammar: grammar)
         let text = String.init(repeating: "a", count: 5000)
         let syntaxTree = try! parser.syntaxTree(for: text )
+		*/
 	}
 
     static var allTests = [

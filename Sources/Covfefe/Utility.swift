@@ -197,6 +197,19 @@ enum Either<A, B> {
 	case second(B)
 }
 
+extension Either: Equatable where A: Equatable, B: Equatable {
+	static func ==(lhs: Either, rhs: Either) -> Bool {
+		switch (lhs, rhs) {
+		case let (.first(lval), .first(rval)) where lval == rval:
+			return true
+		case let (.second(lval), .second(rval)) where lval == rval:
+			return true
+		default:
+			return false
+		}
+	}
+}
+
 extension Either {
 	func map<ResultA, ResultB>(_ transformFirst: (A) throws -> ResultA, _ transformSecond: (B) throws -> ResultB) rethrows -> Either<ResultA, ResultB> {
 		switch self {
