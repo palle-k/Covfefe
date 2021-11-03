@@ -281,85 +281,6 @@ public struct EarleyParser: AmbiguousGrammarParser {
 		return knownItems
 	}
 	
-	private func buildSyntaxTrees(
-		stateCollection: [Set<ParsedItem>],
-		tokenization: [[(terminal: Terminal, range: Range<String.Index>)]],
-		rootItem: ParsedItem,
-		startIndex: Int,
-		ignoreAmbiguousItems: Bool
-	) -> [ParseTree] {
-		
-		guard !rootItem.production.production.isEmpty else {
-			return [SyntaxTree(key: rootItem.production.pattern)]
-		}
-		
-		// Faster return for unambiguous grammars
-		if ignoreAmbiguousItems {
-			let first = StateProcessor(
-				stateCollection: stateCollection, 
-				tokenization: tokenization, 
-				rootItem: rootItem, 
-				startIndex: startIndex, 
-				ignoreAmbiguousItems: ignoreAmbiguousItems
-			).resolve(unresolved: ArraySlice(rootItem.production.production), position: startIndex)[0].reversed()
-			let children = first.map { (element) -> ParseTree in
-				let (position, root) = element
-				return root.combine({ parsedItem -> ParseTree in
-					self.buildSyntaxTrees(
-						stateCollection: stateCollection,
-						tokenization: tokenization,
-						rootItem: parsedItem,
-						startIndex: position,
-						ignoreAmbiguousItems: ignoreAmbiguousItems
-					).first!
-				}, { _ -> ParseTree in
-					return .leaf(tokenization[position].first!.range)
-				})
-			}
-			return [ParseTree.node(key: rootItem.production.pattern, children: children)]
-		}
-		
-		let parseTrees = StateProcessor(
-			stateCollection: stateCollection, 
-			tokenization: tokenization, 
-			rootItem: rootItem, 
-			startIndex: startIndex, 
-			ignoreAmbiguousItems: ignoreAmbiguousItems
-		).resolve(
-			unresolved: ArraySlice(rootItem.production.production),
-			position: startIndex
-		).map { children -> [(Int, Either<ParsedItem, Terminal>)] in
-			children.reversed()
-		}.lazy.flatMap { children -> [[ParseTree]] in
-			children.map { element -> [ParseTree] in
-				let (position, root) = element
-				return root.combine({ parsedItem -> [ParseTree] in
-					self.buildSyntaxTrees(
-						stateCollection: stateCollection,
-						tokenization: tokenization,
-						rootItem: parsedItem,
-						startIndex: position,
-						ignoreAmbiguousItems: ignoreAmbiguousItems
-					)
-				}, { _ -> [ParseTree] in
-					return [.leaf(tokenization[position].first!.range)]
-				})
-			}.combinations()
-		}.map { (children) -> ParseTree in
-			ParseTree.node(key: rootItem.production.pattern, children: children)
-		}
-		
-		if parseTrees.isEmpty {
-			fatalError("Internal error: Could not build syntax tree after successful parse.")
-		}
-		
-		if ignoreAmbiguousItems {
-			return [parseTrees.first!]
-		}
-		
-		return parseTrees.collect(Array.init)
-	}
-	
 	private func parse(_ string: String) throws -> ([Set<ParsedItem>], [[(terminal: Terminal, range: Range<String.Index>)]]) {
 		//TODO: Better support for right recursion
 		
@@ -489,7 +410,7 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			}
 		}
 		
-		return buildSyntaxTrees(stateCollection: parseStates, tokenization: tokenization, rootItem: match, startIndex: 0, ignoreAmbiguousItems: true)[0].explode(grammar.utilityNonTerminals.contains)[0]
+		return SyntaxTreeBuildingMachine(stateCollection: parseStates, tokenization: tokenization, ignoreAmbiguousItems: true).buildSyntaxTrees(rootItem: match, startIndex: 0)[0].explode(grammar.utilityNonTerminals.contains)[0]
 	}
 	
 	/// Generates all syntax trees explaining how a word can be derived from a grammar.
@@ -520,14 +441,105 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			}
 		}
 		return matches.flatMap { match in
-			buildSyntaxTrees(stateCollection: parseStates, tokenization: tokenization, rootItem: match, startIndex: 0, ignoreAmbiguousItems: false).map {
+			SyntaxTreeBuildingMachine(stateCollection: parseStates, tokenization: tokenization, ignoreAmbiguousItems: false).buildSyntaxTrees(rootItem: match, startIndex: 0).map {
 				$0.explode(grammar.utilityNonTerminals.contains)[0]
 			}
 		}
 	}
 }
 
-private final class StateProcessor {
+private final class SyntaxTreeBuildingMachine {
+	private let stateCollection: [Set<ParsedItem>]
+	private let tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]
+	private let ignoreAmbiguousItems: Bool
+
+	init(
+		stateCollection: [Set<ParsedItem>],
+		tokenization: [[(terminal: Terminal, range: Range<String.Index>)]],
+		ignoreAmbiguousItems: Bool
+	) {
+		self.stateCollection = stateCollection
+		self.tokenization = tokenization
+		self.ignoreAmbiguousItems = ignoreAmbiguousItems
+	}
+
+	func buildSyntaxTrees(
+		rootItem: ParsedItem,
+		startIndex: Int
+	) -> [ParseTree] {
+		
+		guard !rootItem.production.production.isEmpty else {
+			return [SyntaxTree(key: rootItem.production.pattern)]
+		}
+
+		// Faster return for unambiguous grammars
+		if ignoreAmbiguousItems {
+			let first = GrammarResolvingMachine(
+				stateCollection: stateCollection, 
+				tokenization: tokenization, 
+				rootItem: rootItem, 
+				startIndex: startIndex, 
+				ignoreAmbiguousItems: ignoreAmbiguousItems
+			).resolve(unresolved: ArraySlice(rootItem.production.production), position: startIndex)[0].reversed()
+			let children = first.map { (element) -> ParseTree in
+				let (position, root) = element
+				return root.combine({ parsedItem -> ParseTree in
+					self.buildSyntaxTrees(
+						rootItem: parsedItem,
+						startIndex: position
+					).first!
+				}, { _ -> ParseTree in
+					return .leaf(tokenization[position].first!.range)
+				})
+			}
+			return [ParseTree.node(key: rootItem.production.pattern, children: children)]
+		}
+		
+		let parseTrees = GrammarResolvingMachine(
+			stateCollection: stateCollection, 
+			tokenization: tokenization, 
+			rootItem: rootItem, 
+			startIndex: startIndex, 
+			ignoreAmbiguousItems: ignoreAmbiguousItems
+		).resolve(
+			unresolved: ArraySlice(rootItem.production.production),
+			position: startIndex
+		).prefix(
+			ignoreAmbiguousItems ? 1 : .max
+		).map { children -> [(Int, Either<ParsedItem, Terminal>)] in
+			children.reversed()
+		}.lazy.flatMap { children -> [[ParseTree]] in
+			let trees = children.map { element -> [ParseTree] in
+				let (position, root) = element
+				return root.combine({ parsedItem -> [ParseTree] in
+					self.buildSyntaxTrees(
+						rootItem: parsedItem,
+						startIndex: position
+					)
+				}, { _ -> [ParseTree] in
+					return [.leaf(self.tokenization[position].first!.range)]
+				})
+			}
+
+			if !self.ignoreAmbiguousItems {
+				return trees.combinations()
+			}
+
+			return trees
+		}.map { (children) -> ParseTree in
+			ParseTree.node(key: rootItem.production.pattern, children: children)
+		}
+		
+		if parseTrees.isEmpty {
+			fatalError("Internal error: Could not build syntax tree after successful parse.")
+		}
+
+		return parseTrees.collect(Array.init)
+	}
+	
+}
+
+private final class GrammarResolvingMachine {
 	typealias Result = [[(Int, Either<ParsedItem, Terminal>)]]
 	
 	private enum StackFrame {
