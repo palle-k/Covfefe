@@ -410,7 +410,7 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			}
 		}
 		
-		return SyntaxTreeBuildingMachine(stateCollection: parseStates, tokenization: tokenization, ignoreAmbiguousItems: true).buildSyntaxTrees(rootItem: match, startIndex: 0)[0].explode(grammar.utilityNonTerminals.contains)[0]
+		return SyntaxTreeNonAmbiguousBuildingMachine(stateCollection: parseStates, tokenization: tokenization).buildSyntaxTrees(rootItem: match, startIndex: 0)[0].explode(grammar.utilityNonTerminals.contains)[0]
 	}
 	
 	/// Generates all syntax trees explaining how a word can be derived from a grammar.
@@ -441,53 +441,40 @@ public struct EarleyParser: AmbiguousGrammarParser {
 			}
 		}
 		return matches.flatMap { match in
-			SyntaxTreeBuildingMachine(stateCollection: parseStates, tokenization: tokenization, ignoreAmbiguousItems: false).buildSyntaxTrees(rootItem: match, startIndex: 0).map {
+			SyntaxTreeAmbiguousBuildingMachine(stateCollection: parseStates, tokenization: tokenization).buildSyntaxTrees(rootItem: match, startIndex: 0).map {
 				$0.explode(grammar.utilityNonTerminals.contains)[0]
 			}
 		}
 	}
 }
 
-private final class SyntaxTreeBuildingMachine {
+private final class SyntaxTreeAmbiguousBuildingMachine {
 	typealias Result = [ParseTree]
 	
 	private enum StackFrame {
 		case result(Result)
-
 		case outerAmbiguousItemsBuildSyntaxTrees(rootItem: ParsedItem, parsed: [[(Int, Either<ParsedItem, Terminal>)]], accumulator: [[ParseTree]], iteratedIndex: Int)
 		case outerResult([[ParseTree]])
 		case innerAmbiguousItemsBuildSyntaxTrees(parsed: [(Int, Either<ParsedItem, Terminal>)], accumulator: [[ParseTree]], iteratedIndex: Int)
-		
-		case innerNonAmbiguousItemsBuildSyntaxTrees(rootItem: ParsedItem, parsed: [(Int, Either<ParsedItem, Terminal>)], accumulator: [ParseTree], iteratedIndex: Int)
+
 	} 
 
 	private let stateCollection: [Set<ParsedItem>]
 	private let tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]
-	private let ignoreAmbiguousItems: Bool
 
 	private var stack = [StackFrame]()
 
-	init(
-		stateCollection: [Set<ParsedItem>],
-		tokenization: [[(terminal: Terminal, range: Range<String.Index>)]],
-		ignoreAmbiguousItems: Bool
-	) {
+	init(stateCollection: [Set<ParsedItem>], tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]) {
 		self.stateCollection = stateCollection
 		self.tokenization = tokenization
-		self.ignoreAmbiguousItems = ignoreAmbiguousItems
 	}
 
 	func buildSyntaxTrees(rootItem: ParsedItem, startIndex: Int) -> Result {
-		if ignoreAmbiguousItems {
-			appendNewNonAmbiguous(rootItem: rootItem, startIndex: startIndex)
-			return runMachine()
-		} else {
-			appendNewAmbiguous(rootItem: rootItem, startIndex: startIndex)
-			return runMachine()
-		}
+		appendNewAmbiguous(rootItem: rootItem, startIndex: startIndex)
+		return runMachine()
 	}
 
-	func runMachine() -> Result {
+	private func runMachine() -> Result {
 		var lastResult: Result?
 		var lastOuterResult: [[ParseTree]]?
 
@@ -496,7 +483,6 @@ private final class SyntaxTreeBuildingMachine {
 			case let .result(result):
 				lastResult = result
 				lastOuterResult = nil
-
 			case let .outerAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: parsed, accumulator: accumulator, iteratedIndex: iteratedIndex):
 				resolveOuterAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: parsed, accumulator: accumulator, iteratedIndex: iteratedIndex, outerResult: lastOuterResult)
 				lastResult = nil
@@ -508,57 +494,10 @@ private final class SyntaxTreeBuildingMachine {
 				resolveInnerAmbiguousItemsBuildSyntaxTrees(parsed: parsed, accumulator: accumulator, iteratedIndex: iteratedIndex, result: lastResult)
 				lastResult = nil
 				lastOuterResult = nil
-			
-			case let .innerNonAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: parsed, accumulator: accumulator, iteratedIndex: iteratedIndex):
-				resolveInnerNonAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: parsed, accumulator: accumulator, iteratedIndex: iteratedIndex, result: lastResult)
-				lastResult = nil
-				lastOuterResult = nil
 			}
 		}
 
 		return lastResult!
-	}
-
-	private func appendNewNonAmbiguous(rootItem: ParsedItem, startIndex: Int) {
-		guard !rootItem.production.production.isEmpty else {
-			stack.append(.result([SyntaxTree(key: rootItem.production.pattern)]))
-			return
-		}
-
-		var first = GrammarResolvingMachine(
-			stateCollection: stateCollection, 
-			tokenization: tokenization, 
-			rootItem: rootItem, 
-			startIndex: startIndex, 
-			ignoreAmbiguousItems: ignoreAmbiguousItems
-		).resolve(unresolved: ArraySlice(rootItem.production.production), position: startIndex)[0]
-		
-		first.reverse()
-
-		stack.append(.innerNonAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: first, accumulator: [ParseTree](), iteratedIndex: 0))
-	}
-
-	private func resolveInnerNonAmbiguousItemsBuildSyntaxTrees(rootItem: ParsedItem, parsed: [(Int, Either<ParsedItem, Terminal>)],  accumulator: [ParseTree], iteratedIndex: Int, result: [ParseTree]?) {
-		var newAccumulator = accumulator
-		if let result = result {
-			newAccumulator.append(result.first!)
-		}
-
-		guard parsed.count > iteratedIndex else {
-			stack.append(.result([ParseTree.node(key: rootItem.production.pattern, children: newAccumulator)]))
-			return
-		}
-
-		let (position, root) = parsed[iteratedIndex]
-
-		switch root {
-		case let .first(parsedItem):
-			stack.append(.innerNonAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: parsed, accumulator: newAccumulator, iteratedIndex: iteratedIndex + 1))
-			appendNewAmbiguous(rootItem: parsedItem, startIndex: position)
-		case .second:
-			stack.append(.innerNonAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: parsed, accumulator: newAccumulator, iteratedIndex: iteratedIndex + 1))
-			stack.append(.result([.leaf(self.tokenization[position].first!.range)]))
-		}
 	}
 
 	private func appendNewAmbiguous(rootItem: ParsedItem, startIndex: Int) {
@@ -572,7 +511,7 @@ private final class SyntaxTreeBuildingMachine {
 			tokenization: tokenization, 
 			rootItem: rootItem, 
 			startIndex: startIndex, 
-			ignoreAmbiguousItems: ignoreAmbiguousItems
+			ignoreAmbiguousItems: false
 		).resolve(
 			unresolved: ArraySlice(rootItem.production.production),
 			position: startIndex
@@ -624,6 +563,89 @@ private final class SyntaxTreeBuildingMachine {
 			appendNewAmbiguous(rootItem: parsedItem, startIndex: position)
 		case .second:
 			stack.append(.innerAmbiguousItemsBuildSyntaxTrees(parsed: parsed, accumulator: newAccumulator, iteratedIndex: iteratedIndex + 1))
+			stack.append(.result([.leaf(self.tokenization[position].first!.range)]))
+		}
+	}
+
+}
+
+private final class SyntaxTreeNonAmbiguousBuildingMachine {
+	typealias Result = [ParseTree]
+	
+	private enum StackFrame {
+		case result(Result)
+		case innerNonAmbiguousItemsBuildSyntaxTrees(rootItem: ParsedItem, parsed: [(Int, Either<ParsedItem, Terminal>)], accumulator: [ParseTree], iteratedIndex: Int)
+	} 
+
+	private let stateCollection: [Set<ParsedItem>]
+	private let tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]
+
+	private var stack = [StackFrame]()
+
+	init(stateCollection: [Set<ParsedItem>], tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]) {
+		self.stateCollection = stateCollection
+		self.tokenization = tokenization
+	}
+
+	func buildSyntaxTrees(rootItem: ParsedItem, startIndex: Int) -> Result {
+		appendNewNonAmbiguous(rootItem: rootItem, startIndex: startIndex)
+		return runMachine()
+	}
+
+	private func runMachine() -> Result {
+		var lastResult: Result?
+
+		while let currentItem = stack.popLast() {
+			switch currentItem {
+			case let .result(result):
+				lastResult = result
+			case let .innerNonAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: parsed, accumulator: accumulator, iteratedIndex: iteratedIndex):
+				resolveInnerNonAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: parsed, accumulator: accumulator, iteratedIndex: iteratedIndex, result: lastResult)
+				lastResult = nil
+			}
+		}
+
+		return lastResult!
+	}
+
+	private func appendNewNonAmbiguous(rootItem: ParsedItem, startIndex: Int) {
+		guard !rootItem.production.production.isEmpty else {
+			stack.append(.result([SyntaxTree(key: rootItem.production.pattern)]))
+			return
+		}
+
+		var first = GrammarResolvingMachine(
+			stateCollection: stateCollection, 
+			tokenization: tokenization, 
+			rootItem: rootItem, 
+			startIndex: startIndex, 
+			ignoreAmbiguousItems: true
+		).resolve(unresolved: ArraySlice(rootItem.production.production), position: startIndex)[0]
+		
+		first.reverse()
+
+		stack.append(.innerNonAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: first, accumulator: [ParseTree](), iteratedIndex: 0))
+	}
+
+	private func resolveInnerNonAmbiguousItemsBuildSyntaxTrees(rootItem: ParsedItem, parsed: [(Int, Either<ParsedItem, Terminal>)],  accumulator: [ParseTree], iteratedIndex: Int, result: [ParseTree]?) {
+		var newAccumulator = accumulator
+		if let result = result {
+			newAccumulator.append(result.first!)
+		}
+
+		guard parsed.count > iteratedIndex else {
+			stack.append(.result([ParseTree.node(key: rootItem.production.pattern, children: newAccumulator)]))
+			return
+		}
+
+		let (position, root) = parsed[iteratedIndex]
+
+		switch root {
+		case let .first(parsedItem):
+			stack.append(.innerNonAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: parsed, accumulator: newAccumulator, iteratedIndex: iteratedIndex + 1))
+			appendNewNonAmbiguous(rootItem: parsedItem, startIndex: position)
+		case .second:
+			stack.append(.innerNonAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: parsed, accumulator: newAccumulator, iteratedIndex: iteratedIndex + 1))
 			stack.append(.result([.leaf(self.tokenization[position].first!.range)]))
 		}
 	}
