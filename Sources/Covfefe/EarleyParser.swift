@@ -528,11 +528,21 @@ public struct EarleyParser: AmbiguousGrammarParser {
 }
 
 private final class StateProcessor {
-	let stateCollection: [Set<ParsedItem>]
-	let tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]
-	let rootItem: ParsedItem
-	let startIndex: Int
-	let ignoreAmbiguousItems: Bool
+	typealias Result = [[(Int, Either<ParsedItem, Terminal>)]]
+	
+	private enum StackFrame {
+		case result(Result)
+		case terminal(Terminal, unresolved: ArraySlice<Symbol>, position: Int)
+		case nonTerminal(NonTerminal, unresolved: ArraySlice<Symbol>, position: Int, resultCollecor: Result, iteratedIndex: Int)
+	} 
+
+	private let stateCollection: [Set<ParsedItem>]
+	private let tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]
+	private let rootItem: ParsedItem
+	private let startIndex: Int
+	private let ignoreAmbiguousItems: Bool
+
+	private var stack = [StackFrame]()
 
 	init(
 		stateCollection: [Set<ParsedItem>],
@@ -548,87 +558,73 @@ private final class StateProcessor {
 		self.ignoreAmbiguousItems = ignoreAmbiguousItems
 	}
 
-	private var stack = [StateProcessorStackFrame]()
 
-	typealias Result = [[(Int, Either<ParsedItem, Terminal>)]]
-	private enum StateProcessorStackFrame {
-		case emptyRequest(result: Result)
-		case terminal(Terminal, unresolved: ArraySlice<Symbol>, position: Int, result: Result?)
-		case anonTerminal(NonTerminal, unresolved: ArraySlice<Symbol>, position: Int, resultCollecor: Result, iteratedIndex: Int, result: Result?)
-		case nonTerminal(NonTerminal, unresolved: ArraySlice<Symbol>, position: Int, resultCollecor: Result, iteratedIndex: Int, result: Result?)
-	} 
+	func resolve(unresolved: ArraySlice<Symbol>, position: Int) -> Result {
+		appendNew(unresolved: unresolved, position: position)
+		return runMachine()
+	}
+
 
 	private func runMachine() -> Result {
 		var currentResult: Result?
 
 		while let currentFrame = stack.popLast() {
 			switch currentFrame {
-			case .emptyRequest(result: let result),
-				.terminal(_ , unresolved: _, position: _, result: let result?),
-				.nonTerminal(_, unresolved: _, position: _, resultCollecor: _, iteratedIndex: _, result: let result?),
-				.anonTerminal(_, unresolved: _, position: _, resultCollecor: _, iteratedIndex: _, result: let result?):
+			case .result(let result):
 				currentResult = result
-			case let .terminal(terminal, unresolved: unresolved, position: position, result: nil):
+			case let .terminal(terminal, unresolved: unresolved, position: position):
 				resolveTerminal(terminal, unresolved: unresolved, position: position, result: currentResult)
 				currentResult = nil
-			case let .nonTerminal(nonTerminal, unresolved: unresolved, position: position, resultCollecor: resultCollecor, iteratedIndex: iteratedIndex, result: nil),
-				let .anonTerminal(nonTerminal, unresolved: unresolved, position: position, resultCollecor: resultCollecor, iteratedIndex: iteratedIndex, result: nil):
+			case let .nonTerminal(nonTerminal, unresolved: unresolved, position: position, resultCollecor: resultCollecor, iteratedIndex: iteratedIndex):
 				resolveNonTerminal(nonTerminal, unresolved: unresolved, position: position, resultCollecor: resultCollecor, iteratedIndex: iteratedIndex, result: currentResult)
 				currentResult = nil
 			}
 		}
 
 		// Result may never be nil!
-		return currentResult ?? Result()
+		return currentResult!
 	}
 
 	private func appendNew(unresolved: ArraySlice<Symbol>, position: Int) {
 		guard position <= rootItem.completedIndex else {
-			stack.append(.emptyRequest(result: []))
+			stack.append(.result([]))
 			return
 		}
 		switch unresolved.first {
 		case nil:
-			stack.append(.emptyRequest(result: position == rootItem.completedIndex ? [[]] : []))
+			stack.append(.result(position == rootItem.completedIndex ? [[]] : []))
 		case .nonTerminal(let nonTerminal)?:
-			stack.append(.anonTerminal(nonTerminal, unresolved: unresolved, position: position, resultCollecor: Result(), iteratedIndex: 0, result: nil))
+			stack.append(.nonTerminal(nonTerminal, unresolved: unresolved, position: position, resultCollecor: Result(), iteratedIndex: 0))
 		case .terminal(let terminal)?:
-			stack.append(.terminal(terminal, unresolved: unresolved, position: position, result: nil))
+			stack.append(.terminal(terminal, unresolved: unresolved, position: position))
 		}
 	}
 
 	private func resolveTerminal(_ terminal: Terminal, unresolved: ArraySlice<Symbol>, position: Int, result: Result?) {
 		if let result = result {
-			stack.append(.terminal(terminal, unresolved: unresolved, position: position, result: result.map{$0 + [(position, .second(terminal))]}))
+			stack.append(.result(result.map{$0 + [(position, .second(terminal))]}))
 			return
 		}
 
 		// A terminal can only be scanned if there is at least one token left.
 		guard position < tokenization.count else {
-			stack.append(.terminal(terminal, unresolved: unresolved, position: position, result: []))
+			stack.append(.result([]))
 			return
 		}
 		// The position might be wrong, so we check that the terminal actually occurred at the current position
 		guard tokenization[position].contains(where: {$0.terminal == terminal}) else {
-			stack.append(.terminal(terminal, unresolved: unresolved, position: position, result: []))
+			stack.append(.result([]))
 			return
 		}
 		// Try to resolve the rest.
-		stack.append(.terminal(terminal, unresolved: unresolved, position: position, result: nil))
+		stack.append(.terminal(terminal, unresolved: unresolved, position: position))
 		appendNew(unresolved: unresolved.dropFirst(), position: position + 1)
 	}
 
 	private func resolveNonTerminal(_ nonTerminal: NonTerminal, unresolved: ArraySlice<Symbol>, position: Int, resultCollecor: Result, iteratedIndex: Int, result: Result?) {
 		guard !ignoreAmbiguousItems || result == nil || result?.isEmpty == true else {
 			let candidate = stateCollection[position][stateCollection[position].index(stateCollection[position].startIndex, offsetBy: iteratedIndex - 1)]
-			stack.append(.nonTerminal(
-				nonTerminal, 
-				unresolved: unresolved, 
-				position: position, 
-				resultCollecor: resultCollecor, 
-				iteratedIndex: iteratedIndex, 
-				result: result!.map{$0 + [(position, .first(candidate))]}
-			))
+			stack.append(.result(result!.map{$0 + [(position, .first(candidate))]}))
 			return
 		}
 
@@ -653,27 +649,13 @@ private final class StateProcessor {
 					unresolved: unresolved, 
 					position: position, 
 					resultCollecor: newCollector, 
-					iteratedIndex: index + 1, 
-					result: nil
+					iteratedIndex: index + 1
 				))
 				appendNew(unresolved: unresolved.dropFirst(), position: iteratedCandidate.completedIndex)
 				return
 			}
 		}
 
-		stack.append(.nonTerminal(
-			nonTerminal, 
-			unresolved: unresolved, 
-			position: position, 
-			resultCollecor: resultCollecor, 
-			iteratedIndex: iteratedIndex, 
-			result: newCollector
-		))
+		stack.append(.result(newCollector))
 	}
-
-	func resolve(unresolved: ArraySlice<Symbol>, position: Int) -> [[(Int, Either<ParsedItem, Terminal>)]] {
-		appendNew(unresolved: unresolved, position: position)
-		return runMachine()
-	}
-
 }
