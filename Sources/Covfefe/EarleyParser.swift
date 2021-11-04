@@ -459,13 +459,13 @@ private final class SyntaxTreeAmbiguousBuildingMachine {
 
 	} 
 
-	private let stateCollection: [Set<ParsedItem>]
+	private let stateCollection: [[ParsedItem]]
 	private let tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]
 
 	private var stack = [StackFrame]()
 
 	init(stateCollection: [Set<ParsedItem>], tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]) {
-		self.stateCollection = stateCollection
+        self.stateCollection = stateCollection.map(Array.init(_:))
 		self.tokenization = tokenization
 	}
 
@@ -577,13 +577,13 @@ private final class SyntaxTreeNonAmbiguousBuildingMachine {
 		case innerNonAmbiguousItemsBuildSyntaxTrees(rootItem: ParsedItem, parsed: [(Int, Either<ParsedItem, Terminal>)], accumulator: [ParseTree], iteratedIndex: Int)
 	} 
 
-	private let stateCollection: [Set<ParsedItem>]
+	private let stateCollection: [[ParsedItem]]
 	private let tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]
 
 	private var stack = [StackFrame]()
 
 	init(stateCollection: [Set<ParsedItem>], tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]) {
-		self.stateCollection = stateCollection
+        self.stateCollection = stateCollection.map(Array.init(_:))
 		self.tokenization = tokenization
 	}
 
@@ -661,7 +661,7 @@ private final class GrammarResolvingMachine {
 		case nonTerminal(NonTerminal, unresolved: ArraySlice<Symbol>, position: Int, resultCollecor: Result, iteratedIndex: Int)
 	} 
 
-	private let stateCollection: [Set<ParsedItem>]
+	private let stateCollection: [[ParsedItem]]
 	private let tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]
 	private let rootItem: ParsedItem
 	private let startIndex: Int
@@ -670,13 +670,13 @@ private final class GrammarResolvingMachine {
 	private var stack = [StackFrame]()
 
 	init(
-		stateCollection: [Set<ParsedItem>],
+		stateCollection: [[ParsedItem]],
 		tokenization: [[(terminal: Terminal, range: Range<String.Index>)]],
 		rootItem: ParsedItem,
 		startIndex: Int,
 		ignoreAmbiguousItems: Bool
 	) {
-		self.stateCollection = stateCollection
+        self.stateCollection = stateCollection
 		self.tokenization = tokenization
 		self.rootItem = rootItem
 		self.startIndex = startIndex
@@ -748,20 +748,20 @@ private final class GrammarResolvingMachine {
 
 	private func resolveNonTerminal(_ nonTerminal: NonTerminal, unresolved: ArraySlice<Symbol>, position: Int, resultCollecor: Result, iteratedIndex: Int, result: Result?) {
 		guard !ignoreAmbiguousItems || result == nil || result?.isEmpty == true else {
-			let candidate = stateCollection[position][stateCollection[position].index(stateCollection[position].startIndex, offsetBy: iteratedIndex - 1)]
+            let candidate = stateCollection[position][iteratedIndex - 1]
 			stack.append(.result(result!.map{$0 + [(position, .first(candidate))]}))
 			return
 		}
 
 		var newCollector = resultCollecor
 		if let result = result {
-			let candidate = stateCollection[position][stateCollection[position].index(stateCollection[position].startIndex, offsetBy: iteratedIndex - 1)]
+			let candidate = stateCollection[position][iteratedIndex - 1]
 			newCollector += result.map{$0 + [(position, .first(candidate))]}
 		} 
 
 		if stateCollection[position].count > iteratedIndex {
 			for index in iteratedIndex..<stateCollection[position].count {
-				let iteratedCandidate = stateCollection[position][stateCollection[position].index(stateCollection[position].startIndex, offsetBy: index)]
+				let iteratedCandidate = stateCollection[position][index]
 
 				guard iteratedCandidate.production.pattern == nonTerminal
 					&& (iteratedCandidate != self.rootItem || self.startIndex != position)
