@@ -98,7 +98,7 @@ class PerformanceTests: XCTestCase {
         }
 
         let parser = EarleyParser(grammar: grammar)
-        let text = String.init(repeating: "a", count: 5000)
+        let text = String.init(repeating: "a", count: 10000)
         let _ = try! parser.syntaxTree(for: text )
 	}
 
