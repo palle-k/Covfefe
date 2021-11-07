@@ -81,6 +81,51 @@ class SyntaxTreeTests: XCTestCase {
 		
 		return Grammar(productions: expression + BinOp + UnOp + Num + Var + BracketExpr + BinOperation + UnOperation + Whitespace, start: "Expr")
 	}
+
+	private var someTree: SyntaxTree<Int, String> = {
+		var tree = SyntaxTree<Int, String>.node(key: 0, children: [
+			.node(key: 10, children: [
+				.node(key: 20, children: [
+					.node(key: 30, children: [
+						.leaf("Leaft 40"),
+					]),
+				]),
+				.node(key: 21, children: [
+					.node(key: 31, children: [
+						.leaf("Leaft 41"),
+						.leaf("Leaft 42"),
+						.leaf("Leaft 43"),
+						.leaf("Leaft 44"),
+						.leaf("Leaft 45"),
+					]),
+					.node(key: 32, children: [
+						.leaf("Leaft 46"),
+						.leaf("Leaft 47"),
+					]),
+				]),
+				.node(key: 22, children: [
+					.leaf("Leaft 30"),
+					.node(key: 33, children: [
+
+					]),
+				]),
+			]),
+			.node(key: 11, children: [
+				.leaf("leaf 20")
+			]),
+			.node(key: 12, children: [
+
+			]),
+			.node(key: 13, children: [
+				.node(key: 23, children: [
+					.leaf("Leaft 31"),
+					.leaf("Leaft 32"),
+				]),
+			]),
+		])
+
+		return tree
+	}()
 	
 	func testTreeDescription() throws {
 		let testString = "((-baz-fooBar)/hello)"
@@ -90,6 +135,6 @@ class SyntaxTreeTests: XCTestCase {
 	}
 
     static var allTests = [
-        ("testTreeDescription", testTreeDescription),
+        ("testTreeDescription", testTreeDescription)
     ]
 }
