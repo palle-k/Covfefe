@@ -131,7 +131,7 @@ extension SyntaxError.Reason: CustomStringConvertible {
 ///
 /// Grammars might be ambiguous. For example, the grammar
 ///
-///  	<expr> ::= <expr> '+' <expr> | 'a'
+///		<expr> ::= <expr> '+' <expr> | 'a'
 ///
 /// can recognize the expression `a+a+a+a` in 5 different ways:
 /// `((a+a)+a)+a`, `(a+(a+a))+a`, `a+(a+(a+a))`, `a+((a+a)+a)`, `(a+a)+(a+a)`.
@@ -188,7 +188,7 @@ extension Grammar: CustomStringConvertible {
 	///
 	/// Example:
 	///
-	///  	<non-terminal-pattern> ::= <produced-non-terminal-pattern> | 'terminal' <concatenated-non-terminal>
+	///		<non-terminal-pattern> ::= <produced-non-terminal-pattern> | 'terminal' <concatenated-non-terminal>
 	public var bnf: String {
 		let groupedProductions = Dictionary(grouping: self.productions) { production in
 			production.pattern
@@ -238,10 +238,6 @@ extension Grammar: CustomStringConvertible {
 						}
 						
 						return "\(lowerString) ... \(upperString)"
-					
-					case .terminal(.characterSet(let aSet, _)):
-                        // TODO: Using EBNF special sequence to print CharacterSet. Find a solution in BNF.
-						return "? \(aSet) ?"
 					}
 				}.joined(separator: " ")
 			}.joined(separator: " | ")
@@ -261,7 +257,7 @@ extension Grammar: CustomStringConvertible {
 	///
 	/// Example:
 	///
-	///  	non-terminal pattern = produced non-terminal | 'terminal', concatenated non-terminal;
+	///		non-terminal pattern = produced non-terminal | 'terminal', concatenated non-terminal;
 	public var ebnf: String {
 		let groupedProductions = Dictionary(grouping: self.productions) { production in
 			production.pattern
@@ -311,9 +307,6 @@ extension Grammar: CustomStringConvertible {
 						}
 						
 						return "\(lowerString) ... \(upperString)"
-					
-					case .terminal(.characterSet(let aSet, _)):
-						return "? \(aSet) ?"
 					}
 				}.joined(separator: ", ")
 			}.joined(separator: " | ")
@@ -363,9 +356,6 @@ extension Grammar: CustomStringConvertible {
                         let upperBound = String(range.upperBound.unicodeScalars.first!.value, radix: 16)
                         
                         return "%x\(lowerBound)-\(upperBound)"
-					
-					case .terminal(.characterSet):
-                        fatalError("Character set cannot be expressed in standard ABNF")
                     }
                 }.joined(separator: " ")
             }.joined(separator: " / ")
