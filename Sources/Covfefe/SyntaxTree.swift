@@ -1,27 +1,27 @@
 //
-//	SyntaxTree.swift
-//	Covfefe
+//  SyntaxTree.swift
+//  Covfefe
 //
-//	Created by Palle Klewitz on 07.08.17.
-//	Copyright (c) 2017 Palle Klewitz
+//  Created by Palle Klewitz on 07.08.17.
+//  Copyright (c) 2017 Palle Klewitz
 //
-//	Permission is hereby granted, free of charge, to any person obtaining a copy
-//	of this software and associated documentation files (the "Software"), to deal
-//	in the Software without restriction, including without limitation the rights
-//	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//	copies of the Software, and to permit persons to whom the Software is
-//	furnished to do so, subject to the following conditions:
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
 //
-//	The above copyright notice and this permission notice shall be included in all
-//	copies or substantial portions of the Software.
+//  The above copyright notice and this permission notice shall be included in all
+//  copies or substantial portions of the Software.
 //
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//	SOFTWARE.
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//  SOFTWARE.
 
 import Foundation
 
@@ -422,8 +422,8 @@ extension SyntaxTree: CustomStringConvertible {
 /// This function returns true, if both trees have the same structure, equal keys in equal nodes and equal leafs
 ///
 /// - Parameters:
-///	  - lhs: First tree to compare
-///	  - rhs: Second tree to compare
+///    - lhs: First tree to compare
+///    - rhs: Second tree to compare
 /// - Returns: A boolean value indicating whether the provided trees are equal to each other
 ///
 /// - Warning: This function is implemented using recursion.
@@ -445,8 +445,8 @@ public extension SyntaxTree {
 	/// Creates a new syntax tree node with a given key and a list of children
 	///
 	/// - Parameters:
-	///	  - key: Root key
-	///	  - children: Children of the root node
+	///    - key: Root key
+	///    - children: Children of the root node
 	init(key: Element, children: [SyntaxTree<Element, LeafElement>]) {
 		self = .node(key: key, children: children)
 	}

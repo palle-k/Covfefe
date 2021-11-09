@@ -32,14 +32,14 @@ public protocol Tokenizer {
 	///
 	/// For a grammar
 	///
-	///		A -> a | A B
-	///		B -> a | B b
+	///  	A -> a | A B
+	///  	B -> a | B b
 	///
 	/// and a string "ab"
 	///
 	/// The tokenizer generates the tokenization
 	///
-	///		[[a], [b]]
+	///  	[[a], [b]]
 	///
 	/// - Parameter word: Word which should be tokenized
 	/// - Returns: Tokenization of the word
@@ -68,14 +68,14 @@ public struct DefaultTokenizer: Tokenizer {
 	///
 	/// For a grammar
 	///
-	///		A -> a | A B
-	///		B -> a | B b
+	///  	A -> a | A B
+	///  	B -> a | B b
 	///
 	/// and a string "ab"
 	///
 	/// The tokenizer generates the tokenization
 	///
-	///		[[a], [b]]
+	///  	[[a], [b]]
 	///
 	/// - Parameter word: Word which should be tokenized
 	/// - Returns: Tokenization of the word

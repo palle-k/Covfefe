@@ -92,7 +92,7 @@ public extension Grammar {
 	/// Creates a new grammar from a specification in Extended Backus-Naur Form (EBNF)
 	///
 	/// 	pattern1 = alternative1 | alternative2;
-	///		pattern2 = 'con', 'catenation';
+	///  	pattern2 = 'con', 'catenation';
 	///
 	/// - Parameters:
 	///   - bnfString: String describing the grammar in EBNF

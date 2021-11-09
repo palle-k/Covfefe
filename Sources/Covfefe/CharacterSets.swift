@@ -75,7 +75,7 @@ extension ProductionString: ExpressibleByArrayLiteral {
 ///
 /// A production result can be used when creating a production rule with different possible productions:
 ///
-///		"A" --> n("B") <|> t("x")
+///  	"A" --> n("B") <|> t("x")
 /// 				 	^ generates a production result
 public struct ProductionResult {
 	

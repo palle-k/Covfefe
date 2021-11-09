@@ -89,7 +89,7 @@ public extension Grammar {
 	/// Creates a new grammar from a specification in Backus-Naur Form (BNF)
 	///
 	/// 	<pattern1> ::= <alternative1> | <alternative2>
-	///		<pattern2> ::= 'con' 'catenation'
+	///  	<pattern2> ::= 'con' 'catenation'
 	///
 	/// - Parameters:
 	///   - bnfString: String describing the grammar in BNF
@@ -102,7 +102,7 @@ public extension Grammar {
 	/// Creates a new grammar from a specification in Backus-Naur Form (BNF)
 	///
 	/// 	<pattern1> ::= <alternative1> | <alternative2>
-	///		<pattern2> ::= 'con' 'catenation'
+	///  	<pattern2> ::= 'con' 'catenation'
 	///
 	/// - Parameters:
 	///   - bnf: String describing the grammar in BNF
