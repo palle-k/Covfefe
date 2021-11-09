@@ -38,8 +38,10 @@ public enum SyntaxTree<Element, LeafElement> {
 }
 
 public extension SyntaxTree {
+	/// Index path which uniquely identifies each node or leaf of the tree.
 	typealias IndexPath = [Int]
 
+	/// Returns an appropriate node for given index path, if exists.
 	subscript(_ indexPath: IndexPath) -> SyntaxTree? {
 		var current = self
 		for index in indexPath {
@@ -58,6 +60,15 @@ public extension SyntaxTree {
 		case children(key: Element, children: [SyntaxTree], index: Int)
 	}
 
+	/// Iterates through tree from top to bottom, from start to end.
+	/// - Parameters:
+	///   - nextSubtree: Iterates through leafs and nodes
+	///   - indexPath: Index path of iterated item
+	///   - currentItem: The iterated item
+	///   - shouldEnterSubtree: Set to `false` in order to avoid iterating subtree. Has no effect if `currentItem` is a leaf.
+	///   - nodeIterarionComplete: Called when all item of the subtree of the node are iterated and iteration proceeds to next item. This is also called if the subtree of the node is not called.
+	///   - key: The key of the node iteration of which was completed.
+	///   - continueIterating: Set to `false` in order to abort the iteration. No more callbacks will be called.
 	func iterate(
 		nextSubtree: (_ indexPath: IndexPath, _ currentItem: SyntaxTree, _ shouldEnterSubtree: inout Bool) throws ->  Void,
 		nodeIterarionComplete: ((_ indexPath: IndexPath, _ key: Element, _ continueIterating: inout Bool) throws -> Void)? = nil
@@ -169,6 +180,11 @@ public extension SyntaxTree {
 
 public extension SyntaxTree {
 
+	/// The reduce operation on the tree from top to bottom, from start to end.
+	/// - Parameters:
+	///   - currentItem: The iterated item
+	///   - result: The inout property which will be returned to the caller
+	///   - shouldContinue: Set to `false` in order to stop iteration and return the result.
 	func reduce<T>(_ initial: T, next: (_ currentItem: SyntaxTree, _ result: inout T, _ shouldContinue: inout Bool) throws ->  Void ) rethrows -> T {
 		var accumulator = initial
 
