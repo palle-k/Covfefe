@@ -1,8 +1,8 @@
 //
-//  PerformanceTests.swift
-//  CovfefeTests
+//	PerformanceTests.swift
+//	CovfefeTests
 //
-//  Created by Palle Klewitz on 17.02.18.
+//	Created by Palle Klewitz on 17.02.18.
 //
 
 import XCTest
@@ -93,29 +93,29 @@ class PerformanceTests: XCTestCase {
 
 	func testErleyStackOverflow() {
 		let grammar = Grammar(start: "initial") {
-            "initial"       --> n("initial") <+> t("a")
-                            <|> t()
-        }
+			"initial"		--> n("initial") <+> t("a")
+							<|> t()
+		}
 
-        let parser = EarleyParser(grammar: grammar)
-        let text = String.init(repeating: "a", count: 10000)
-        let _ = try! parser.syntaxTree(for: text )
+		let parser = EarleyParser(grammar: grammar)
+		let text = String.init(repeating: "a", count: 10000)
+		let _ = try! parser.syntaxTree(for: text )
 	}
 
 	func testErleyAllTreesStackOverflow() {
 		let grammar = Grammar(start: "initial") {
-            "initial"       --> n("initial") <+> t("a")
-                            <|> t()
-        }
+			"initial"		--> n("initial") <+> t("a")
+							<|> t()
+		}
 
-        let parser = EarleyParser(grammar: grammar)
-        let text = String.init(repeating: "a", count: 5000)
-        let _ = try! parser.allSyntaxTrees(for: text )
+		let parser = EarleyParser(grammar: grammar)
+		let text = String.init(repeating: "a", count: 5000)
+		let _ = try! parser.allSyntaxTrees(for: text )
 	}
 
-    static var allTests = [
-        ("testEarleyPerformance", testEarleyPerformance),
-        ("testErleyStackOverflow", testErleyStackOverflow),
+	static var allTests = [
+		("testEarleyPerformance", testEarleyPerformance),
+		("testErleyStackOverflow", testErleyStackOverflow),
 		("testErleyAllTreesStackOverflow", testErleyAllTreesStackOverflow)
-    ]
+	]
 }

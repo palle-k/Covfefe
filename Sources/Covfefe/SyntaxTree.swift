@@ -1,27 +1,27 @@
 //
-//  SyntaxTree.swift
-//  Covfefe
+//	SyntaxTree.swift
+//	Covfefe
 //
-//  Created by Palle Klewitz on 07.08.17.
-//  Copyright (c) 2017 Palle Klewitz
+//	Created by Palle Klewitz on 07.08.17.
+//	Copyright (c) 2017 Palle Klewitz
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
+//	Permission is hereby granted, free of charge, to any person obtaining a copy
+//	of this software and associated documentation files (the "Software"), to deal
+//	in the Software without restriction, including without limitation the rights
+//	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//	copies of the Software, and to permit persons to whom the Software is
+//	furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in all
-//  copies or substantial portions of the Software.
+//	The above copyright notice and this permission notice shall be included in all
+//	copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//  SOFTWARE.
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//	SOFTWARE.
 
 import Foundation
 
@@ -54,30 +54,30 @@ public extension SyntaxTree {
 }
 
 public extension SyntaxTree {
-    private enum IterateStackFrame {
-        case children(key: Element, children: [SyntaxTree], index: Int)
-    }
+	private enum IterateStackFrame {
+		case children(key: Element, children: [SyntaxTree], index: Int)
+	}
 
 	func iterate(
 		nextSubtree: (_ indexPath: IndexPath, _ currentItem: SyntaxTree, _ shouldEnterSubtree: inout Bool) throws ->  Void,
 		nodeIterarionComplete: ((_ indexPath: IndexPath, _ key: Element, _ continueIterating: inout Bool) throws -> Void)? = nil
 	) rethrows {
-        var stack = [IterateStackFrame]()
+		var stack = [IterateStackFrame]()
 		var indexPath = IndexPath()
 
-        func appendNew(_ tree: SyntaxTree) throws {
-            var shouldEnterSubtree = true
-            try nextSubtree(indexPath, tree, &shouldEnterSubtree)
-            if 
-                shouldEnterSubtree,
-                case let .node(key: key, children: children) = tree 
-            {
-                stack.append(.children(key:key, children: children, index: 0))
+		func appendNew(_ tree: SyntaxTree) throws {
+			var shouldEnterSubtree = true
+			try nextSubtree(indexPath, tree, &shouldEnterSubtree)
+			if 
+				shouldEnterSubtree,
+				case let .node(key: key, children: children) = tree 
+			{
+				stack.append(.children(key:key, children: children, index: 0))
 				indexPath.append(0)
-            }
-        }
+			}
+		}
 
-        func resolve(key: Element, children: [SyntaxTree], iteratedIndex: Int) throws {
+		func resolve(key: Element, children: [SyntaxTree], iteratedIndex: Int) throws {
 			indexPath.removeLast()
 
 			guard children.count > iteratedIndex else {
@@ -87,97 +87,97 @@ public extension SyntaxTree {
 					stack.removeAll()
 				}
 				return
-            } 
+			} 
 
 			indexPath.append(iteratedIndex)
-            stack.append(.children(key: key, children: children, index: iteratedIndex + 1))
+			stack.append(.children(key: key, children: children, index: iteratedIndex + 1))
 			try appendNew(children[iteratedIndex])
-        }
+		}
 
-        try appendNew(self)
-        while let currentFrame = stack.popLast() {
-            switch currentFrame {
-            case let .children(key: key, children: children, index: index):
-                try resolve(key: key, children: children, iteratedIndex: index)
-            }
-        }
-    }
+		try appendNew(self)
+		while let currentFrame = stack.popLast() {
+			switch currentFrame {
+			case let .children(key: key, children: children, index: index):
+				try resolve(key: key, children: children, iteratedIndex: index)
+			}
+		}
+	}
 
 }
 
 
 public extension SyntaxTree {
-    private enum ExplostionStackFrame {
-        case result([SyntaxTree])
-        case current(key: Element, children: [SyntaxTree], shouldExplodeResult: Bool, accumulator: [SyntaxTree], iteratedIndex: Int)
-    }
+	private enum ExplostionStackFrame {
+		case result([SyntaxTree])
+		case current(key: Element, children: [SyntaxTree], shouldExplodeResult: Bool, accumulator: [SyntaxTree], iteratedIndex: Int)
+	}
 
 	/// Explodes nodes and passes all child nodes to the parent node if the given closure returns true
 	///
 	/// - Parameter shouldExplode: Determines if a node should be exploded
 	/// - Returns: A tree generated by exploding nodes determined by the given predicate
 	func explode(_ shouldExplode: (Element) throws -> Bool) rethrows -> [SyntaxTree<Element, LeafElement>] {
-        var stack = [ExplostionStackFrame]()
-        var lastResult: [SyntaxTree]?
+		var stack = [ExplostionStackFrame]()
+		var lastResult: [SyntaxTree]?
 
-        func appendNew(_ tree: SyntaxTree) throws {
-            switch tree {
-            case .leaf:
-                stack.append(.result([tree]))
-            case .node(key: let key, children: let children):
-                stack.append(.current(key: key, children: children, shouldExplodeResult: try shouldExplode(key), accumulator: [], iteratedIndex: 0))
-            }
-        }
+		func appendNew(_ tree: SyntaxTree) throws {
+			switch tree {
+			case .leaf:
+				stack.append(.result([tree]))
+			case .node(key: let key, children: let children):
+				stack.append(.current(key: key, children: children, shouldExplodeResult: try shouldExplode(key), accumulator: [], iteratedIndex: 0))
+			}
+		}
 
-        func resolve(key: Element, children: [SyntaxTree], shouldExplodeResult: Bool, accumulator: [SyntaxTree], iteratedIndex: Int, lastResult: [SyntaxTree]?) throws {
-            var newAccumulator = accumulator
-            if let result = lastResult {
-                newAccumulator.append(contentsOf: result)
-            }
+		func resolve(key: Element, children: [SyntaxTree], shouldExplodeResult: Bool, accumulator: [SyntaxTree], iteratedIndex: Int, lastResult: [SyntaxTree]?) throws {
+			var newAccumulator = accumulator
+			if let result = lastResult {
+				newAccumulator.append(contentsOf: result)
+			}
 
-            guard children.count > iteratedIndex else {
-                if shouldExplodeResult {
-                    stack.append(.result(newAccumulator))
-                } else {
-                    stack.append(.result([.node(key: key, children: newAccumulator)]))
-                }
-                return
-            }
+			guard children.count > iteratedIndex else {
+				if shouldExplodeResult {
+					stack.append(.result(newAccumulator))
+				} else {
+					stack.append(.result([.node(key: key, children: newAccumulator)]))
+				}
+				return
+			}
 
-            let child = children[iteratedIndex]
+			let child = children[iteratedIndex]
 
-            stack.append(.current(key: key, children: children, shouldExplodeResult: shouldExplodeResult, accumulator: newAccumulator, iteratedIndex: iteratedIndex + 1))
-            try appendNew(child)
+			stack.append(.current(key: key, children: children, shouldExplodeResult: shouldExplodeResult, accumulator: newAccumulator, iteratedIndex: iteratedIndex + 1))
+			try appendNew(child)
 
-        }
+		}
 
-        try appendNew(self)
+		try appendNew(self)
 
-        while let currentFrame = stack.popLast() {
-            switch currentFrame {
-            case let .result(result):
-                lastResult = result
-            case let .current(key: key, children: children, shouldExplodeResult: shouldExplodeResult, accumulator: accumulator, iteratedIndex: iteratedIndex):
-                try resolve(key: key, children: children, shouldExplodeResult: shouldExplodeResult, accumulator: accumulator, iteratedIndex: iteratedIndex, lastResult: lastResult)
-                lastResult = nil
-            }
-        }
+		while let currentFrame = stack.popLast() {
+			switch currentFrame {
+			case let .result(result):
+				lastResult = result
+			case let .current(key: key, children: children, shouldExplodeResult: shouldExplodeResult, accumulator: accumulator, iteratedIndex: iteratedIndex):
+				try resolve(key: key, children: children, shouldExplodeResult: shouldExplodeResult, accumulator: accumulator, iteratedIndex: iteratedIndex, lastResult: lastResult)
+				lastResult = nil
+			}
+		}
 
-        return lastResult!
+		return lastResult!
 	}
 }
 
 public extension SyntaxTree {
 
-    func reduce<T>(_ initial: T, next: (_ currentItem: SyntaxTree, _ result: inout T, _ shouldContinue: inout Bool) throws ->  Void ) rethrows -> T {
-        var accumulator = initial
+	func reduce<T>(_ initial: T, next: (_ currentItem: SyntaxTree, _ result: inout T, _ shouldContinue: inout Bool) throws ->  Void ) rethrows -> T {
+		var accumulator = initial
 
 		try iterate { _, item, shouldContinue in
 			try next(item, &accumulator, &shouldContinue)
 		}
 
-        return accumulator
-    }
+		return accumulator
+	}
 
 	/// Generates a new syntax tree by applying the transform function to every key of the tree
 	///
@@ -231,10 +231,10 @@ public extension SyntaxTree {
 	/// All leafs of the tree
 	var leafs: [LeafElement] {
 		self.reduce([]) { current, accumulator, _ in
-            if case let .leaf(leaf) = current {
-                accumulator.append(leaf)
-            }
-        }
+			if case let .leaf(leaf) = current {
+				accumulator.append(leaf)
+			}
+		}
 	}
 	
 	/// Filters the tree by removing all nodes and their corresponding subtrees if the given predicate is false
@@ -365,9 +365,9 @@ extension SyntaxTree: CustomStringConvertible {
 			switch tree {
 			case .leaf(let leaf):
 				let (id, leafElement) = leaf
-                let leafDescription = "\(leafElement)"
-                    .literalEscaped
-                    .replacingOccurrences(of: "\"", with: "\\\"")
+				let leafDescription = "\(leafElement)"
+					.literalEscaped
+					.replacingOccurrences(of: "\"", with: "\\\"")
 				return "node\(id) [label=\"\(leafDescription)\" shape=box]"
 				
 			case .node(key: let key, children: let children):
@@ -422,8 +422,8 @@ extension SyntaxTree: CustomStringConvertible {
 /// This function returns true, if both trees have the same structure, equal keys in equal nodes and equal leafs
 ///
 /// - Parameters:
-///   - lhs: First tree to compare
-///   - rhs: Second tree to compare
+///	  - lhs: First tree to compare
+///	  - rhs: Second tree to compare
 /// - Returns: A boolean value indicating whether the provided trees are equal to each other
 ///
 /// - Warning: This function is implemented using recursion.
@@ -445,8 +445,8 @@ public extension SyntaxTree {
 	/// Creates a new syntax tree node with a given key and a list of children
 	///
 	/// - Parameters:
-	///   - key: Root key
-	///   - children: Children of the root node
+	///	  - key: Root key
+	///	  - children: Children of the root node
 	init(key: Element, children: [SyntaxTree<Element, LeafElement>]) {
 		self = .node(key: key, children: children)
 	}

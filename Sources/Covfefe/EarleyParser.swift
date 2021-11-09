@@ -1,27 +1,27 @@
 //
-//  EarleyParser.swift
-//  Covfefe
+//	EarleyParser.swift
+//	Covfefe
 //
-//  Created by Palle Klewitz on 27.08.17.
-//  Copyright (c) 2017 Palle Klewitz
+//	Created by Palle Klewitz on 27.08.17.
+//	Copyright (c) 2017 Palle Klewitz
 //
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
+//	Permission is hereby granted, free of charge, to any person obtaining a copy
+//	of this software and associated documentation files (the "Software"), to deal
+//	in the Software without restriction, including without limitation the rights
+//	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//	copies of the Software, and to permit persons to whom the Software is
+//	furnished to do so, subject to the following conditions:
 //
-//  The above copyright notice and this permission notice shall be included in all
-//  copies or substantial portions of the Software.
+//	The above copyright notice and this permission notice shall be included in all
+//	copies or substantial portions of the Software.
 //
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//  SOFTWARE.
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//	SOFTWARE.
 
 import Foundation
 
@@ -71,10 +71,10 @@ extension ParseStateItem: Hashable {
 	var hashValue: Int {
 		return production.hashValue ^ productionPosition.hashValue ^ (startTokenIndex.hashValue << 32) ^ (startTokenIndex.hashValue >> 32)
 	}
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(hashValue)
-    }
+	
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(hashValue)
+	}
 }
 
 extension ParseStateItem: CustomStringConvertible {
@@ -115,10 +115,10 @@ extension ParsedItem: Hashable {
 	var hashValue: Int {
 		return production.hashValue ^ completedIndex.hashValue
 	}
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(hashValue)
-    }
+	
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(hashValue)
+	}
 	
 	static func ==(lhs: ParsedItem, rhs: ParsedItem) -> Bool {
 		return lhs.production == rhs.production && lhs.completedIndex == rhs.completedIndex
@@ -465,7 +465,7 @@ private final class SyntaxTreeAmbiguousBuildingMachine {
 	private var stack = [StackFrame]()
 
 	init(stateCollection: [Set<ParsedItem>], tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]) {
-        self.stateCollection = stateCollection.map(Array.init(_:))
+		self.stateCollection = stateCollection.map(Array.init(_:))
 		self.tokenization = tokenization
 	}
 
@@ -544,7 +544,7 @@ private final class SyntaxTreeAmbiguousBuildingMachine {
 		stack.append(.innerAmbiguousItemsBuildSyntaxTrees(parsed: anItem, accumulator: [[ParseTree]](), iteratedIndex: 0))
 	}
 
-	private func resolveInnerAmbiguousItemsBuildSyntaxTrees(parsed: [(Int, Either<ParsedItem, Terminal>)],  accumulator: [[ParseTree]], iteratedIndex: Int, result: [ParseTree]?) {
+	private func resolveInnerAmbiguousItemsBuildSyntaxTrees(parsed: [(Int, Either<ParsedItem, Terminal>)],	accumulator: [[ParseTree]], iteratedIndex: Int, result: [ParseTree]?) {
 		var newAccumulator = accumulator
 		if let result = result {
 			newAccumulator.append(result)
@@ -583,7 +583,7 @@ private final class SyntaxTreeNonAmbiguousBuildingMachine {
 	private var stack = [StackFrame]()
 
 	init(stateCollection: [Set<ParsedItem>], tokenization: [[(terminal: Terminal, range: Range<String.Index>)]]) {
-        self.stateCollection = stateCollection.map(Array.init(_:))
+		self.stateCollection = stateCollection.map(Array.init(_:))
 		self.tokenization = tokenization
 	}
 
@@ -627,7 +627,7 @@ private final class SyntaxTreeNonAmbiguousBuildingMachine {
 		stack.append(.innerNonAmbiguousItemsBuildSyntaxTrees(rootItem: rootItem, parsed: first, accumulator: [ParseTree](), iteratedIndex: 0))
 	}
 
-	private func resolveInnerNonAmbiguousItemsBuildSyntaxTrees(rootItem: ParsedItem, parsed: [(Int, Either<ParsedItem, Terminal>)],  accumulator: [ParseTree], iteratedIndex: Int, result: [ParseTree]?) {
+	private func resolveInnerNonAmbiguousItemsBuildSyntaxTrees(rootItem: ParsedItem, parsed: [(Int, Either<ParsedItem, Terminal>)],	 accumulator: [ParseTree], iteratedIndex: Int, result: [ParseTree]?) {
 		var newAccumulator = accumulator
 		if let result = result {
 			newAccumulator.append(result.first!)
@@ -676,7 +676,7 @@ private final class GrammarResolvingMachine {
 		startIndex: Int,
 		ignoreAmbiguousItems: Bool
 	) {
-        self.stateCollection = stateCollection
+		self.stateCollection = stateCollection
 		self.tokenization = tokenization
 		self.rootItem = rootItem
 		self.startIndex = startIndex
@@ -748,7 +748,7 @@ private final class GrammarResolvingMachine {
 
 	private func resolveNonTerminal(_ nonTerminal: NonTerminal, unresolved: ArraySlice<Symbol>, position: Int, resultCollecor: Result, iteratedIndex: Int, result: Result?) {
 		guard !ignoreAmbiguousItems || result == nil || result?.isEmpty == true else {
-            let candidate = stateCollection[position][iteratedIndex - 1]
+			let candidate = stateCollection[position][iteratedIndex - 1]
 			stack.append(.result(result!.map{$0 + [(position, .first(candidate))]}))
 			return
 		}
