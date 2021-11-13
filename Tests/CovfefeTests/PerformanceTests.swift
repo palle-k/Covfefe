@@ -91,7 +91,7 @@ class PerformanceTests: XCTestCase {
 		}
 	}
 
-	func testErleyStackOverflow() {
+	func testEarleyStackOverflow() {
 		let grammar = Grammar(start: "initial") {
 			"initial"		--> n("initial") <+> t("a")
 							<|> t()
@@ -102,7 +102,7 @@ class PerformanceTests: XCTestCase {
 		let _ = try! parser.syntaxTree(for: text )
 	}
 
-	func testErleyAllTreesStackOverflow() {
+	func testEarleyAllTreesStackOverflow() {
 		let grammar = Grammar(start: "initial") {
 			"initial"		--> n("initial") <+> t("a")
 							<|> t()
@@ -115,7 +115,7 @@ class PerformanceTests: XCTestCase {
 
 	static var allTests = [
 		("testEarleyPerformance", testEarleyPerformance),
-		("testErleyStackOverflow", testErleyStackOverflow),
-		("testErleyAllTreesStackOverflow", testErleyAllTreesStackOverflow)
+		("testEarleyStackOverflow", testEarleyStackOverflow),
+		("testEarleyAllTreesStackOverflow", testEarleyAllTreesStackOverflow)
 	]
 }

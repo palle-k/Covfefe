@@ -206,13 +206,13 @@ class SyntaxTreeTests: XCTestCase {
 
 	func testTreeDescription() throws {
 		let testString = "((-baz-fooBar)/hello)"
-		let tree = try EarleyParser(grammar: expressionGrammar).syntaxTree(for: testString).mapLeafs{String(testString[$0])}
+		let tree = try EarleyParser(grammar: expressionGrammar).syntaxTree(for: testString).mapLeaves{String(testString[$0])}
 		let description = tree.description
 		XCTAssertTrue(CYKParser(grammar: dotGrammar).recognizes(description))
 	}
 
 	func testTreeMaps() {
-		let invertedTree = tree1.map(String.init).mapLeafs { Int($0)! }
+		let invertedTree = tree1.map(String.init).mapLeaves { Int($0)! }
 
 		XCTAssertTrue(invertedTree == tree2) 
 	}
@@ -236,21 +236,21 @@ class SyntaxTreeTests: XCTestCase {
 	func testTreeFilter() {
 		let filtered = tree2
 			.filter { Int($0)! % 2 == 1 }!
-			.filterLeafs { abs($0) % 2 == 1 }!
+			.filterLeaves { abs($0) % 2 == 1 }!
 
 		XCTAssertTrue(filtered == tree3)
 
 		XCTAssertTrue(tree4.filter { Int($0)! % 2 == 0 }!.root == "0")
 		XCTAssertTrue(tree4.filter { Int($0)! % 2 == 1 } == nil )
 
-		XCTAssertTrue(tree4.filterLeafs { $0 % 2 == 0 }!.root! == "0")
-		XCTAssertTrue(tree4.filterLeafs { $0 % 2 == 1 }!.root! == "0")
+		XCTAssertTrue(tree4.filterLeaves { $0 % 2 == 0 }!.root! == "0")
+		XCTAssertTrue(tree4.filterLeaves { $0 % 2 == 1 }!.root! == "0")
 
 		XCTAssertTrue(tree5.filter { Int($0)! % 2 == 0 }!.leaf! == 0)
 		XCTAssertTrue(tree5.filter { Int($0)! % 2 == 1 }!.leaf! == 0)
 
-		XCTAssertTrue(tree5.filterLeafs { $0 % 2 == 0 }!.leaf! == 0)
-		XCTAssertTrue(tree5.filterLeafs { $0 % 2 == 1 } == nil )
+		XCTAssertTrue(tree5.filterLeaves { $0 % 2 == 0 }!.leaf! == 0)
+		XCTAssertTrue(tree5.filterLeaves { $0 % 2 == 1 } == nil )
 	}
 
 	static var allTests = [

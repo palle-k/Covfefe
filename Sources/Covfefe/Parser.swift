@@ -26,8 +26,23 @@
 import Foundation
 
 
-/// A syntax tree with non-terminal keys and string range leafs.
+/// A syntax tree with non-terminal keys and string range leaves.
 public typealias ParseTree = SyntaxTree<NonTerminal, Range<String.Index>>
+
+public extension ParseTree {
+
+	/// Searches all leaves of the tree and creates substring, that bounds all of the leaves.
+	///
+	/// - Parameter source: The string upon which the Parse tree was constructed.
+	///
+	/// The tree must contain at least one leaf.
+    func realize(from source: String) -> Substring {
+        let leaves = self.leaves
+        let lower = leaves.map(\.lowerBound).min()!
+        let upper = leaves.map(\.upperBound).max()!
+        return source[lower..<upper]
+    }
+}
 
 /// A parser which can check if a word is in a language
 /// and generate a syntax tree explaining how a word was derived from a grammar
