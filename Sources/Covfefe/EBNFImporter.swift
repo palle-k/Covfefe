@@ -109,7 +109,7 @@ public extension Grammar {
 		let ruleDeclarations = syntaxTree.allNodes(where: {$0.name == "rule"})
 		
 		func ruleName(from container: SyntaxTree<NonTerminal, Range<String.Index>>) -> String {
-			return container.leafs
+			return container.leaves
 				.reduce("") { partialResult, range -> String in
 					partialResult.appending(ebnfString[range])
 			}
@@ -132,7 +132,7 @@ public extension Grammar {
 					fatalError()
 					
 				case .node(key: "unicode-scalar", children: let children):
-					let hexString: String = children.dropFirst(3).dropLast().flatMap {$0.leafs}.map {ebnfString[$0]}.joined()
+					let hexString: String = children.dropFirst(3).dropLast().flatMap {$0.leaves}.map {ebnfString[$0]}.joined()
 					// Grammar guarantees that hexString is always a valid hex integer literal
 					let charValue = Int(hexString, radix: 16)!
 					guard let scalar = UnicodeScalar(charValue) else {
@@ -285,7 +285,7 @@ public extension Grammar {
 					guard let group = children[0].children else {
 						fatalError()
 					}
-					let multiplicityExpression = group[0].leafs
+					let multiplicityExpression = group[0].leaves
 					let multiplicityRange = multiplicityExpression.first!.lowerBound ..< multiplicityExpression.last!.upperBound
 					let multiplicity = Int(ebnfString[multiplicityRange])!
 					

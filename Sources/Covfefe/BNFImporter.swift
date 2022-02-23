@@ -121,7 +121,7 @@ public extension Grammar {
 		func ruleName(from container: SyntaxTree<NonTerminal, Range<String.Index>>) -> String {
 			return container
 				.allNodes(where: {$0.name == "rule-name-char"})
-				.flatMap{$0.leafs}
+				.flatMap{$0.leaves}
 				.reduce("") { partialResult, range -> String in
 					partialResult.appending(bnfString[range])
 			}
@@ -144,7 +144,7 @@ public extension Grammar {
 					fatalError()
 					
 				case .node(key: "unicode-scalar", children: let children):
-					let hexString: String = children.dropFirst(3).dropLast().flatMap {$0.leafs}.map {bnfString[$0]}.joined()
+					let hexString: String = children.dropFirst(3).dropLast().flatMap {$0.leaves}.map {bnfString[$0]}.joined()
 					// Grammar guarantees that hexString is always a valid hex integer literal
 					let charValue = Int(hexString, radix: 16)!
 					guard let scalar = UnicodeScalar(charValue) else {

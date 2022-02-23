@@ -26,7 +26,7 @@
 import Foundation
 
 extension Sequence {
-    @available(*, unavailable, renamed: "allSatisfy")
+	@available(*, unavailable, renamed: "allSatisfy")
 	func allMatch(_ predicate: (Element) throws -> Bool) rethrows -> Bool {
 		return try !self.contains(where: {try !predicate($0)})
 	}
@@ -195,6 +195,19 @@ extension Sequence {
 enum Either<A, B> {
 	case first(A)
 	case second(B)
+}
+
+extension Either: Equatable where A: Equatable, B: Equatable {
+	static func ==(lhs: Either, rhs: Either) -> Bool {
+		switch (lhs, rhs) {
+		case let (.first(lval), .first(rval)) where lval == rval:
+			return true
+		case let (.second(lval), .second(rval)) where lval == rval:
+			return true
+		default:
+			return false
+		}
+	}
 }
 
 extension Either {

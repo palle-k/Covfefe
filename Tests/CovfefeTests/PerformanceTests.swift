@@ -91,7 +91,31 @@ class PerformanceTests: XCTestCase {
 		}
 	}
 
-    static var allTests = [
-        ("testEarleyPerformance", testEarleyPerformance)
-    ]
+	func testEarleyStackOverflow() {
+		let grammar = Grammar(start: "initial") {
+			"initial"		--> n("initial") <+> t("a")
+							<|> t()
+		}
+
+		let parser = EarleyParser(grammar: grammar)
+		let text = String.init(repeating: "a", count: 10000)
+		let _ = try! parser.syntaxTree(for: text )
+	}
+
+	func testEarleyAllTreesStackOverflow() {
+		let grammar = Grammar(start: "initial") {
+			"initial"		--> n("initial") <+> t("a")
+							<|> t()
+		}
+
+		let parser = EarleyParser(grammar: grammar)
+		let text = String.init(repeating: "a", count: 5000)
+		let _ = try! parser.allSyntaxTrees(for: text )
+	}
+
+	static var allTests = [
+		("testEarleyPerformance", testEarleyPerformance),
+		("testEarleyStackOverflow", testEarleyStackOverflow),
+		("testEarleyAllTreesStackOverflow", testEarleyAllTreesStackOverflow)
+	]
 }

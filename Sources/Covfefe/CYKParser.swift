@@ -80,9 +80,9 @@ public struct CYKParser: AmbiguousGrammarParser {
 		}
 		
 		if let firstMember = memberRows[0] {
-			return SyntaxError(range: cykTable[0][firstMember+1][0].leafs.first!, in: string, reason: .unmatchedPattern)
+			return SyntaxError(range: cykTable[0][firstMember+1][0].leaves.first!, in: string, reason: .unmatchedPattern)
 		} else {
-			return SyntaxError(range: cykTable[0][0][0].leafs.first!, in: string, reason: .unmatchedPattern)
+			return SyntaxError(range: cykTable[0][0][0].leaves.first!, in: string, reason: .unmatchedPattern)
 		}
 	}
 	

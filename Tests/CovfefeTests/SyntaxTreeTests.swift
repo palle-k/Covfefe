@@ -27,6 +27,128 @@ import Foundation
 import XCTest
 @testable import Covfefe
 
+
+private let tree1: SyntaxTree<Int, String> = {
+	.node(key: 1, children: [
+		.node(key: 10, children: [
+			.leaf("-10")
+		]),
+		.node(key: 11, children: [
+			.node(key: 20, children: [
+				.node(key: 30, children: [
+					.leaf("-40"),
+				]),
+			]),
+			.node(key: 21, children: [
+				.node(key: 31, children: [
+					.leaf("-41"),
+					.leaf("-42"),
+					.leaf("-43"),
+					.leaf("-44"),
+					.leaf("-45"),
+				]),
+				.node(key: 32, children: [
+					.leaf("-46"),
+					.leaf("-47"),
+				]),
+			]),
+			.node(key: 22, children: [
+				.leaf("-30"),
+				.node(key: 33, children: [
+
+				]),
+			]),
+		]),
+		.node(key: 11, children: [
+			.leaf("-20")
+		]),
+		.node(key: 12, children: [
+
+		]),
+		.node(key: 13, children: [
+			.node(key: 23, children: [
+				.leaf("-31"),
+				.leaf("-32"),
+			]),
+		]),
+	])
+}()
+
+private let tree2: SyntaxTree<String, Int> = {
+	.node(key: "1", children: [
+		.node(key: "10", children: [
+			.leaf(-10)
+		]),
+		.node(key: "11", children: [
+			.node(key: "20", children: [
+				.node(key: "30", children: [
+					.leaf(-40),
+				]),
+			]),
+			.node(key: "21", children: [
+				.node(key: "31", children: [
+					.leaf(-41),
+					.leaf(-42),
+					.leaf(-43),
+					.leaf(-44),
+					.leaf(-45),
+				]),
+				.node(key: "32", children: [
+					.leaf(-46),
+					.leaf(-47),
+				]),
+			]),
+			.node(key: "22", children: [
+				.leaf(-30),
+				.node(key: "33", children: [
+
+				]),
+			]),
+		]),
+		.node(key: "11", children: [
+			.leaf(-20)
+		]),
+		.node(key: "12", children: [
+
+		]),
+		.node(key: "13", children: [
+			.node(key: "23", children: [
+				.leaf(-31),
+				.leaf(-32),
+			]),
+		]),
+	])
+}()
+
+private let tree3: SyntaxTree<String, Int> = {
+	.node(key: "1", children: [
+		.node(key: "11", children: [
+			.node(key: "21", children: [
+				.node(key: "31", children: [
+					.leaf(-41),
+					.leaf(-43),
+					.leaf(-45),
+				]),
+			]),
+		]),
+		.node(key: "11", children: [
+		]),
+		.node(key: "13", children: [
+			.node(key: "23", children: [
+				.leaf(-31),
+			]),
+		]),
+	])
+}()
+
+private let tree4: SyntaxTree<String, Int> = {
+	.node(key: "0", children: [])
+}()
+
+private let tree5: SyntaxTree<String, Int> = {
+	.leaf(0)
+}()
+
 class SyntaxTreeTests: XCTestCase {
 	private var dotGrammar: Grammar {
 		var productions: [Production] = []
@@ -81,15 +203,60 @@ class SyntaxTreeTests: XCTestCase {
 		
 		return Grammar(productions: expression + BinOp + UnOp + Num + Var + BracketExpr + BinOperation + UnOperation + Whitespace, start: "Expr")
 	}
-	
+
 	func testTreeDescription() throws {
 		let testString = "((-baz-fooBar)/hello)"
-		let tree = try EarleyParser(grammar: expressionGrammar).syntaxTree(for: testString).mapLeafs{String(testString[$0])}
+		let tree = try EarleyParser(grammar: expressionGrammar).syntaxTree(for: testString).mapLeaves{String(testString[$0])}
 		let description = tree.description
 		XCTAssertTrue(CYKParser(grammar: dotGrammar).recognizes(description))
 	}
 
-    static var allTests = [
-        ("testTreeDescription", testTreeDescription),
-    ]
+	func testTreeMaps() {
+		let invertedTree = tree1.map(String.init).mapLeaves { Int($0)! }
+
+		XCTAssertTrue(invertedTree == tree2) 
+	}
+
+	func testTreeReduce() {
+		let reduced: [Int] = tree1.reduce([]) { item, accumulator, _ in
+			switch item {
+			case .leaf(let leaf):
+				accumulator.append(Int(leaf)!)
+			case .node(let key, _):
+				accumulator.append(key)
+			}
+		}
+		let expected = [1, 10, -10, 11, 20, 30, -40, 21, 31, -41, -42, -43, -44, -45, 32, -46, -47, 22, -30, 33, 11, -20, 12, 13, 23, -31, -32]
+		XCTAssertTrue(reduced == expected)
+
+		XCTAssertTrue(tree4.reduce([]) { item, result, _ in result.append(item.root!)} == ["0"])
+		XCTAssertTrue(tree5.reduce([]) { item, result, _ in result.append(item.leaf!)} == [0])
+	}
+
+	func testTreeFilter() {
+		let filtered = tree2
+			.filter { Int($0)! % 2 == 1 }!
+			.filterLeaves { abs($0) % 2 == 1 }!
+
+		XCTAssertTrue(filtered == tree3)
+
+		XCTAssertTrue(tree4.filter { Int($0)! % 2 == 0 }!.root == "0")
+		XCTAssertTrue(tree4.filter { Int($0)! % 2 == 1 } == nil )
+
+		XCTAssertTrue(tree4.filterLeaves { $0 % 2 == 0 }!.root! == "0")
+		XCTAssertTrue(tree4.filterLeaves { $0 % 2 == 1 }!.root! == "0")
+
+		XCTAssertTrue(tree5.filter { Int($0)! % 2 == 0 }!.leaf! == 0)
+		XCTAssertTrue(tree5.filter { Int($0)! % 2 == 1 }!.leaf! == 0)
+
+		XCTAssertTrue(tree5.filterLeaves { $0 % 2 == 0 }!.leaf! == 0)
+		XCTAssertTrue(tree5.filterLeaves { $0 % 2 == 1 } == nil )
+	}
+
+	static var allTests = [
+		("testTreeDescription", testTreeDescription),
+		("testTreeMaps", testTreeMaps),
+		("testTreeReduce", testTreeReduce),
+		("testTreeFilter", testTreeFilter)
+	]
 }

@@ -39,7 +39,7 @@ class EarleyParserTests: XCTestCase {
 		let grammar = try Grammar(bnf: grammarString, start: "sum")
 		let parser = EarleyParser(grammar: grammar)
 		let expression = "1+(2*3-4)"
-		_ = try parser.syntaxTree(for: (expression)).mapLeafs{String(expression[$0])}
+		_ = try parser.syntaxTree(for: (expression)).mapLeaves{String(expression[$0])}
 	}
 	
 	func testEarleyParser2() throws {
@@ -58,7 +58,7 @@ class EarleyParserTests: XCTestCase {
 		let grammar = try Grammar(bnf: grammarString, start: "expression")
 		let parser = EarleyParser(grammar: grammar)
 		let expression = "(a+b)*(-c)"
-		_ = try parser.syntaxTree(for: (expression)).mapLeafs{String(expression[$0])}
+		_ = try parser.syntaxTree(for: (expression)).mapLeaves{String(expression[$0])}
 	}
 	
 	func testEarleyEmpty() throws {
@@ -78,7 +78,7 @@ class EarleyParserTests: XCTestCase {
 		let expression = """
 		hello=1337
 		"""
-		_ = try parser.syntaxTree(for: (expression)).mapLeafs{String(expression[$0])}
+		_ = try parser.syntaxTree(for: (expression)).mapLeaves{String(expression[$0])}
 	}
 	
 	func testEarleyJSON() throws {

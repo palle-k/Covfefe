@@ -138,7 +138,7 @@ public extension Grammar {
         }
         
         func parse(nonTerminal: ParseTree) -> NonTerminal {
-            let nt = nonTerminal.leafs.map {abnf[$0]}.joined()
+            let nt = nonTerminal.leaves.map {abnf[$0]}.joined()
             return NonTerminal(name: nt)
         }
         
@@ -146,14 +146,14 @@ public extension Grammar {
             guard case .node(key: "string-literal", children: let children) = stringLiteral else {
                 fatalError("Invalid parse tree")
             }
-            return children.dropFirst().dropLast().flatMap {$0.leafs}.map {abnf[$0]}.joined()
+            return children.dropFirst().dropLast().flatMap {$0.leaves}.map {abnf[$0]}.joined()
         }
         
         func parse(hexInt: ParseTree) throws -> Character {
-            let hexDigits = hexInt.leafs.map {abnf[$0]}.joined()
+            let hexDigits = hexInt.leaves.map {abnf[$0]}.joined()
             
             guard let scalar = UInt32(hexDigits, radix: 16), let unichar = UnicodeScalar(scalar) else {
-                let errorBound = hexInt.leafs[0].lowerBound
+                let errorBound = hexInt.leaves[0].lowerBound
                 throw ABNFImportError.invalidCharcode(
                     line: abnf[...errorBound].filter {$0.isNewline}.count,
                     column: abnf.distance(
@@ -166,10 +166,10 @@ public extension Grammar {
         }
         
         func parse(decInt: ParseTree) throws -> Character {
-            let hexDigits = decInt.leafs.map {abnf[$0]}.joined()
+            let hexDigits = decInt.leaves.map {abnf[$0]}.joined()
             
             guard let scalar = UInt32(hexDigits), let unichar = UnicodeScalar(scalar) else {
-                let errorBound = decInt.leafs[0].lowerBound
+                let errorBound = decInt.leaves[0].lowerBound
                 throw ABNFImportError.invalidCharcode(
                     line: abnf[...errorBound].filter {$0.isNewline}.count,
                     column: abnf.distance(
@@ -215,7 +215,7 @@ public extension Grammar {
             let upperBound = try parse(hexInt: children[4])
             
             if lowerBound > upperBound {
-                let errorBound = hexRangeLiteral.leafs[0].lowerBound
+                let errorBound = hexRangeLiteral.leaves[0].lowerBound
                 throw ABNFImportError.invalidCharacterRange(
                     line: abnf[...errorBound].filter {$0.isNewline}.count,
                     column: abnf.distance(
@@ -236,7 +236,7 @@ public extension Grammar {
             let upperBound = try parse(decInt: children[4])
             
             if lowerBound > upperBound {
-                let errorBound = decimalRangeLiteral.leafs[0].lowerBound
+                let errorBound = decimalRangeLiteral.leaves[0].lowerBound
                 throw ABNFImportError.invalidCharacterRange(
                     line: abnf[...errorBound].filter {$0.isNewline}.count,
                     column: abnf.distance(
@@ -321,7 +321,7 @@ public extension Grammar {
             guard case .node(key: "integer-literal", children: _) = integerLiteral else {
                 fatalError("Invalid parse tree")
             }
-            guard let integer = Int(integerLiteral.leafs.map {abnf[$0]}.joined()) else {
+            guard let integer = Int(integerLiteral.leaves.map {abnf[$0]}.joined()) else {
                 fatalError("Invalid parse tree")
             }
             return integer
@@ -333,10 +333,10 @@ public extension Grammar {
                 let (lowerBound, upperBound) = (parse(integerLiteral: children[0]), parse(integerLiteral: children[2]))
                 if lowerBound > upperBound {
                     throw ABNFImportError.invalidRange(
-                        line: abnf[...range.leafs[0].lowerBound].filter {$0.isNewline}.count,
+                        line: abnf[...range.leaves[0].lowerBound].filter {$0.isNewline}.count,
                         column: abnf.distance(
-                            from: abnf[...range.leafs[0].lowerBound].lastIndex(where: {$0.isNewline}) ?? abnf.startIndex,
-                            to: range.leafs[0].lowerBound
+                            from: abnf[...range.leaves[0].lowerBound].lastIndex(where: {$0.isNewline}) ?? abnf.startIndex,
+                            to: range.leaves[0].lowerBound
                         )
                     )
                 }
